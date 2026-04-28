@@ -1,0 +1,21 @@
+---
+layout: default
+---
+
+<article class="post-card post-card--single fade-in">
+  <time class="post-date" datetime="{{ page.date | date_to_xmlschema }}">
+    {{ page.date | date: "%B %-d, %Y" }}
+  </time>
+
+  {% if page.image %}
+    <img
+      class="post-image"
+      src="{{ page.image | relative_url }}"
+      alt="{{ page.title | default: 'Travel journal photograph' | escape }}"
+    >
+  {% endif %}
+
+  <div class="post-content">
+    {{ content }}
+  </div>
+</article>

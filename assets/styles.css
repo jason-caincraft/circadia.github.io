@@ -1,0 +1,175 @@
+:root {
+  --background: #f7f3eb;
+  --surface: #fbf8f1;
+  --text: #2f2a24;
+  --muted: #7a6e61;
+  --border: rgba(77, 64, 50, 0.12);
+  --shadow: 0 18px 50px rgba(65, 51, 37, 0.08);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  background:
+    radial-gradient(circle at top, rgba(255, 255, 255, 0.85), transparent 38%),
+    linear-gradient(180deg, #f9f5ee 0%, var(--background) 28%, #f4efe7 100%);
+  color: var(--text);
+  font-family: Georgia, "Times New Roman", serif;
+  line-height: 1.8;
+}
+
+img {
+  display: block;
+  max-width: 100%;
+}
+
+a {
+  color: inherit;
+}
+
+.page-shell {
+  width: min(100%, 980px);
+  margin: 0 auto;
+  padding: 3rem 1.5rem 4rem;
+}
+
+.site-header {
+  text-align: center;
+  padding: 2rem 0 3.5rem;
+}
+
+.site-title {
+  color: var(--text);
+  font-size: clamp(2.2rem, 5vw, 3.5rem);
+  letter-spacing: 0.08em;
+  text-decoration: none;
+  text-transform: uppercase;
+}
+
+.site-description {
+  width: min(100%, 32rem);
+  margin: 1rem auto 0;
+  color: var(--muted);
+  font-size: 1rem;
+}
+
+.site-content {
+  width: min(100%, 800px);
+  margin: 0 auto;
+}
+
+.post-card {
+  margin: 0 0 4.5rem;
+  padding: 0 0 1.25rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.post-card--single {
+  margin-bottom: 1rem;
+}
+
+.post-date {
+  display: inline-block;
+  margin-bottom: 1.25rem;
+  color: var(--muted);
+  font-size: 0.95rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.post-image-link {
+  display: block;
+  text-decoration: none;
+}
+
+.post-image {
+  width: 100%;
+  height: auto;
+  border-radius: 16px;
+  box-shadow: var(--shadow);
+  object-fit: cover;
+}
+
+.post-content {
+  margin-top: 1.5rem;
+  font-size: 1.08rem;
+}
+
+.post-content > :first-child {
+  margin-top: 0;
+}
+
+.post-content p {
+  margin: 0 0 1.4rem;
+}
+
+.pagination {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  padding-top: 0.5rem;
+}
+
+.pagination-link {
+  min-width: 6rem;
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.46);
+  text-align: center;
+  text-decoration: none;
+  transition: transform 180ms ease, background-color 180ms ease, border-color 180ms ease;
+}
+
+.pagination-link:hover,
+.pagination-link:focus-visible {
+  background: var(--surface);
+  border-color: rgba(77, 64, 50, 0.24);
+  transform: translateY(-1px);
+}
+
+.pagination-link.is-disabled {
+  color: rgba(47, 42, 36, 0.42);
+  pointer-events: none;
+}
+
+.fade-in {
+  animation: post-fade-in 700ms ease both;
+}
+
+@keyframes post-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (max-width: 640px) {
+  .page-shell {
+    padding: 2rem 1rem 3rem;
+  }
+
+  .site-header {
+    padding-bottom: 2.5rem;
+  }
+
+  .post-card {
+    margin-bottom: 3.5rem;
+  }
+
+  .post-content {
+    font-size: 1rem;
+  }
+}
