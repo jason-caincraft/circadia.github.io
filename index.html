@@ -1,0 +1,24 @@
+---
+layout: default
+title: Home
+---
+
+{% for post in paginator.posts %}
+  {% include post-card.html post=post %}
+{% endfor %}
+
+{% if paginator.total_pages > 1 %}
+  <nav class="pagination" aria-label="Post pagination">
+    {% if paginator.previous_page %}
+      <a class="pagination-link" href="{{ paginator.previous_page_path | relative_url }}">Newer</a>
+    {% else %}
+      <span class="pagination-link is-disabled">Newer</span>
+    {% endif %}
+
+    {% if paginator.next_page %}
+      <a class="pagination-link" href="{{ paginator.next_page_path | relative_url }}">Older</a>
+    {% else %}
+      <span class="pagination-link is-disabled">Older</span>
+    {% endif %}
+  </nav>
+{% endif %}

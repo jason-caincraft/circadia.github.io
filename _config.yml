@@ -1,0 +1,15 @@
+title: Circadia
+description: A quiet travel journal for slow miles, good light, and thoughtful returns.
+theme: null
+markdown: kramdown
+paginate: 10
+paginate_path: "/page:num/"
+plugins:
+  - jekyll-paginate
+permalink: /:year/:month/:day/:title/
+defaults:
+  - scope:
+      path: ""
+      type: posts
+    values:
+      layout: post
