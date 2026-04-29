@@ -1,0 +1,54 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "New Circadia Post",
+      "type": "shell",
+      "command": "npm",
+      "args": [
+        "run",
+        "newpost",
+        "${input:title}",
+        "--",
+        "--image",
+        "${input:image}",
+        "--text",
+        "${input:text}"
+      ],
+      "problemMatcher": []
+    }
+  ],
+  "inputs": [
+    {
+      "id": "title",
+      "type": "promptString",
+      "description": "Post title"
+    },
+    {
+      "id": "image",
+      "type": "command",
+      "command": "extension.commandvariable.file.openDialog",
+      "args": {
+        "canSelect": "files",
+        "defaultUri": "${workspaceFolder}",
+        "title": "Select an image for the new Circadia post",
+        "openLabel": "Use this image",
+        "filters": {
+          "Images": [
+            "jpg",
+            "jpeg",
+            "png",
+            "gif",
+            "webp",
+            "avif"
+          ]
+        }
+      }
+    },
+    {
+      "id": "text",
+      "type": "promptString",
+      "description": "Short field note text"
+    }
+  ]
+}
