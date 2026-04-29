@@ -16,6 +16,12 @@
         "${input:text}"
       ],
       "problemMatcher": []
+    },
+    {
+      "label": "Publish Circadia Post",
+      "type": "shell",
+      "command": "npm run publishpost -- \"${input:commitMessage}\"",
+      "problemMatcher": []
     }
   ],
   "inputs": [
@@ -49,6 +55,12 @@
       "id": "text",
       "type": "promptString",
       "description": "Short field note text"
+    },
+    {
+      "id": "commitMessage",
+      "type": "promptString",
+      "description": "Commit message",
+      "default": "Add new Circadia post"
     }
   ]
 }

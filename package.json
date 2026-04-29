@@ -2,6 +2,7 @@
   "name": "circadia",
   "private": true,
   "scripts": {
-    "newpost": "node scripts/newpost.js"
+    "newpost": "node scripts/newpost.js",
+    "publishpost": "node scripts/publishpost.js"
   }
 }
