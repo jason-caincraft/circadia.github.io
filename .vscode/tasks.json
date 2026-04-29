@@ -3,7 +3,7 @@
   "tasks": [
     {
       "label": "New Circadia Post",
-      "type": "shell",
+      "type": "process",
       "command": "npm",
       "args": [
         "run",
@@ -19,8 +19,14 @@
     },
     {
       "label": "Publish Circadia Post",
-      "type": "shell",
-      "command": "npm run publishpost -- \"${input:commitMessage}\"",
+      "type": "process",
+      "command": "npm",
+      "args": [
+        "run",
+        "publishpost",
+        "--",
+        "${input:commitMessage}"
+      ],
       "problemMatcher": []
     }
   ],
