@@ -30,7 +30,7 @@
       "command": "extension.commandvariable.file.openDialog",
       "args": {
         "canSelect": "files",
-        "defaultUri": "${workspaceFolder}",
+        "defaultUri": "C:\\Users\\terb0\\Downloads\\PostImages",
         "title": "Select an image for the new Circadia post",
         "openLabel": "Use this image",
         "filters": {
