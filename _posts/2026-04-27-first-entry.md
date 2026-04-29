@@ -1,10 +1,11 @@
 ---
 title: First Entry
 image: /images/sample.jpg
+category: camping
+location: "Somewhere off the main road"
+alt: "Camp setup near a trail"
 ---
 
-The road into the valley was still wet from last night's rain, and every turn held a new kind of green. I stopped before sunrise to watch the fog lift off the pines and felt the day arrive in layers: birds first, then the low hum of distant tires, then light settling across the shoulders of the hills.
+Camp went up fast once the wind dropped. Stove on the tailgate, damp boots by the fire ring, and just enough daylight left to mark the trailhead on the map before supper.
 
-By noon I had found a quiet cafe with chipped blue tables and a window facing the river. I wrote postcards I may never send, drank coffee that tasted faintly of orange peel, and let the afternoon pass without trying to organize it into anything more meaningful than a good place to sit.
-
-Travel feels gentlest when I stop asking it to perform. Some days the memory is only a color, a weather pattern, the sound of a chair dragging across stone. That was enough for today.
+Nothing dramatic to report, which is usually a good sign. The notes for this stop are simple: tighten the ridge line next time, bring a second flashlight, and come back when the aspens turn.

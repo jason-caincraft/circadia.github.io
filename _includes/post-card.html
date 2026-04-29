@@ -1,19 +1,48 @@
-<article class="post-card fade-in">
-  <time class="post-date" datetime="{{ include.post.date | date_to_xmlschema }}">
-    {{ include.post.date | date: "%B %-d, %Y" }}
-  </time>
+{% assign category_key = include.post.category | downcase %}
+{% capture category_label %}
+  {% case category_key %}
+    {% when "gardening" %}🌱 Garden
+    {% when "rc-crawling" %}🛻 RC Crawling
+    {% when "fpv" %}✈️ FPV / Aircraft
+    {% when "photography" %}📷 Photography
+    {% when "amateur-radio" %}📻 Amateur Radio
+    {% when "motorcycling" %}🏍️ Motorcycling
+    {% when "camping" %}🏕️ Camping
+    {% when "marksmanship" %}🎯 Marksmanship
+    {% else %}🧭 Field Note
+  {% endcase %}
+{% endcapture %}
 
+<article class="post-card fade-in">
   {% if include.post.image %}
     <a class="post-image-link" href="{{ include.post.url | relative_url }}" aria-label="Read post from {{ include.post.date | date: '%B %-d, %Y' }}">
       <img
         class="post-image"
         src="{{ include.post.image | relative_url }}"
-        alt="{{ include.post.title | default: 'Travel journal photograph' | escape }}"
+        alt="{{ include.post.alt | default: include.post.title | default: 'Field journal image' | escape }}"
       >
     </a>
   {% endif %}
 
-  <div class="post-content">
-    {{ include.post.content }}
+  <div class="post-body">
+    <div class="post-meta">
+      <time class="post-date" datetime="{{ include.post.date | date_to_xmlschema }}">
+        {{ include.post.date | date: "%B %-d, %Y" }}
+      </time>
+      <span class="post-category">{{ category_label | strip }}</span>
+      {% if include.post.location %}
+        <span class="post-location">{{ include.post.location }}</span>
+      {% endif %}
+    </div>
+
+    {% if include.post.title %}
+      <h2 class="post-title">
+        <a class="post-title-link" href="{{ include.post.url | relative_url }}">{{ include.post.title }}</a>
+      </h2>
+    {% endif %}
+
+    <div class="post-content">
+      {{ include.post.content }}
+    </div>
   </div>
 </article>
