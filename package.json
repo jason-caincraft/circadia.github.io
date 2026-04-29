@@ -1,0 +1,7 @@
+{
+  "name": "circadia",
+  "private": true,
+  "scripts": {
+    "newpost": "node scripts/newpost.js"
+  }
+}
