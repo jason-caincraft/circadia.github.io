@@ -3,6 +3,7 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    {% assign meta_description = page.excerpt | default: page.description | default: site.description | strip_html | strip_newlines | truncate: 160 %}
     <title>
       {% if page.title and page.title != "Home" %}
         {{ page.title }} | {{ site.title }}
@@ -10,15 +11,24 @@
         {{ site.title }}
       {% endif %}
     </title>
-    <meta name="description" content="{{ site.description }}">
+    <meta name="description" content="{{ meta_description }}">
     <link rel="stylesheet" href="{{ '/assets/styles.css' | relative_url }}">
   </head>
-  <body>
+  <body class="{% if page.url == '/' %}page-home{% else %}page-inner{% endif %}">
     <div class="page-shell">
-      <header class="site-header">
-        <a class="site-title" href="{{ '/' | relative_url }}">{{ site.title }}</a>
-        <p class="site-description">{{ site.description }}</p>
-      </header>
+      {% unless page.url == '/' %}
+        <header class="site-banner">
+          <a class="site-banner-image-link" href="{{ '/' | relative_url }}" aria-label="Return to homepage">
+            <img
+              class="site-banner-image site-banner-image--compact"
+              src="{{ '/images/caincraft_banner.png' | relative_url }}"
+              alt="CainCraft Circadia banner"
+            >
+          </a>
+          <a class="site-brand" href="{{ '/' | relative_url }}">{{ site.title }}</a>
+          <p class="site-description">{{ site.description }}</p>
+        </header>
+      {% endunless %}
 
       <main class="site-content">
         {{ content }}

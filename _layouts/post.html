@@ -2,16 +2,41 @@
 layout: default
 ---
 
+{% assign category_key = page.category | downcase %}
+{% capture category_label %}
+  {% case category_key %}
+    {% when "gardening" %}🌱 Garden
+    {% when "rc-crawling" %}🛻 RC Crawling
+    {% when "fpv" %}✈️ FPV / Aircraft
+    {% when "photography" %}📷 Photography
+    {% when "amateur-radio" %}📻 Amateur Radio
+    {% when "motorcycling" %}🏍️ Motorcycling
+    {% when "camping" %}🏕️ Camping
+    {% when "marksmanship" %}🎯 Marksmanship
+    {% else %}🧭 Field Note
+  {% endcase %}
+{% endcapture %}
+
 <article class="post-card post-card--single fade-in">
-  <time class="post-date" datetime="{{ page.date | date_to_xmlschema }}">
-    {{ page.date | date: "%B %-d, %Y" }}
-  </time>
+  <div class="post-meta">
+    <time class="post-date" datetime="{{ page.date | date_to_xmlschema }}">
+      {{ page.date | date: "%B %-d, %Y" }}
+    </time>
+    <span class="post-category">{{ category_label | strip }}</span>
+    {% if page.location %}
+      <span class="post-location">{{ page.location }}</span>
+    {% endif %}
+  </div>
+
+  {% if page.title %}
+    <h1 class="post-title">{{ page.title }}</h1>
+  {% endif %}
 
   {% if page.image %}
     <img
       class="post-image"
       src="{{ page.image | relative_url }}"
-      alt="{{ page.title | default: 'Travel journal photograph' | escape }}"
+      alt="{{ page.alt | default: page.title | default: 'Field journal image' | escape }}"
     >
   {% endif %}
 

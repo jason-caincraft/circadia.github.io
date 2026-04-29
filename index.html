@@ -3,9 +3,34 @@ layout: default
 title: Home
 ---
 
-{% for post in paginator.posts %}
-  {% include post-card.html post=post %}
-{% endfor %}
+<section class="hero-panel fade-in" aria-labelledby="site-title">
+  <img
+    class="site-banner-image site-banner-image--hero"
+    src="{{ '/images/caincraft_banner.png' | relative_url }}"
+    alt="CainCraft Circadia banner"
+  >
+  <p class="hero-kicker">Field Journal</p>
+  <h1 class="hero-title" id="site-title">{{ site.title }}</h1>
+  <p class="hero-subtitle">{{ site.subtitle }}</p>
+  <p class="hero-intro">{{ site.intro }}</p>
+
+  <div class="hobby-tags" aria-label="Site hobby themes">
+    <span class="hobby-tag">Garden</span>
+    <span class="hobby-tag">RC Crawling</span>
+    <span class="hobby-tag">FPV</span>
+    <span class="hobby-tag">Photography</span>
+    <span class="hobby-tag">Amateur Radio</span>
+    <span class="hobby-tag">Motorcycling</span>
+    <span class="hobby-tag">Camping</span>
+    <span class="hobby-tag">Marksmanship</span>
+  </div>
+</section>
+
+<section class="feed" aria-label="Field notes archive">
+  {% for post in paginator.posts %}
+    {% include post-card.html post=post %}
+  {% endfor %}
+</section>
 
 {% if paginator.total_pages > 1 %}
   <nav class="pagination" aria-label="Post pagination">
@@ -20,5 +45,7 @@ title: Home
     {% else %}
       <span class="pagination-link is-disabled">Older</span>
     {% endif %}
+
+    <span class="pagination-status">Page {{ paginator.page }} of {{ paginator.total_pages }}</span>
   </nav>
 {% endif %}
