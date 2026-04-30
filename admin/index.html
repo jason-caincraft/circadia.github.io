@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Circadia Admin</title>
+    <meta name="robots" content="noindex, nofollow">
+    <style>
+      :root {
+        color-scheme: light;
+        --ink: #1d1a16;
+        --muted: #6b6258;
+        --paper: #f4efe6;
+        --panel: rgba(255, 252, 246, 0.96);
+        --edge: rgba(81, 66, 48, 0.16);
+        --accent: #9a5d2f;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        background:
+          radial-gradient(circle at top, rgba(154, 93, 47, 0.14), transparent 42%),
+          linear-gradient(180deg, #f7f1e7 0%, #efe6d7 100%);
+        color: var(--ink);
+        font-family: Georgia, "Times New Roman", serif;
+      }
+
+      .admin-shell {
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 2rem;
+      }
+
+      .admin-card {
+        width: min(100%, 42rem);
+        padding: 2rem;
+        border: 1px solid var(--edge);
+        border-radius: 1.5rem;
+        background: var(--panel);
+        box-shadow: 0 1.5rem 4rem rgba(41, 30, 15, 0.12);
+      }
+
+      .admin-kicker {
+        margin: 0 0 0.75rem;
+        color: var(--accent);
+        font: 600 0.8rem/1.2 "Trebuchet MS", "Segoe UI", sans-serif;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+      }
+
+      .admin-title {
+        margin: 0;
+        font-size: clamp(2rem, 5vw, 3rem);
+        line-height: 1;
+      }
+
+      .admin-copy {
+        margin: 1rem 0 0;
+        max-width: 34rem;
+        color: var(--muted);
+        font-size: 1rem;
+        line-height: 1.7;
+      }
+
+      .admin-note {
+        margin-top: 1.25rem;
+        color: var(--muted);
+        font: 0.92rem/1.6 "Trebuchet MS", "Segoe UI", sans-serif;
+      }
+
+      #nc-root {
+        min-height: 1px;
+      }
+
+      @media (max-width: 640px) {
+        .admin-shell {
+          padding: 1rem;
+        }
+
+        .admin-card {
+          padding: 1.5rem;
+          border-radius: 1rem;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div id="nc-root">
+      <main class="admin-shell">
+        <section class="admin-card" aria-labelledby="admin-title">
+          <p class="admin-kicker">Circadia Admin</p>
+          <h1 class="admin-title" id="admin-title">Sign in to write a field note.</h1>
+          <p class="admin-copy">
+            This editor saves posts directly into the GitHub repository that powers
+            <strong>caincraft.com</strong>. Use your GitHub login, then create or update entries in
+            <code>_posts/</code> and upload images into <code>images/</code>.
+          </p>
+          <p class="admin-note">
+            If login does not open, verify the separate OAuth proxy has been deployed and that
+            <code>admin/config.yml</code> points to the right auth domain.
+          </p>
+        </section>
+      </main>
+    </div>
+    <script src="https://unpkg.com/decap-cms@^3.12.2/dist/decap-cms.js"></script>
+  </body>
+</html>

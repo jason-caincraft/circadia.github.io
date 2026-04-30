@@ -1,0 +1,4 @@
+GITHUB_CLIENT_ID=replace-with-your-oauth-client-id
+GITHUB_CLIENT_SECRET=replace-with-your-oauth-client-secret
+GITHUB_SCOPE=public_repo
+GITHUB_ALLOW_SIGNUP=false

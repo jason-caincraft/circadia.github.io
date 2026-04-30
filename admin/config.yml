@@ -1,0 +1,194 @@
+backend:
+  name: github
+  repo: jason-caincraft/circadia.github.io
+  branch: master
+  base_url: https://auth.caincraft.com
+  auth_endpoint: auth
+  site_domain: caincraft.com
+
+site_url: https://caincraft.com
+display_url: https://caincraft.com
+publish_mode: simple
+show_preview_links: false
+media_folder: images
+public_folder: /images
+
+slug:
+  encoding: ascii
+  clean_accents: true
+  sanitize_replacement: "-"
+
+collections:
+  - name: posts
+    label: Posts
+    label_singular: Post
+    description: Field notes and build logs stored in _posts/ as Jekyll markdown files.
+    folder: _posts
+    create: true
+    extension: md
+    format: frontmatter
+    slug: "{{year}}-{{month}}-{{day}}-{{slug}}"
+    preview_path: "{{year}}/{{month}}/{{day}}/{{slug}}/"
+    summary: "{{year}}-{{month}}-{{day}} | {{title}}"
+    sortable_fields:
+      - date
+      - title
+      - category
+      - layout
+    editor:
+      preview: false
+    fields:
+      - label: Layout
+        name: layout
+        widget: select
+        default: post
+        hint: Use build only for workbench-style project logs.
+        options:
+          - post
+          - build
+      - label: Title
+        name: title
+        widget: string
+      - label: Publish Date
+        name: date
+        widget: datetime
+        default: "{{now}}"
+        format: "YYYY-MM-DD HH:mm:ss Z"
+        picker_utc: false
+      - label: Featured Image
+        name: image
+        widget: image
+        required: false
+        choose_url: false
+      - label: Image Alt Text
+        name: alt
+        widget: string
+        required: false
+      - label: Category
+        name: category
+        widget: select
+        required: false
+        options:
+          - gardening
+          - rc-crawling
+          - fpv
+          - photography
+          - amateur-radio
+          - motorcycling
+          - camping
+          - marksmanship
+      - label: Tags
+        name: tags
+        widget: list
+        required: false
+        default: []
+        collapsed: false
+        field:
+          label: Tag
+          name: tag
+          widget: string
+      - label: Mode
+        name: mode
+        widget: select
+        required: false
+        options:
+          - build
+          - explore
+          - test
+          - maintain
+          - observe
+      - label: Location
+        name: location
+        widget: string
+        required: false
+      - label: Coordinates
+        name: coordinates
+        widget: object
+        required: false
+        collapsed: true
+        summary: "{{fields.lat}}, {{fields.lng}}"
+        fields:
+          - label: Latitude
+            name: lat
+            widget: number
+            value_type: float
+            required: false
+          - label: Longitude
+            name: lng
+            widget: number
+            value_type: float
+            required: false
+      - label: Conditions
+        name: conditions
+        widget: object
+        required: false
+        collapsed: true
+        summary: "{{fields.weather}} {{fields.temperature}} {{fields.light}}"
+        fields:
+          - label: Weather
+            name: weather
+            widget: string
+            required: false
+          - label: Temperature
+            name: temperature
+            widget: string
+            required: false
+          - label: Light
+            name: light
+            widget: string
+            required: false
+      - label: Gear
+        name: gear
+        widget: list
+        required: false
+        default: []
+        collapsed: true
+        field:
+          label: Gear Item
+          name: item
+          widget: string
+      - label: Project
+        name: project
+        widget: string
+        required: false
+      - label: Stage
+        name: stage
+        widget: string
+        required: false
+      - label: Parts
+        name: parts
+        widget: list
+        required: false
+        default: []
+        collapsed: true
+        field:
+          label: Part
+          name: item
+          widget: string
+      - label: Changes
+        name: changes
+        widget: list
+        required: false
+        default: []
+        collapsed: true
+        field:
+          label: Change
+          name: item
+          widget: string
+      - label: Lessons
+        name: lessons
+        widget: list
+        required: false
+        default: []
+        collapsed: true
+        field:
+          label: Lesson
+          name: item
+          widget: string
+      - label: Body
+        name: body
+        widget: markdown
+        required: false
+        modes:
+          - raw
+          - rich_text

@@ -1,6 +1,6 @@
 # CainCraft Circadia - Field Notes and Anecdotes
 
-CainCraft Circadia is a static GitHub Pages-friendly Jekyll field journal for projects, places, repairs, rides, flights, radio checks, photos, and small observations. The site stays fully static: no backend, no database, no CMS, no custom Jekyll plugins, and no JavaScript frameworks.
+CainCraft Circadia is a GitHub Pages-friendly Jekyll field journal for projects, places, repairs, rides, flights, radio checks, photos, and small observations. The public site stays static: no database, no custom Jekyll plugins, and no JavaScript framework in the published experience. Authoring can happen either locally with Node helper scripts or in the browser through `/admin/`, which commits back to GitHub through a separate OAuth proxy deployment.
 
 ## Discovery Features
 
@@ -44,6 +44,33 @@ The script:
 - suggests a category from the title and text unless you override it
 - keeps working even if optional metadata is omitted
 - writes an explicit front matter `date:` so the post timestamp and filename stay aligned
+
+## Browser Authoring Workflow
+
+- `/admin/` loads Decap CMS for owner-only browser editing.
+- The CMS writes Markdown posts into `_posts/` and uploads selected images into `images/`.
+- The CMS logs in through GitHub OAuth using a separately deployed proxy service.
+- Browser-created posts use the same front matter fields as the existing Jekyll layouts, search index, archive pages, category pages, and map page.
+
+### CMS Files
+
+- `admin/index.html` is the browser editor shell.
+- `admin/config.yml` defines the GitHub-backed post collection and image upload behavior.
+- `oauth-proxy/` contains the Cloudflare Worker used for the GitHub OAuth popup flow.
+
+### One-Time OAuth Setup
+
+1. Create a GitHub OAuth app for this site.
+2. Deploy the Worker in `oauth-proxy/` to a subdomain such as `https://auth.caincraft.com`.
+3. Set the Worker secrets for `GITHUB_CLIENT_ID` and `GITHUB_CLIENT_SECRET`.
+4. Keep `admin/config.yml` pointed at the deployed auth domain through `backend.base_url`.
+
+Recommended OAuth app values:
+
+- Homepage URL: `https://caincraft.com/admin/`
+- Authorization callback URL: `https://auth.caincraft.com/callback`
+
+For deployment details, see `oauth-proxy/README.md`.
 
 ### EXIF-Assisted Post Creation
 
@@ -188,7 +215,8 @@ See `_posts/2026-04-30-scx6-backyard-suspension-test.md` for a complete working 
 - Search works from a generated static JSON file and browser-side JavaScript.
 - On This Day also uses browser-side JavaScript against the generated static JSON file.
 - EXIF processing is local only in Node and does not run on GitHub Pages.
-- The deployed site remains static and maintainable.
+- `/admin/` is a static route, while authentication is delegated to the separate OAuth proxy deployment.
+- The deployed public site remains static and maintainable.
 
 ## Project Structure
 
@@ -200,6 +228,8 @@ See `_posts/2026-04-30-scx6-backyard-suspension-test.md` for a complete working 
 - `archive.html` builds the archive page at `/archive/`.
 - `category/index.html` builds the category directory page at `/category/`.
 - `category/*.html` builds one static page per category such as `/category/camping/`.
+- `admin/index.html` loads the browser-based post editor at `/admin/`.
+- `admin/config.yml` defines the browser editor schema and GitHub backend settings.
 - `_layouts/default.html` provides the shared page shell and navigation.
 - `_layouts/post.html` renders standard field note pages.
 - `_layouts/build.html` renders project and workbench style entries.
@@ -208,3 +238,4 @@ See `_posts/2026-04-30-scx6-backyard-suspension-test.md` for a complete working 
 - `images/` stores post images.
 - `assets/styles.css` contains the field notebook and workbench theme.
 - `scripts/newpost.js` handles local post generation and optional EXIF extraction.
+- `oauth-proxy/` contains the separate GitHub OAuth Worker for browser login.
