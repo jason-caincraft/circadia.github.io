@@ -119,6 +119,8 @@ alt: "Optional image description"
 
 Everything except `title` is optional. Existing posts without coordinates, conditions, gear, tags, or mode still render normally.
 
+When `location` is provided through the post helper, it is also added to `tags` automatically unless that same tag is already present.
+
 The post date comes from the filename. If you want a post to land on a different day, change the `YYYY-MM-DD` portion of the filename or use `--use-exif` with an image that contains a capture date.
 
 ## Categories
@@ -153,7 +155,7 @@ If `mode` is omitted, nothing is shown.
 - Store post images in `images/`.
 - Reference them from front matter with a site-root path such as `/images/camp.jpg`.
 - Add `alt` text when possible so the image is described for screen readers.
-- Add `location` when a note should show where it happened.
+- Add `location` when a note should show where it happened. The helper also adds that location text to `tags` for easier filtering and search.
 - Add both `coordinates.lat` and `coordinates.lng` when a post should appear on `/map/`.
 
 Posts without coordinates are ignored on the map page. Posts without images, locations, or conditions still render cleanly.

@@ -4,6 +4,9 @@ image: /images/2026-04-30-calculate-our-range-to-target.jpg
 category: marksmanship
 mode: observe
 location: "Oregon"
+coordinates:
+  lat: 43.533085
+  lng: -117.170152
 conditions:
   weather: "Overcast, Winds Calm"
   temperature: "45 F"
