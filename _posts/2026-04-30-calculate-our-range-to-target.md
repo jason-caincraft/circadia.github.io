@@ -5,12 +5,11 @@ category: marksmanship
 mode: observe
 location: "Oregon"
 conditions:
-  weather: "45 Degrees F, Winds Calm"
+  weather: "Overcast, Winds Calm"
   temperature: "45 F"
-  light: "Overcase"
 gear:
   - "Vortex Fury HD 5000"
 alt: "Calculate Our Range to Target"
 ---
 
-Testing out my range-finder.  This is one of my steel targets set up yonder.
+Testing out my range-finder.  This is one of my steel targets set up yonder past the paper target.
