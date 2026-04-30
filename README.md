@@ -43,10 +43,13 @@ The script:
 - copies the selected image into `images/`
 - suggests a category from the title and text unless you override it
 - keeps working even if optional metadata is omitted
+- writes an explicit front matter `date:` so the post timestamp and filename stay aligned
 
 ### EXIF-Assisted Post Creation
 
 The EXIF helper is local only. It runs in `scripts/newpost.js` through Node and never runs during the GitHub Pages build.
+
+The VS Code `New Circadia Post` task now enables EXIF automatically for the selected image. Direct CLI use can still opt in with `--use-exif`.
 
 Example:
 
@@ -56,9 +59,10 @@ npm run newpost "Camp dawn" -- --image ./photos/camp-dawn.jpg --text "Cold air a
 
 When `--use-exif` is passed:
 
-- the script tries to read the image's capture date and uses that date in the post filename
+- the script tries to read the image's capture date and uses that same timestamp for the front matter `date:` field
+- the script uses the capture day in the post filename and copied image filename
 - the script tries to read GPS coordinates and adds them to front matter when found
-- if EXIF data is incomplete or missing, the script continues gracefully and falls back to today's date
+- if EXIF data is incomplete or missing, the script continues gracefully and falls back to the current local date and time
 - if you already pass `--coordinates-lat` and `--coordinates-lng`, those manual values win
 
 EXIF fields that may be detected:
@@ -98,6 +102,7 @@ Use this front matter shape for a standard post:
 ```yaml
 ---
 title: "Post Title"
+date: 2026-04-30 07:18:00 -0600
 image: /images/example.jpg
 category: rc-crawling
 tags: [backyard, testing, suspension]
@@ -117,11 +122,11 @@ alt: "Optional image description"
 ---
 ```
 
-Everything except `title` is optional. Existing posts without coordinates, conditions, gear, tags, or mode still render normally.
+Everything except `title` is optional. The helper now writes `date:` automatically for new posts. Existing posts without coordinates, conditions, gear, tags, or mode still render normally.
 
 When `location` is provided through the post helper, it is also added to `tags` automatically unless that same tag is already present.
 
-The post date comes from the filename. If you want a post to land on a different day, change the `YYYY-MM-DD` portion of the filename or use `--use-exif` with an image that contains a capture date.
+For new helper-generated posts, the filename day and front matter `date:` are kept in sync. If you want a post to land on a different day, change the `YYYY-MM-DD` portion of the filename and the `date:` value together, or use `--use-exif` with an image that contains a capture date.
 
 ## Categories
 

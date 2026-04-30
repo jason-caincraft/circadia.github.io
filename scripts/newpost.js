@@ -270,6 +270,20 @@ function formatDateForFilename(date) {
   return `${date.getFullYear()}-${padNumber(date.getMonth() + 1)}-${padNumber(date.getDate())}`;
 }
 
+function formatDateForFrontMatter(date) {
+  const offsetMinutes = -date.getTimezoneOffset();
+  const sign = offsetMinutes >= 0 ? "+" : "-";
+  const absoluteOffset = Math.abs(offsetMinutes);
+  const offsetHours = padNumber(Math.floor(absoluteOffset / 60));
+  const offsetRemainderMinutes = padNumber(absoluteOffset % 60);
+
+  return [
+    `${date.getFullYear()}-${padNumber(date.getMonth() + 1)}-${padNumber(date.getDate())}`,
+    `${padNumber(date.getHours())}:${padNumber(date.getMinutes())}:${padNumber(date.getSeconds())}`,
+    `${sign}${offsetHours}${offsetRemainderMinutes}`
+  ].join(" ");
+}
+
 function pickExifDate(metadata) {
   if (!metadata || typeof metadata !== "object") {
     return null;
@@ -322,7 +336,8 @@ function pickExifCoordinates(metadata) {
 
 async function readExifMeta(imagePath) {
   const meta = {
-    date: "",
+    captureDate: null,
+    fileDate: "",
     coordinates: null,
     warnings: []
   };
@@ -343,15 +358,16 @@ async function readExifMeta(imagePath) {
     const coordinates = pickExifCoordinates(metadata);
 
     if (exifDate) {
-      meta.date = formatDateForFilename(exifDate);
+      meta.captureDate = exifDate;
+      meta.fileDate = formatDateForFilename(exifDate);
     }
 
     if (coordinates) {
       meta.coordinates = coordinates;
     }
 
-    if (!meta.date) {
-      meta.warnings.push("No EXIF capture date was found. Using today's date instead.");
+    if (!meta.captureDate) {
+      meta.warnings.push("No EXIF capture date was found. Using the current local date and time instead.");
     }
 
     if (!meta.coordinates) {
@@ -417,7 +433,8 @@ async function main() {
   const imagesDir = path.join(process.cwd(), "images");
   const slug = slugify(title);
   const imagePath = normalizeValue(options.image);
-  const defaultDate = formatDateForFilename(new Date());
+  const defaultTimestamp = new Date();
+  const defaultDate = formatDateForFilename(defaultTimestamp);
 
   if (!fs.existsSync(postsDir)) {
     fs.mkdirSync(postsDir);
@@ -437,8 +454,10 @@ async function main() {
   }
 
   let postDate = defaultDate;
+  let postTimestamp = defaultTimestamp;
   let exifMeta = {
-    date: "",
+    captureDate: null,
+    fileDate: "",
     coordinates: null,
     warnings: []
   };
@@ -446,8 +465,9 @@ async function main() {
   if (options.useExif) {
     exifMeta = await readExifMeta(resolvedImagePath);
 
-    if (exifMeta.date) {
-      postDate = exifMeta.date;
+    if (exifMeta.captureDate) {
+      postTimestamp = exifMeta.captureDate;
+      postDate = exifMeta.fileDate;
     }
 
     if (!coordinatesLat && !coordinatesLng && exifMeta.coordinates) {
@@ -485,6 +505,7 @@ async function main() {
     frontMatter.push("layout: build");
   }
   frontMatter.push(`title: ${yamlString(title)}`);
+  frontMatter.push(`date: ${formatDateForFrontMatter(postTimestamp)}`);
   if (imageFrontMatter) {
     frontMatter.push(`image: ${imageFrontMatter}`);
   }
@@ -553,8 +574,8 @@ async function main() {
       console.warn(`EXIF: ${warning}`);
     }
 
-    if (exifMeta.date) {
-      console.log(`EXIF date applied: ${postDate}`);
+    if (exifMeta.captureDate) {
+      console.log(`EXIF capture date applied: ${formatDateForFrontMatter(postTimestamp)}`);
     }
 
     if (exifMeta.coordinates) {
