@@ -13,6 +13,17 @@
   {% endcase %}
 {% endcapture %}
 
+{% assign mode_key = include.post.mode | downcase %}
+{% capture mode_label %}
+  {% case mode_key %}
+    {% when "build" %}🔧 Build
+    {% when "explore" %}🧭 Explore
+    {% when "test" %}🧪 Test
+    {% when "maintain" %}🔁 Maintain
+    {% when "observe" %}👀 Observe
+  {% endcase %}
+{% endcapture %}
+
 <article class="post-card fade-in">
   {% if include.post.image %}
     <a class="post-image-link" href="{{ include.post.url | relative_url }}" aria-label="Read post from {{ include.post.date | date: '%B %-d, %Y' }}">
@@ -29,7 +40,14 @@
       <time class="post-date" datetime="{{ include.post.date | date_to_xmlschema }}">
         {{ include.post.date | date: "%B %-d, %Y" }}
       </time>
-      <span class="post-category">{{ category_label | strip }}</span>
+      {% if include.post.category %}
+        <a class="post-category post-category-link" href="{{ '/category/' | append: category_key | append: '/' | relative_url }}">{{ category_label | strip }}</a>
+      {% else %}
+        <span class="post-category">{{ category_label | strip }}</span>
+      {% endif %}
+      {% if mode_label != blank %}
+        <span class="post-mode">{{ mode_label | strip }}</span>
+      {% endif %}
       {% if include.post.location %}
         <span class="post-location">{{ include.post.location }}</span>
       {% endif %}
@@ -44,5 +62,13 @@
     <div class="post-content">
       {{ include.post.content }}
     </div>
+
+    {% if include.post.tags and include.post.tags != empty %}
+      <ul class="tag-pills" aria-label="Post tags">
+        {% for tag in include.post.tags %}
+          <li class="tag-pill">{{ tag }}</li>
+        {% endfor %}
+      </ul>
+    {% endif %}
   </div>
 </article>

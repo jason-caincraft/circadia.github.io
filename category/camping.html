@@ -1,0 +1,25 @@
+---
+layout: default
+title: Camping
+permalink: /category/camping/
+---
+
+{% assign category_posts = site.posts | where: "category", "camping" %}
+
+<section class="section-panel fade-in">
+  <p class="section-kicker">Category</p>
+  <h1 class="section-title">🏕️ Camping</h1>
+  <p class="section-copy">Camp setups, overnight notes, gear adjustments, and places worth returning to.</p>
+</section>
+
+{% if category_posts.size > 0 %}
+  <section class="feed" aria-label="Camping posts">
+    {% for post in category_posts %}
+      {% include post-card.html post=post %}
+    {% endfor %}
+  </section>
+{% else %}
+  <section class="section-panel fade-in">
+    <p class="empty-note">No camping notes yet. The first one will show up here automatically.</p>
+  </section>
+{% endif %}

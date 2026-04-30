@@ -1,0 +1,25 @@
+---
+layout: default
+title: RC Crawling
+permalink: /category/rc-crawling/
+---
+
+{% assign category_posts = site.posts | where: "category", "rc-crawling" %}
+
+<section class="section-panel fade-in">
+  <p class="section-kicker">Category</p>
+  <h1 class="section-title">🛻 RC Crawling</h1>
+  <p class="section-copy">Trail setups, breakage reports, tuning notes, and low-speed obstacle experiments.</p>
+</section>
+
+{% if category_posts.size > 0 %}
+  <section class="feed" aria-label="RC Crawling posts">
+    {% for post in category_posts %}
+      {% include post-card.html post=post %}
+    {% endfor %}
+  </section>
+{% else %}
+  <section class="section-panel fade-in">
+    <p class="empty-note">No RC crawling notes yet. The first one will show up here automatically.</p>
+  </section>
+{% endif %}

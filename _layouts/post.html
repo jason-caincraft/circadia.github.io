@@ -17,12 +17,30 @@ layout: default
   {% endcase %}
 {% endcapture %}
 
+{% assign mode_key = page.mode | downcase %}
+{% capture mode_label %}
+  {% case mode_key %}
+    {% when "build" %}🔧 Build
+    {% when "explore" %}🧭 Explore
+    {% when "test" %}🧪 Test
+    {% when "maintain" %}🔁 Maintain
+    {% when "observe" %}👀 Observe
+  {% endcase %}
+{% endcapture %}
+
 <article class="post-card post-card--single fade-in">
   <div class="post-meta">
     <time class="post-date" datetime="{{ page.date | date_to_xmlschema }}">
       {{ page.date | date: "%B %-d, %Y" }}
     </time>
-    <span class="post-category">{{ category_label | strip }}</span>
+    {% if page.category %}
+      <a class="post-category post-category-link" href="{{ '/category/' | append: category_key | append: '/' | relative_url }}">{{ category_label | strip }}</a>
+    {% else %}
+      <span class="post-category">{{ category_label | strip }}</span>
+    {% endif %}
+    {% if mode_label != blank %}
+      <span class="post-mode">{{ mode_label | strip }}</span>
+    {% endif %}
     {% if page.location %}
       <span class="post-location">{{ page.location }}</span>
     {% endif %}
@@ -43,4 +61,12 @@ layout: default
   <div class="post-content">
     {{ content }}
   </div>
+
+  {% if page.tags and page.tags != empty %}
+    <ul class="tag-pills" aria-label="Post tags">
+      {% for tag in page.tags %}
+        <li class="tag-pill">{{ tag }}</li>
+      {% endfor %}
+    </ul>
+  {% endif %}
 </article>

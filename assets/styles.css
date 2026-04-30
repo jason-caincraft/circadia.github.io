@@ -77,7 +77,10 @@ a:focus-visible {
 .site-banner,
 .hero-panel,
 .post-card,
-.pagination {
+.pagination,
+.section-panel,
+.archive-panel,
+.directory-card {
   position: relative;
   z-index: 1;
 }
@@ -91,6 +94,11 @@ a:focus-visible {
     linear-gradient(180deg, rgba(255, 255, 255, 0.55), rgba(255, 255, 255, 0.18)),
     var(--surface);
   box-shadow: var(--shadow);
+}
+
+.site-banner--home {
+  padding-top: 1rem;
+  padding-bottom: 1rem;
 }
 
 .site-banner-image-link {
@@ -112,6 +120,14 @@ a:focus-visible {
   margin-bottom: 1rem;
 }
 
+.site-banner-top {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.9rem 1.2rem;
+}
+
 .site-brand {
   display: inline-block;
   font-size: clamp(1.25rem, 2vw, 1.6rem);
@@ -120,12 +136,58 @@ a:focus-visible {
   text-decoration: none;
 }
 
+.site-nav,
+.category-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem;
+}
+
+.site-nav {
+  justify-content: flex-end;
+}
+
+.site-nav-link,
+.category-link {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.45rem 0.85rem;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.52);
+  color: var(--accent);
+  font-family: var(--sans);
+  font-size: 0.9rem;
+  font-weight: 700;
+  text-decoration: none;
+  transition: transform 180ms ease, border-color 180ms ease, background-color 180ms ease;
+}
+
+.site-nav-link:hover,
+.site-nav-link:focus-visible,
+.category-link:hover,
+.category-link:focus-visible {
+  border-color: var(--line-strong);
+  background: rgba(255, 255, 255, 0.78);
+  transform: translateY(-1px);
+}
+
+.site-nav-link.is-current,
+.category-link.is-current {
+  border-color: rgba(109, 90, 58, 0.3);
+  background: rgba(109, 90, 58, 0.12);
+}
+
 .site-description {
   margin: 0.5rem 0 0;
   color: var(--muted);
   font-family: var(--sans);
   font-size: 0.98rem;
   line-height: 1.5;
+}
+
+.category-links--compact {
+  margin-top: 1rem;
 }
 
 .hero-panel {
@@ -147,7 +209,12 @@ a:focus-visible {
 .post-meta,
 .pagination-link,
 .pagination-status,
-.hobby-tag {
+.hobby-tag,
+.section-kicker,
+.archive-entry-meta,
+.tag-pill,
+.directory-count,
+.empty-note {
   font-family: var(--sans);
 }
 
@@ -264,6 +331,21 @@ a:focus-visible {
   font-weight: 700;
 }
 
+.post-category-link {
+  text-decoration: none;
+}
+
+.post-mode {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.35rem 0.7rem;
+  border: 1px solid rgba(63, 94, 74, 0.18);
+  border-radius: 999px;
+  background: rgba(76, 106, 87, 0.08);
+  color: #435c4a;
+  font-weight: 700;
+}
+
 .post-location::before {
   content: "•";
   margin-right: 0.45rem;
@@ -306,6 +388,184 @@ a:focus-visible {
   padding-left: 1rem;
   border-left: 3px solid rgba(109, 90, 58, 0.35);
   color: var(--muted);
+}
+
+.tag-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.55rem;
+  margin: 1.1rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.tag-pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.3rem 0.7rem;
+  border: 1px solid rgba(86, 68, 43, 0.14);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.54);
+  color: var(--muted);
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.section-panel,
+.archive-panel,
+.directory-card {
+  margin-bottom: 1.5rem;
+  padding: 1.35rem 1.35rem 1.5rem;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.58), rgba(255, 255, 255, 0.18)),
+    var(--surface);
+  box-shadow: var(--shadow);
+}
+
+.section-kicker {
+  margin: 0 0 0.85rem;
+  color: var(--accent);
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.section-title {
+  margin: 0;
+  font-size: clamp(2rem, 4vw, 2.9rem);
+  line-height: 1.1;
+}
+
+.section-copy {
+  margin: 0.95rem 0 0;
+  color: var(--muted);
+  font-size: 1.03rem;
+}
+
+.section-copy:last-child {
+  margin-bottom: 0;
+}
+
+.archive-year + .archive-year {
+  margin-top: 1.75rem;
+}
+
+.archive-year-heading,
+.archive-month-heading {
+  margin: 0;
+  font-weight: 700;
+  line-height: 1.15;
+}
+
+.archive-year-heading {
+  margin-bottom: 1rem;
+  font-size: clamp(1.8rem, 3vw, 2.2rem);
+}
+
+.archive-month + .archive-month {
+  margin-top: 1.25rem;
+}
+
+.archive-month-heading {
+  margin-bottom: 0.8rem;
+  color: var(--accent);
+  font-size: 1.2rem;
+}
+
+.archive-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.archive-entry + .archive-entry {
+  margin-top: 0.8rem;
+  padding-top: 0.8rem;
+  border-top: 1px dashed rgba(86, 68, 43, 0.16);
+}
+
+.archive-entry-link {
+  display: block;
+  text-decoration: none;
+}
+
+.archive-entry-title {
+  margin: 0;
+  font-size: 1.08rem;
+  line-height: 1.3;
+}
+
+.archive-entry-link:hover .archive-entry-title,
+.archive-entry-link:focus-visible .archive-entry-title {
+  color: var(--accent);
+}
+
+.archive-entry-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.55rem;
+  margin-top: 0.35rem;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.archive-entry-date {
+  text-transform: uppercase;
+}
+
+.archive-entry .post-category,
+.archive-entry .post-mode {
+  font-size: 0.82rem;
+}
+
+.directory-grid {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+}
+
+.directory-card {
+  margin-bottom: 0;
+  text-decoration: none;
+  transition: transform 180ms ease, border-color 180ms ease, background-color 180ms ease;
+}
+
+.directory-card:hover,
+.directory-card:focus-visible {
+  transform: translateY(-2px);
+}
+
+.directory-card-title {
+  margin: 0;
+  font-size: 1.25rem;
+  line-height: 1.2;
+}
+
+.directory-card-copy {
+  margin: 0.8rem 0 0;
+  color: var(--muted);
+  font-size: 0.98rem;
+}
+
+.directory-count {
+  display: inline-flex;
+  margin-top: 1rem;
+  color: var(--accent);
+  font-size: 0.84rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.empty-note {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.96rem;
 }
 
 .pagination {
@@ -379,9 +639,20 @@ a:focus-visible {
   .hero-panel,
   .post-body,
   .post-card--single,
-  .pagination {
+  .pagination,
+  .section-panel,
+  .archive-panel,
+  .directory-card {
     padding-left: 1rem;
     padding-right: 1rem;
+  }
+
+  .site-banner-top {
+    align-items: flex-start;
+  }
+
+  .site-nav {
+    justify-content: flex-start;
   }
 
   .hero-title {
@@ -401,6 +672,16 @@ a:focus-visible {
   .post-meta {
     align-items: flex-start;
     gap: 0.5rem;
+  }
+
+  .site-nav,
+  .category-links {
+    gap: 0.45rem;
+  }
+
+  .site-nav-link,
+  .category-link {
+    font-size: 0.84rem;
   }
 
   .post-location::before {

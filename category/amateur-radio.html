@@ -1,0 +1,25 @@
+---
+layout: default
+title: Amateur Radio
+permalink: /category/amateur-radio/
+---
+
+{% assign category_posts = site.posts | where: "category", "amateur-radio" %}
+
+<section class="section-panel fade-in">
+  <p class="section-kicker">Category</p>
+  <h1 class="section-title">📻 Amateur Radio</h1>
+  <p class="section-copy">Radio checks, antenna tweaks, shack notes, and field comms experiments.</p>
+</section>
+
+{% if category_posts.size > 0 %}
+  <section class="feed" aria-label="Amateur Radio posts">
+    {% for post in category_posts %}
+      {% include post-card.html post=post %}
+    {% endfor %}
+  </section>
+{% else %}
+  <section class="section-panel fade-in">
+    <p class="empty-note">No amateur radio notes yet. The first one will show up here automatically.</p>
+  </section>
+{% endif %}
