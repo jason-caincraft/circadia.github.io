@@ -404,6 +404,10 @@ async function main() {
   }
 
   const tags = parseList(options.tags, /,/);
+  const location = normalizeValue(options.location);
+  if (location && !tags.some((tag) => tag.toLowerCase() === location.toLowerCase())) {
+    tags.push(location);
+  }
   const gear = parseList(options.gear, /\|/);
   const parts = parseList(options.parts, /\|/);
   const changes = parseList(options.changes, /\|/);
@@ -497,8 +501,8 @@ async function main() {
   if (normalizeValue(options.stage)) {
     frontMatter.push(`stage: ${yamlString(normalizeValue(options.stage))}`);
   }
-  if (normalizeValue(options.location)) {
-    frontMatter.push(`location: ${yamlString(normalizeValue(options.location))}`);
+  if (location) {
+    frontMatter.push(`location: ${yamlString(location)}`);
   }
   if (coordinatesLat && coordinatesLng) {
     frontMatter.push("coordinates:");
