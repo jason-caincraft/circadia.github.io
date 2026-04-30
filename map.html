@@ -1,0 +1,172 @@
+---
+layout: default
+title: Map
+permalink: /map/
+map_page: true
+---
+
+{% assign map_post_count = 0 %}
+{% for post in site.posts %}
+  {% if post.coordinates and post.coordinates.lat and post.coordinates.lng %}
+    {% assign map_post_count = map_post_count | plus: 1 %}
+  {% endif %}
+{% endfor %}
+
+<section class="section-panel fade-in" aria-labelledby="map-title">
+  <p class="section-kicker">Field Map</p>
+  <h1 class="section-title" id="map-title">Notes pinned to the map</h1>
+  <p class="section-copy">
+    Posts with saved coordinates show up here as markers. Each pin opens a small ledger entry with the title, date,
+    category, location, and a link back to the full note.
+  </p>
+</section>
+
+{% if map_post_count > 0 %}
+  <section class="map-shell fade-in" aria-label="Mapped field notes">
+    <div class="section-panel map-panel">
+      <div id="field-map" class="map-canvas" aria-label="Map of field note locations"></div>
+      <noscript>
+        <p class="map-note">This map needs JavaScript enabled to draw markers. The post list alongside it still works.</p>
+      </noscript>
+    </div>
+
+    <aside class="section-panel map-ledger" aria-labelledby="map-ledger-title">
+      <h2 class="map-ledger-title" id="map-ledger-title">Mapped posts</h2>
+      <p class="map-note">Only entries with `coordinates.lat` and `coordinates.lng` are listed here.</p>
+      <ol class="map-entry-list">
+        {% for post in site.posts %}
+          {% if post.coordinates and post.coordinates.lat and post.coordinates.lng %}
+            {% assign map_category_key = post.category | downcase %}
+            {% capture map_category_label %}
+              {% case map_category_key %}
+                {% when "gardening" %}Garden
+                {% when "rc-crawling" %}RC Crawling
+                {% when "fpv" %}FPV / Aircraft
+                {% when "photography" %}Photography
+                {% when "amateur-radio" %}Amateur Radio
+                {% when "motorcycling" %}Motorcycling
+                {% when "camping" %}Camping
+                {% when "marksmanship" %}Marksmanship
+                {% else %}Field Note
+              {% endcase %}
+            {% endcapture %}
+            <li class="map-entry">
+              <a class="map-entry-link" href="{{ post.url | relative_url }}">{{ post.title }}</a>
+              <div class="map-entry-meta">
+                <span>{{ post.date | date: "%B %-d, %Y" }}</span>
+                {% if post.category %}
+                  <span>{{ map_category_label | strip }}</span>
+                {% endif %}
+                {% if post.location %}
+                  <span>{{ post.location }}</span>
+                {% endif %}
+              </div>
+            </li>
+          {% endif %}
+        {% endfor %}
+      </ol>
+    </aside>
+  </section>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      if (!window.L) {
+        return;
+      }
+
+      {% assign mapped_post_index = 0 %}
+      const mapPosts = [
+        {% for post in site.posts %}
+          {% if post.coordinates and post.coordinates.lat and post.coordinates.lng %}
+            {% assign mapped_post_index = mapped_post_index | plus: 1 %}
+            {% assign map_category_key = post.category | downcase %}
+            {% capture map_category_label %}
+              {% case map_category_key %}
+                {% when "gardening" %}Garden
+                {% when "rc-crawling" %}RC Crawling
+                {% when "fpv" %}FPV / Aircraft
+                {% when "photography" %}Photography
+                {% when "amateur-radio" %}Amateur Radio
+                {% when "motorcycling" %}Motorcycling
+                {% when "camping" %}Camping
+                {% when "marksmanship" %}Marksmanship
+                {% else %}Field Note
+              {% endcase %}
+            {% endcapture %}
+            {
+              title: {{ post.title | jsonify }},
+              date: {{ post.date | date: "%B %-d, %Y" | jsonify }},
+              category: {{ map_category_label | strip | jsonify }},
+              location: {{ post.location | default: "Location noted in post" | jsonify }},
+              url: {{ post.url | relative_url | jsonify }},
+              lat: {{ post.coordinates.lat | jsonify }},
+              lng: {{ post.coordinates.lng | jsonify }}
+            }{% if mapped_post_index < map_post_count %},{% endif %}
+          {% endif %}
+        {% endfor %}
+      ];
+
+      if (!mapPosts.length) {
+        return;
+      }
+
+      const escapeHtml = function (value) {
+        return String(value).replace(/[&<>"']/g, function (character) {
+          const entities = {
+            "&": "&amp;",
+            "<": "&lt;",
+            ">": "&gt;",
+            "\"": "&quot;",
+            "'": "&#39;"
+          };
+          return entities[character];
+        });
+      };
+
+      const map = L.map("field-map", {
+        scrollWheelZoom: false
+      });
+
+      L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+        maxZoom: 18,
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+      }).addTo(map);
+
+      const bounds = [];
+
+      mapPosts.forEach(function (post) {
+        const marker = L.marker([post.lat, post.lng]).addTo(map);
+        bounds.push([post.lat, post.lng]);
+
+        marker.bindPopup(
+          '<div class="map-popup">' +
+            '<strong class="map-popup-title">' + escapeHtml(post.title) + '</strong>' +
+            '<span>' + escapeHtml(post.date) + '</span>' +
+            '<span>' + escapeHtml(post.category) + '</span>' +
+            '<span>' + escapeHtml(post.location) + '</span>' +
+            '<a class="map-popup-link" href="' + post.url + '">Read post</a>' +
+          '</div>'
+        );
+      });
+
+      if (bounds.length === 1) {
+        map.setView(bounds[0], 11);
+      } else {
+        map.fitBounds(bounds, {
+          padding: [28, 28]
+        });
+      }
+    });
+  </script>
+{% else %}
+  <section class="section-panel map-empty fade-in" aria-labelledby="map-empty-title">
+    <h2 class="map-ledger-title" id="map-empty-title">No mapped posts yet</h2>
+    <p class="section-copy">
+      Add a `coordinates` block to any post front matter and it will appear here automatically the next time the site
+      builds.
+    </p>
+    <pre class="map-example"><code>coordinates:
+  lat: 43.615
+  lng: -116.202</code></pre>
+  </section>
+{% endif %}

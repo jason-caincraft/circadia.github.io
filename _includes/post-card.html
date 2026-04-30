@@ -1,28 +1,38 @@
 {% assign category_key = include.post.category | downcase %}
 {% capture category_label %}
   {% case category_key %}
-    {% when "gardening" %}🌱 Garden
-    {% when "rc-crawling" %}🛻 RC Crawling
-    {% when "fpv" %}✈️ FPV / Aircraft
-    {% when "photography" %}📷 Photography
-    {% when "amateur-radio" %}📻 Amateur Radio
-    {% when "motorcycling" %}🏍️ Motorcycling
-    {% when "camping" %}🏕️ Camping
-    {% when "marksmanship" %}🎯 Marksmanship
-    {% else %}🧭 Field Note
+    {% when "gardening" %}Garden
+    {% when "rc-crawling" %}RC Crawling
+    {% when "fpv" %}FPV / Aircraft
+    {% when "photography" %}Photography
+    {% when "amateur-radio" %}Amateur Radio
+    {% when "motorcycling" %}Motorcycling
+    {% when "camping" %}Camping
+    {% when "marksmanship" %}Marksmanship
+    {% else %}Field Note
   {% endcase %}
 {% endcapture %}
 
 {% assign mode_key = include.post.mode | downcase %}
 {% capture mode_label %}
   {% case mode_key %}
-    {% when "build" %}🔧 Build
-    {% when "explore" %}🧭 Explore
-    {% when "test" %}🧪 Test
-    {% when "maintain" %}🔁 Maintain
-    {% when "observe" %}👀 Observe
+    {% when "build" %}Build
+    {% when "explore" %}Explore
+    {% when "test" %}Test
+    {% when "maintain" %}Maintain
+    {% when "observe" %}Observe
   {% endcase %}
 {% endcapture %}
+
+{% assign card_condition_weather = include.post.conditions.weather | default: "" %}
+{% assign card_condition_temperature = include.post.conditions.temperature | default: "" %}
+{% assign card_condition_light = include.post.conditions.light | default: "" %}
+{% assign has_conditions = false %}
+{% if card_condition_weather != blank or card_condition_temperature != blank or card_condition_light != blank %}
+  {% assign has_conditions = true %}
+{% endif %}
+
+{% assign card_content = include.post.excerpt | default: include.post.content %}
 
 <article class="post-card fade-in">
   {% if include.post.image %}
@@ -59,9 +69,66 @@
       </h2>
     {% endif %}
 
+    {% if include.post.project or include.post.stage %}
+      <div class="workbench-strip workbench-strip--compact">
+        {% if include.post.project %}
+          <div class="workbench-card">
+            <span class="workbench-label">Project</span>
+            <strong class="workbench-value">{{ include.post.project }}</strong>
+          </div>
+        {% endif %}
+        {% if include.post.stage %}
+          <div class="workbench-card">
+            <span class="workbench-label">Stage</span>
+            <strong class="workbench-value">{{ include.post.stage }}</strong>
+          </div>
+        {% endif %}
+      </div>
+    {% endif %}
+
     <div class="post-content">
-      {{ include.post.content }}
+      {{ card_content }}
     </div>
+
+    {% if has_conditions %}
+      <section class="meta-panel meta-panel--compact" aria-label="Conditions">
+        <h3 class="meta-panel-title">Conditions</h3>
+        <div class="conditions-list conditions-list--compact">
+          {% if card_condition_weather != blank %}
+            <div class="conditions-item">
+              <span class="meta-label">Weather</span>
+              <span class="meta-value">{{ card_condition_weather }}</span>
+            </div>
+          {% endif %}
+          {% if card_condition_temperature != blank %}
+            <div class="conditions-item">
+              <span class="meta-label">Temperature</span>
+              <span class="meta-value">{{ card_condition_temperature }}</span>
+            </div>
+          {% endif %}
+          {% if card_condition_light != blank %}
+            <div class="conditions-item">
+              <span class="meta-label">Light</span>
+              <span class="meta-value">{{ card_condition_light }}</span>
+            </div>
+          {% endif %}
+        </div>
+      </section>
+    {% endif %}
+
+    {% if include.post.gear and include.post.gear != empty %}
+      <div class="gear-inline" aria-label="Gear used">
+        <span class="meta-label">Gear Used</span>
+        <ul class="gear-inline-list">
+          {% for item in include.post.gear limit:3 %}
+            <li class="gear-inline-item">{{ item }}</li>
+          {% endfor %}
+          {% if include.post.gear.size > 3 %}
+            <li class="gear-inline-item">+{{ include.post.gear.size | minus: 3 }} more</li>
+          {% endif %}
+        </ul>
+      </div>
+    {% endif %}
 
     {% if include.post.tags and include.post.tags != empty %}
       <ul class="tag-pills" aria-label="Post tags">

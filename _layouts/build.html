@@ -33,14 +33,26 @@ layout: default
 {% assign condition_light = page.conditions.light | default: "" %}
 {% assign has_conditions = false %}
 {% assign has_gear = false %}
+{% assign has_parts = false %}
+{% assign has_changes = false %}
+{% assign has_lessons = false %}
 {% if condition_weather != blank or condition_temperature != blank or condition_light != blank %}
   {% assign has_conditions = true %}
 {% endif %}
 {% if page.gear and page.gear != empty %}
   {% assign has_gear = true %}
 {% endif %}
+{% if page.parts and page.parts != empty %}
+  {% assign has_parts = true %}
+{% endif %}
+{% if page.changes and page.changes != empty %}
+  {% assign has_changes = true %}
+{% endif %}
+{% if page.lessons and page.lessons != empty %}
+  {% assign has_lessons = true %}
+{% endif %}
 
-<article class="post-card post-card--single fade-in">
+<article class="post-card post-card--single build-entry fade-in">
   <div class="post-meta">
     <time class="post-date" datetime="{{ page.date | date_to_xmlschema }}">
       {{ page.date | date: "%B %-d, %Y" }}
@@ -58,23 +70,42 @@ layout: default
     {% endif %}
   </div>
 
+  <p class="section-kicker">Workbench Log</p>
+
   {% if page.title %}
     <h1 class="post-title">{{ page.title }}</h1>
   {% endif %}
 
+  {% if page.project or page.stage %}
+    <div class="workbench-strip">
+      {% if page.project %}
+        <div class="workbench-card">
+          <span class="workbench-label">Project</span>
+          <strong class="workbench-value">{{ page.project }}</strong>
+        </div>
+      {% endif %}
+      {% if page.stage %}
+        <div class="workbench-card">
+          <span class="workbench-label">Stage</span>
+          <strong class="workbench-value">{{ page.stage }}</strong>
+        </div>
+      {% endif %}
+    </div>
+  {% endif %}
+
   {% if page.image %}
     <img
-      class="post-image"
+      class="post-image build-hero"
       src="{{ page.image | relative_url }}"
-      alt="{{ page.alt | default: page.title | default: 'Field journal image' | escape }}"
+      alt="{{ page.alt | default: page.title | default: 'Build log image' | escape }}"
     >
   {% endif %}
 
   {% if has_conditions or has_gear %}
     <div class="meta-grid">
       {% if has_conditions %}
-        <section class="meta-panel" aria-labelledby="conditions-heading">
-          <h2 class="meta-panel-title" id="conditions-heading">Conditions</h2>
+        <section class="meta-panel" aria-labelledby="build-conditions-heading">
+          <h2 class="meta-panel-title" id="build-conditions-heading">Conditions</h2>
           <div class="conditions-list">
             {% if condition_weather != blank %}
               <div class="conditions-item">
@@ -99,8 +130,8 @@ layout: default
       {% endif %}
 
       {% if has_gear %}
-        <section class="meta-panel" aria-labelledby="gear-heading">
-          <h2 class="meta-panel-title" id="gear-heading">Gear Used</h2>
+        <section class="meta-panel" aria-labelledby="build-gear-heading">
+          <h2 class="meta-panel-title" id="build-gear-heading">Gear Used</h2>
           <ul class="gear-list">
             {% for item in page.gear %}
               <li>{{ item }}</li>
@@ -114,6 +145,43 @@ layout: default
   <div class="post-content">
     {{ content }}
   </div>
+
+  {% if has_parts or has_changes or has_lessons %}
+    <div class="build-section-grid">
+      {% if has_parts %}
+        <section class="build-section" aria-labelledby="parts-heading">
+          <h2 class="build-section-title" id="parts-heading">Parts</h2>
+          <ul class="build-list">
+            {% for item in page.parts %}
+              <li>{{ item }}</li>
+            {% endfor %}
+          </ul>
+        </section>
+      {% endif %}
+
+      {% if has_changes %}
+        <section class="build-section" aria-labelledby="changes-heading">
+          <h2 class="build-section-title" id="changes-heading">Changes Made</h2>
+          <ul class="build-list">
+            {% for item in page.changes %}
+              <li>{{ item }}</li>
+            {% endfor %}
+          </ul>
+        </section>
+      {% endif %}
+
+      {% if has_lessons %}
+        <section class="build-section" aria-labelledby="lessons-heading">
+          <h2 class="build-section-title" id="lessons-heading">Lessons Learned</h2>
+          <ul class="build-list">
+            {% for item in page.lessons %}
+              <li>{{ item }}</li>
+            {% endfor %}
+          </ul>
+        </section>
+      {% endif %}
+    </div>
+  {% endif %}
 
   {% if page.tags and page.tags != empty %}
     <ul class="tag-pills" aria-label="Post tags">

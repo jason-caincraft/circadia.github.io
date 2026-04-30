@@ -13,7 +13,41 @@
         "--image",
         "${input:image}",
         "--text",
-        "${input:text}"
+        "${input:text}",
+        "--layout",
+        "${input:layout}",
+        "--category",
+        "${input:category}",
+        "--tags",
+        "${input:tags}",
+        "--mode",
+        "${input:mode}",
+        "--location",
+        "${input:location}",
+        "--coordinates-lat",
+        "${input:coordinatesLat}",
+        "--coordinates-lng",
+        "${input:coordinatesLng}",
+        "--weather",
+        "${input:weather}",
+        "--temperature",
+        "${input:temperature}",
+        "--light",
+        "${input:light}",
+        "--gear",
+        "${input:gear}",
+        "--project",
+        "${input:project}",
+        "--stage",
+        "${input:stage}",
+        "--parts",
+        "${input:parts}",
+        "--changes",
+        "${input:changes}",
+        "--lessons",
+        "${input:lessons}",
+        "--alt",
+        "${input:alt}"
       ],
       "problemMatcher": []
     },
@@ -60,7 +94,132 @@
     {
       "id": "text",
       "type": "promptString",
-      "description": "Short field note text"
+      "description": "Post body text"
+    },
+    {
+      "id": "layout",
+      "type": "pickString",
+      "description": "Post layout",
+      "default": "post",
+      "options": [
+        "post",
+        "build"
+      ]
+    },
+    {
+      "id": "category",
+      "type": "pickString",
+      "description": "Category or auto-detect",
+      "default": "auto",
+      "options": [
+        "auto",
+        "gardening",
+        "rc-crawling",
+        "fpv",
+        "photography",
+        "amateur-radio",
+        "motorcycling",
+        "camping",
+        "marksmanship"
+      ]
+    },
+    {
+      "id": "tags",
+      "type": "promptString",
+      "description": "Optional tags, comma-separated",
+      "default": ""
+    },
+    {
+      "id": "mode",
+      "type": "pickString",
+      "description": "Optional mode",
+      "default": "",
+      "options": [
+        "",
+        "build",
+        "explore",
+        "test",
+        "maintain",
+        "observe"
+      ]
+    },
+    {
+      "id": "location",
+      "type": "promptString",
+      "description": "Optional location",
+      "default": ""
+    },
+    {
+      "id": "coordinatesLat",
+      "type": "promptString",
+      "description": "Optional latitude",
+      "default": ""
+    },
+    {
+      "id": "coordinatesLng",
+      "type": "promptString",
+      "description": "Optional longitude",
+      "default": ""
+    },
+    {
+      "id": "weather",
+      "type": "promptString",
+      "description": "Optional weather",
+      "default": ""
+    },
+    {
+      "id": "temperature",
+      "type": "promptString",
+      "description": "Optional temperature",
+      "default": ""
+    },
+    {
+      "id": "light",
+      "type": "promptString",
+      "description": "Optional light conditions",
+      "default": ""
+    },
+    {
+      "id": "gear",
+      "type": "promptString",
+      "description": "Optional gear list, separate items with |",
+      "default": ""
+    },
+    {
+      "id": "project",
+      "type": "promptString",
+      "description": "Optional build project name",
+      "default": ""
+    },
+    {
+      "id": "stage",
+      "type": "promptString",
+      "description": "Optional build stage",
+      "default": ""
+    },
+    {
+      "id": "parts",
+      "type": "promptString",
+      "description": "Optional build parts list, separate items with |",
+      "default": ""
+    },
+    {
+      "id": "changes",
+      "type": "promptString",
+      "description": "Optional build changes list, separate items with |",
+      "default": ""
+    },
+    {
+      "id": "lessons",
+      "type": "promptString",
+      "description": "Optional build lessons list, separate items with |",
+      "default": ""
+    },
+    {
+      "id": "alt",
+      "type": "promptString",
+      "description": "Optional image alt text",
+      "default": ""
     },
     {
       "id": "commitMessage",
