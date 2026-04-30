@@ -26,6 +26,118 @@ title: Home
   </div>
 </section>
 
+{% if paginator.page == 1 %}
+  <section class="section-panel section-panel--compact on-this-day fade-in" data-on-this-day hidden aria-labelledby="on-this-day-title">
+    <p class="section-kicker">Field Echo</p>
+    <h2 class="section-title section-title--small" id="on-this-day-title">On This Day</h2>
+    <p class="section-copy" data-on-this-day-copy>Looking for earlier notes from this date.</p>
+    <div class="on-this-day-results" data-on-this-day-results></div>
+    <p class="empty-note" data-on-this-day-empty hidden>No earlier field notes share this date yet.</p>
+  </section>
+
+  <script>
+  (() => {
+    const panel = document.querySelector("[data-on-this-day]");
+    const results = document.querySelector("[data-on-this-day-results]");
+    const empty = document.querySelector("[data-on-this-day-empty]");
+    const copy = document.querySelector("[data-on-this-day-copy]");
+
+    if (!panel || !results || !empty || !copy) {
+      return;
+    }
+
+    const categoryLabels = {
+      gardening: "Garden",
+      "rc-crawling": "RC Crawling",
+      fpv: "FPV / Aircraft",
+      photography: "Photography",
+      "amateur-radio": "Amateur Radio",
+      motorcycling: "Motorcycling",
+      camping: "Camping",
+      marksmanship: "Marksmanship"
+    };
+
+    function parsePostDate(value) {
+      const match = String(value || "").match(/^(\d{4})-(\d{2})-(\d{2})$/);
+      if (!match) {
+        return new Date(value);
+      }
+
+      return new Date(Number(match[1]), Number(match[2]) - 1, Number(match[3]));
+    }
+
+    const today = new Date();
+    const todayMonth = today.getMonth();
+    const todayDay = today.getDate();
+    const currentYear = today.getFullYear();
+    const displayDate = new Intl.DateTimeFormat(undefined, {
+      month: "long",
+      day: "numeric"
+    }).format(today);
+
+    copy.textContent = `Previous notes from ${displayDate}.`;
+
+    fetch('{{ "/search.json" | relative_url }}')
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error(`On This Day request failed with ${response.status}`);
+        }
+        return response.json();
+      })
+      .then((posts) => {
+        const matches = (Array.isArray(posts) ? posts : [])
+          .filter((post) => {
+            const postDate = parsePostDate(post.date);
+            return postDate.getFullYear() < currentYear &&
+              postDate.getMonth() === todayMonth &&
+              postDate.getDate() === todayDay;
+          })
+          .sort((left, right) => parsePostDate(right.date) - parsePostDate(left.date));
+
+        panel.hidden = false;
+
+        if (matches.length === 0) {
+          empty.hidden = false;
+          return;
+        }
+
+        const list = document.createElement("ul");
+        list.className = "on-this-day-list";
+
+        for (const post of matches) {
+          const item = document.createElement("li");
+          item.className = "on-this-day-entry";
+
+          const link = document.createElement("a");
+          link.className = "on-this-day-link";
+          link.href = post.url;
+
+          const title = document.createElement("span");
+          title.className = "on-this-day-title";
+          title.textContent = post.title || "Untitled note";
+
+          const meta = document.createElement("span");
+          meta.className = "on-this-day-meta";
+
+          const year = parsePostDate(post.date).getFullYear();
+          const category = categoryLabels[post.category] || "Field Note";
+          meta.textContent = `${year} / ${category}`;
+
+          link.appendChild(title);
+          link.appendChild(meta);
+          item.appendChild(link);
+          list.appendChild(item);
+        }
+
+        results.appendChild(list);
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+  })();
+  </script>
+{% endif %}
+
 <section class="feed" aria-label="Field notes archive">
   {% for post in paginator.posts %}
     {% include post-card.html post=post %}
