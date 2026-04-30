@@ -1,0 +1,25 @@
+---
+layout: default
+title: FPV
+permalink: /category/fpv/
+---
+
+{% assign category_posts = site.posts | where: "category", "fpv" %}
+
+<section class="section-panel fade-in">
+  <p class="section-kicker">Category</p>
+  <h1 class="section-title">✈️ FPV</h1>
+  <p class="section-copy">Flight sessions, line-of-sight checks, repairs, batteries, and field-ready aircraft notes.</p>
+</section>
+
+{% if category_posts.size > 0 %}
+  <section class="feed" aria-label="FPV posts">
+    {% for post in category_posts %}
+      {% include post-card.html post=post %}
+    {% endfor %}
+  </section>
+{% else %}
+  <section class="section-panel fade-in">
+    <p class="empty-note">No FPV notes yet. The first one will show up here automatically.</p>
+  </section>
+{% endif %}

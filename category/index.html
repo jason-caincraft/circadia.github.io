@@ -1,0 +1,69 @@
+---
+layout: default
+title: Categories
+permalink: /category/
+---
+
+<section class="section-panel fade-in">
+  <p class="section-kicker">Bench Index</p>
+  <h1 class="section-title">Categories</h1>
+  <p class="section-copy">Browse the field notes by subject without changing the homepage feed or its pagination.</p>
+</section>
+
+<section class="directory-grid fade-in" aria-label="Category directory">
+  {% assign gardening_posts = site.posts | where: "category", "gardening" %}
+  <a class="directory-card" href="{{ '/category/gardening/' | relative_url }}">
+    <h2 class="directory-card-title">🌱 Garden</h2>
+    <p class="directory-card-copy">Season notes, propagation experiments, bed maintenance, and what the weather let happen.</p>
+    <span class="directory-count">{{ gardening_posts.size }} post{% if gardening_posts.size != 1 %}s{% endif %}</span>
+  </a>
+
+  {% assign rc_posts = site.posts | where: "category", "rc-crawling" %}
+  <a class="directory-card" href="{{ '/category/rc-crawling/' | relative_url }}">
+    <h2 class="directory-card-title">🛻 RC Crawling</h2>
+    <p class="directory-card-copy">Trail setups, breakage reports, tuning notes, and low-speed obstacle experiments.</p>
+    <span class="directory-count">{{ rc_posts.size }} post{% if rc_posts.size != 1 %}s{% endif %}</span>
+  </a>
+
+  {% assign fpv_posts = site.posts | where: "category", "fpv" %}
+  <a class="directory-card" href="{{ '/category/fpv/' | relative_url }}">
+    <h2 class="directory-card-title">✈️ FPV</h2>
+    <p class="directory-card-copy">Flight sessions, line-of-sight checks, repairs, batteries, and field-ready aircraft notes.</p>
+    <span class="directory-count">{{ fpv_posts.size }} post{% if fpv_posts.size != 1 %}s{% endif %}</span>
+  </a>
+
+  {% assign photography_posts = site.posts | where: "category", "photography" %}
+  <a class="directory-card" href="{{ '/category/photography/' | relative_url }}">
+    <h2 class="directory-card-title">📷 Photography</h2>
+    <p class="directory-card-copy">Camera walks, lens tests, exposure notes, and small visual studies from the field.</p>
+    <span class="directory-count">{{ photography_posts.size }} post{% if photography_posts.size != 1 %}s{% endif %}</span>
+  </a>
+
+  {% assign radio_posts = site.posts | where: "category", "amateur-radio" %}
+  <a class="directory-card" href="{{ '/category/amateur-radio/' | relative_url }}">
+    <h2 class="directory-card-title">📻 Amateur Radio</h2>
+    <p class="directory-card-copy">Radio checks, antenna tweaks, shack notes, and field comms experiments.</p>
+    <span class="directory-count">{{ radio_posts.size }} post{% if radio_posts.size != 1 %}s{% endif %}</span>
+  </a>
+
+  {% assign motorcycle_posts = site.posts | where: "category", "motorcycling" %}
+  <a class="directory-card" href="{{ '/category/motorcycling/' | relative_url }}">
+    <h2 class="directory-card-title">🏍️ Motorcycling</h2>
+    <p class="directory-card-copy">Ride logs, route notes, maintenance work, and small machine lessons from the road.</p>
+    <span class="directory-count">{{ motorcycle_posts.size }} post{% if motorcycle_posts.size != 1 %}s{% endif %}</span>
+  </a>
+
+  {% assign camping_posts = site.posts | where: "category", "camping" %}
+  <a class="directory-card" href="{{ '/category/camping/' | relative_url }}">
+    <h2 class="directory-card-title">🏕️ Camping</h2>
+    <p class="directory-card-copy">Camp setups, overnight notes, gear adjustments, and places worth returning to.</p>
+    <span class="directory-count">{{ camping_posts.size }} post{% if camping_posts.size != 1 %}s{% endif %}</span>
+  </a>
+
+  {% assign marksmanship_posts = site.posts | where: "category", "marksmanship" %}
+  <a class="directory-card" href="{{ '/category/marksmanship/' | relative_url }}">
+    <h2 class="directory-card-title">🎯 Marksmanship</h2>
+    <p class="directory-card-copy">Range notes, zero checks, handling drills, and observations from deliberate practice.</p>
+    <span class="directory-count">{{ marksmanship_posts.size }} post{% if marksmanship_posts.size != 1 %}s{% endif %}</span>
+  </a>
+</section>

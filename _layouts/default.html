@@ -16,8 +16,8 @@
   </head>
   <body class="{% if page.url == '/' %}page-home{% else %}page-inner{% endif %}">
     <div class="page-shell">
-      {% unless page.url == '/' %}
-        <header class="site-banner">
+        <header class="site-banner {% if page.url == '/' %}site-banner--home{% endif %}">
+          {% unless page.url == '/' %}
           <a class="site-banner-image-link" href="{{ '/' | relative_url }}" aria-label="Return to homepage">
             <img
               class="site-banner-image site-banner-image--compact"
@@ -25,10 +25,33 @@
               alt="CainCraft Circadia banner"
             >
           </a>
-          <a class="site-brand" href="{{ '/' | relative_url }}">{{ site.title }}</a>
-          <p class="site-description">{{ site.description }}</p>
+          {% endunless %}
+
+          <div class="site-banner-top">
+            <a class="site-brand" href="{{ '/' | relative_url }}">{{ site.title }}</a>
+
+            <nav class="site-nav" aria-label="Primary navigation">
+              <a class="site-nav-link{% if page.url == '/' %} is-current{% endif %}" href="{{ '/' | relative_url }}">Home</a>
+              <a class="site-nav-link{% if page.url == '/archive/' %} is-current{% endif %}" href="{{ '/archive/' | relative_url }}">Archive</a>
+              <a class="site-nav-link{% if page.url contains '/category/' %} is-current{% endif %}" href="{{ '/category/' | relative_url }}">Categories</a>
+            </nav>
+          </div>
+
+          {% unless page.url == '/' %}
+            <p class="site-description">{{ site.description }}</p>
+          {% endunless %}
+
+          <div class="category-links category-links--compact" aria-label="Browse categories">
+            <a class="category-link{% if page.url == '/category/gardening/' %} is-current{% endif %}" href="{{ '/category/gardening/' | relative_url }}">Garden</a>
+            <a class="category-link{% if page.url == '/category/rc-crawling/' %} is-current{% endif %}" href="{{ '/category/rc-crawling/' | relative_url }}">RC Crawling</a>
+            <a class="category-link{% if page.url == '/category/fpv/' %} is-current{% endif %}" href="{{ '/category/fpv/' | relative_url }}">FPV</a>
+            <a class="category-link{% if page.url == '/category/photography/' %} is-current{% endif %}" href="{{ '/category/photography/' | relative_url }}">Photography</a>
+            <a class="category-link{% if page.url == '/category/amateur-radio/' %} is-current{% endif %}" href="{{ '/category/amateur-radio/' | relative_url }}">Amateur Radio</a>
+            <a class="category-link{% if page.url == '/category/motorcycling/' %} is-current{% endif %}" href="{{ '/category/motorcycling/' | relative_url }}">Motorcycling</a>
+            <a class="category-link{% if page.url == '/category/camping/' %} is-current{% endif %}" href="{{ '/category/camping/' | relative_url }}">Camping</a>
+            <a class="category-link{% if page.url == '/category/marksmanship/' %} is-current{% endif %}" href="{{ '/category/marksmanship/' | relative_url }}">Marksmanship</a>
+          </div>
         </header>
-      {% endunless %}
 
       <main class="site-content">
         {{ content }}

@@ -1,7 +1,9 @@
 ---
-title: First Entry
+title: "First Entry"
 image: /images/sample.jpg
 category: camping
+tags: [trailhead, camp-setup, aspens]
+mode: observe
 location: "Somewhere off the main road"
 alt: "Camp setup near a trail"
 ---
