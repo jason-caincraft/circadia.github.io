@@ -1,0 +1,197 @@
+---
+layout: default
+title: Search
+permalink: /search/
+---
+
+<section class="section-panel fade-in">
+  <p class="section-kicker">Field Index</p>
+  <h1 class="section-title">Search</h1>
+  <p class="section-copy">Search titles, categories, tags, locations, and note text without leaving the static site.</p>
+</section>
+
+<section class="search-shell fade-in" aria-label="Search the field notes">
+  <div class="search-panel">
+    <label class="search-label" for="search-input">Search the field notes</label>
+    <input
+      class="search-input"
+      id="search-input"
+      type="search"
+      name="q"
+      placeholder="Try backyard, radio, Boise, suspension..."
+      autocomplete="off"
+      spellcheck="false"
+    >
+    <p class="search-hint">Search checks title, category, tags, location, and note text from the generated static index.</p>
+  </div>
+
+  <p class="search-summary" data-search-summary>Loading search index...</p>
+  <div class="search-results" data-search-results></div>
+</section>
+
+<script>
+(() => {
+  const input = document.getElementById("search-input");
+  const summary = document.querySelector("[data-search-summary]");
+  const results = document.querySelector("[data-search-results]");
+  const params = new URLSearchParams(window.location.search);
+  const initialQuery = params.get("q") || "";
+  const categoryLabels = {
+    gardening: "Garden",
+    "rc-crawling": "RC Crawling",
+    fpv: "FPV / Aircraft",
+    photography: "Photography",
+    "amateur-radio": "Amateur Radio",
+    motorcycling: "Motorcycling",
+    camping: "Camping",
+    marksmanship: "Marksmanship"
+  };
+  const formatDate = new Intl.DateTimeFormat(undefined, {
+    year: "numeric",
+    month: "long",
+    day: "numeric"
+  });
+
+  let posts = [];
+
+  function normalize(value) {
+    return String(value || "").toLowerCase();
+  }
+
+  function getCategoryLabel(category) {
+    return categoryLabels[category] || "Field Note";
+  }
+
+  function parsePostDate(value) {
+    const match = String(value || "").match(/^(\d{4})-(\d{2})-(\d{2})$/);
+    if (!match) {
+      return new Date(value);
+    }
+
+    return new Date(Number(match[1]), Number(match[2]) - 1, Number(match[3]));
+  }
+
+  function buildHaystack(post) {
+    return normalize([
+      post.title,
+      post.category,
+      Array.isArray(post.tags) ? post.tags.join(" ") : "",
+      post.location,
+      post.content,
+      post.excerpt
+    ].join(" "));
+  }
+
+  function setQueryParam(query) {
+    const next = new URLSearchParams(window.location.search);
+
+    if (query) {
+      next.set("q", query);
+    } else {
+      next.delete("q");
+    }
+
+    const nextQuery = next.toString();
+    const nextUrl = `${window.location.pathname}${nextQuery ? `?${nextQuery}` : ""}`;
+    history.replaceState({}, "", nextUrl);
+  }
+
+  function renderEmpty(message) {
+    results.innerHTML = "";
+    const note = document.createElement("p");
+    note.className = "empty-note";
+    note.textContent = message;
+    results.appendChild(note);
+  }
+
+  function renderResults(query) {
+    const trimmed = query.trim();
+    const terms = normalize(trimmed).split(/\s+/).filter(Boolean);
+
+    setQueryParam(trimmed);
+    results.innerHTML = "";
+
+    if (!trimmed) {
+      summary.textContent = `${posts.length} notes indexed. Start typing to filter the journal.`;
+      renderEmpty("Try a place, project, category, or a few words from a note.");
+      return;
+    }
+
+    const matches = posts.filter((post) => {
+      const haystack = buildHaystack(post);
+      return terms.every((term) => haystack.includes(term));
+    });
+
+    summary.textContent = `${matches.length} result${matches.length === 1 ? "" : "s"} for "${trimmed}".`;
+
+    if (matches.length === 0) {
+      renderEmpty("No notes matched that search yet.");
+      return;
+    }
+
+    for (const post of matches) {
+      const article = document.createElement("article");
+      article.className = "search-result";
+
+      const title = document.createElement("h2");
+      title.className = "search-result-title";
+
+      const link = document.createElement("a");
+      link.className = "search-result-link";
+      link.href = post.url;
+      link.textContent = post.title || "Untitled note";
+      title.appendChild(link);
+
+      const meta = document.createElement("p");
+      meta.className = "search-result-meta";
+      meta.textContent = `${formatDate.format(parsePostDate(post.date))} / ${getCategoryLabel(post.category)}`;
+
+      const excerpt = document.createElement("p");
+      excerpt.className = "search-result-excerpt";
+      excerpt.textContent = post.excerpt || "No excerpt available.";
+
+      article.appendChild(title);
+      article.appendChild(meta);
+
+      if (post.location) {
+        const location = document.createElement("p");
+        location.className = "search-result-location";
+        location.textContent = `Location: ${post.location}`;
+        article.appendChild(location);
+      }
+
+      article.appendChild(excerpt);
+
+      if (Array.isArray(post.tags) && post.tags.length > 0) {
+        const tags = document.createElement("p");
+        tags.className = "search-result-tags";
+        tags.textContent = `Tags: ${post.tags.join(", ")}`;
+        article.appendChild(tags);
+      }
+
+      results.appendChild(article);
+    }
+  }
+
+  input.value = initialQuery;
+
+  fetch('{{ "/search.json" | relative_url }}')
+    .then((response) => {
+      if (!response.ok) {
+        throw new Error(`Search index request failed with ${response.status}`);
+      }
+      return response.json();
+    })
+    .then((data) => {
+      posts = Array.isArray(data) ? data : [];
+      renderResults(initialQuery);
+    })
+    .catch((error) => {
+      console.error(error);
+      summary.textContent = "Search index could not be loaded.";
+      renderEmpty("The static search index is unavailable right now.");
+    });
+
+  input.addEventListener("input", () => renderResults(input.value));
+})();
+</script>

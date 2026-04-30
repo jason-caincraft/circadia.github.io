@@ -14,61 +14,76 @@ permalink: /archive/
 
 <section class="archive-panel fade-in" aria-label="Posts by year and month">
   {% for year in posts_by_year %}
-    <div class="archive-year">
-      <h2 class="archive-year-heading">{{ year.name }}</h2>
+    {% assign posts_by_month = year.items | group_by_exp: "post", "post.date | date: '%B'" %}
 
-      {% assign posts_by_month = year.items | group_by_exp: "post", "post.date | date: '%B'" %}
-      {% for month in posts_by_month %}
-        <div class="archive-month">
-          <h3 class="archive-month-heading">{{ month.name }}</h3>
-          <ul class="archive-list">
-            {% for post in month.items %}
-              {% assign category_key = post.category | downcase %}
-              {% capture category_label %}
-                {% case category_key %}
-                  {% when "gardening" %}🌱 Garden
-                  {% when "rc-crawling" %}🛻 RC Crawling
-                  {% when "fpv" %}✈️ FPV / Aircraft
-                  {% when "photography" %}📷 Photography
-                  {% when "amateur-radio" %}📻 Amateur Radio
-                  {% when "motorcycling" %}🏍️ Motorcycling
-                  {% when "camping" %}🏕️ Camping
-                  {% when "marksmanship" %}🎯 Marksmanship
-                  {% else %}🧭 Field Note
-                {% endcase %}
-              {% endcapture %}
-
-              {% assign mode_key = post.mode | downcase %}
-              {% capture mode_label %}
-                {% case mode_key %}
-                  {% when "build" %}🔧 Build
-                  {% when "explore" %}🧭 Explore
-                  {% when "test" %}🧪 Test
-                  {% when "maintain" %}🔁 Maintain
-                  {% when "observe" %}👀 Observe
-                {% endcase %}
-              {% endcapture %}
-
-              <li class="archive-entry">
-                <a class="archive-entry-link" href="{{ post.url | relative_url }}">
-                  <h4 class="archive-entry-title">{{ post.title }}</h4>
-                  <div class="archive-entry-meta">
-                    <span class="archive-entry-date">{{ post.date | date: "%b %-d" }}</span>
-                    {% if post.category %}
-                      <span class="post-category">{{ category_label | strip }}</span>
-                    {% else %}
-                      <span class="post-category">{{ category_label | strip }}</span>
-                    {% endif %}
-                    {% if mode_label != blank %}
-                      <span class="post-mode">{{ mode_label | strip }}</span>
-                    {% endif %}
-                  </div>
-                </a>
-              </li>
-            {% endfor %}
-          </ul>
+    <section class="archive-year">
+      <div class="archive-year-header">
+        <div>
+          <p class="archive-year-label">Year</p>
+          <h2 class="archive-year-heading">{{ year.name }}</h2>
         </div>
-      {% endfor %}
-    </div>
+        <p class="archive-year-count">{{ year.items | size }} entries across {{ posts_by_month | size }} months</p>
+      </div>
+
+      <div class="archive-timeline" aria-label="Field notes from {{ year.name }}">
+        {% for month in posts_by_month %}
+          <div class="archive-month">
+            <div class="archive-month-label-wrap">
+              <h3 class="archive-month-heading">{{ month.name }}</h3>
+              <p class="archive-month-count">{{ month.items | size }} notes</p>
+            </div>
+
+            <ul class="archive-list">
+              {% for post in month.items %}
+                {% assign category_key = post.category | downcase %}
+                {% capture category_label %}
+                  {% case category_key %}
+                    {% when "gardening" %}Garden
+                    {% when "rc-crawling" %}RC Crawling
+                    {% when "fpv" %}FPV / Aircraft
+                    {% when "photography" %}Photography
+                    {% when "amateur-radio" %}Amateur Radio
+                    {% when "motorcycling" %}Motorcycling
+                    {% when "camping" %}Camping
+                    {% when "marksmanship" %}Marksmanship
+                    {% else %}Field Note
+                  {% endcase %}
+                {% endcapture %}
+
+                {% assign mode_key = post.mode | downcase %}
+                {% capture mode_label %}
+                  {% case mode_key %}
+                    {% when "build" %}Build
+                    {% when "explore" %}Explore
+                    {% when "test" %}Test
+                    {% when "maintain" %}Maintain
+                    {% when "observe" %}Observe
+                  {% endcase %}
+                {% endcapture %}
+
+                <li class="archive-entry">
+                  <a class="archive-entry-link" href="{{ post.url | relative_url }}">
+                    <span class="archive-entry-day">{{ post.date | date: "%d" }}</span>
+                    <div class="archive-entry-copy">
+                      <h4 class="archive-entry-title">{{ post.title }}</h4>
+                      <div class="archive-entry-meta">
+                        <span class="archive-entry-date">{{ post.date | date: "%b %-d" }}</span>
+                        <span class="post-category">{{ category_label | strip }}</span>
+                        {% if mode_label != blank %}
+                          <span class="post-mode">{{ mode_label | strip }}</span>
+                        {% endif %}
+                        {% if post.location %}
+                          <span class="archive-entry-location">{{ post.location }}</span>
+                        {% endif %}
+                      </div>
+                    </div>
+                  </a>
+                </li>
+              {% endfor %}
+            </ul>
+          </div>
+        {% endfor %}
+      </div>
+    </section>
   {% endfor %}
 </section>

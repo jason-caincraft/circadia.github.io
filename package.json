@@ -4,5 +4,8 @@
   "scripts": {
     "newpost": "node scripts/newpost.js",
     "publishpost": "node scripts/publishpost.js"
+  },
+  "dependencies": {
+    "exifr": "^7.1.3"
   }
 }

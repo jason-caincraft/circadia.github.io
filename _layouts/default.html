@@ -36,7 +36,7 @@
     {% endif %}
     <link rel="stylesheet" href="{{ '/assets/styles.css' | relative_url }}">
   </head>
-  <body class="{% if page.url == '/' %}page-home{% else %}page-inner{% endif %}{% if page.map_page %} page-map{% endif %}{% if page.layout == 'build' %} page-build{% endif %}">
+  <body class="{% if page.url == '/' %}page-home{% else %}page-inner{% endif %}{% if page.map_page %} page-map{% endif %}{% if page.layout == 'build' %} page-build{% endif %}{% if page.url == '/search/' %} page-search{% endif %}">
     <div class="page-shell">
       <header class="site-banner {% if page.url == '/' %}site-banner--home{% endif %}">
         {% unless page.url == '/' %}
@@ -55,6 +55,7 @@
           <nav class="site-nav" aria-label="Primary navigation">
             <a class="site-nav-link{% if page.url == '/' %} is-current{% endif %}" href="{{ '/' | relative_url }}">Home</a>
             <a class="site-nav-link{% if page.url == '/archive/' %} is-current{% endif %}" href="{{ '/archive/' | relative_url }}">Archive</a>
+            <a class="site-nav-link{% if page.url == '/search/' %} is-current{% endif %}" href="{{ '/search/' | relative_url }}">Search</a>
             <a class="site-nav-link{% if page.url contains '/category/' %} is-current{% endif %}" href="{{ '/category/' | relative_url }}">Categories</a>
             <a class="site-nav-link{% if page.url == '/map/' %} is-current{% endif %}" href="{{ '/map/' | relative_url }}">Map</a>
           </nav>

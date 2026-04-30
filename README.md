@@ -1,12 +1,97 @@
 # CainCraft Circadia - Field Notes and Anecdotes
 
-CainCraft Circadia is a GitHub Pages-friendly Jekyll field journal for projects, places, repairs, rides, flights, radio checks, and small observations. Posts stay newest first on the homepage and paginate automatically every 10 entries.
+CainCraft Circadia is a static GitHub Pages-friendly Jekyll field journal for projects, places, repairs, rides, flights, radio checks, photos, and small observations. The site stays fully static: no backend, no database, no CMS, no custom Jekyll plugins, and no JavaScript frameworks.
 
-## Create a New Post
+## Discovery Features
 
-1. Duplicate an existing Markdown file in `_posts/`.
-2. Rename it using Jekyll's required filename format: `YYYY-MM-DD-title.md`.
-3. Update the front matter and body text for the new entry.
+### Search
+
+- `/search/` is a plain JavaScript client-side search page.
+- The page loads `/search.json`, which Jekyll generates with Liquid during the normal site build.
+- `search.json` includes each post's title, URL, date, category, tags, location, excerpt, and searchable text content.
+- Search runs entirely in the browser and checks title, category, tags, location, and note text.
+
+### On This Day
+
+- The homepage includes a small `On This Day` section.
+- It reads the same static `search.json` index in the browser.
+- The script compares the visitor's current month and day to post dates and shows matching posts from earlier years.
+- If there are no matches yet, the section shows a quiet empty state.
+
+### Archive Timeline
+
+- `/archive/` keeps the site static and now groups entries into clearer year sections with compact month timelines.
+- The archive layout stays readable on mobile and still works with older posts that only have basic front matter.
+
+## Local Authoring Workflow
+
+Install local Node dependencies once:
+
+```bash
+npm install
+```
+
+Create a new post with the helper script:
+
+```bash
+npm run newpost "Post title" -- --image ./path/to/photo.jpg --text "Short note text"
+```
+
+The script:
+
+- creates a dated Markdown file in `_posts/`
+- copies the selected image into `images/`
+- suggests a category from the title and text unless you override it
+- keeps working even if optional metadata is omitted
+
+### EXIF-Assisted Post Creation
+
+The EXIF helper is local only. It runs in `scripts/newpost.js` through Node and never runs during the GitHub Pages build.
+
+Example:
+
+```bash
+npm run newpost "Camp dawn" -- --image ./photos/camp-dawn.jpg --text "Cold air and quiet coffee." --use-exif
+```
+
+When `--use-exif` is passed:
+
+- the script tries to read the image's capture date and uses that date in the post filename
+- the script tries to read GPS coordinates and adds them to front matter when found
+- if EXIF data is incomplete or missing, the script continues gracefully and falls back to today's date
+- if you already pass `--coordinates-lat` and `--coordinates-lng`, those manual values win
+
+EXIF fields that may be detected:
+
+- original capture date, create date, or similar EXIF timestamp fields
+- GPS latitude and longitude when the image contains them
+
+If the `exifr` dependency is not installed yet, `--use-exif` warns and continues without failing the rest of the post creation flow.
+
+## Post Helper Options
+
+Optional flags for `npm run newpost`:
+
+- `--layout post|build`
+- `--category auto|gardening|rc-crawling|fpv|photography|amateur-radio|motorcycling|camping|marksmanship`
+- `--tags "tag one, tag two"`
+- `--mode build|explore|test|maintain|observe`
+- `--location "Backyard"`
+- `--coordinates-lat 43.615`
+- `--coordinates-lng -116.202`
+- `--weather "Clear"`
+- `--temperature "58 F"`
+- `--light "Late afternoon"`
+- `--gear "Axial SCX6 Jeep | Canon camera"`
+- `--project "Axial SCX6 Jeep"`
+- `--stage "Suspension tuning"`
+- `--parts "Softer rear springs | Wheel weights"`
+- `--changes "Adjusted preload | Moved battery forward"`
+- `--lessons "Better climbing balance"`
+- `--alt "Optional image description"`
+- `--use-exif`
+
+## Front Matter Reference
 
 Use this front matter shape for a standard post:
 
@@ -32,11 +117,11 @@ alt: "Optional image description"
 ---
 ```
 
-Everything except `title` is optional. Existing posts without coordinates, conditions, gear, or mode still render normally.
+Everything except `title` is optional. Existing posts without coordinates, conditions, gear, tags, or mode still render normally.
 
-The post date comes from the filename, not from front matter. If you want a post to show a different day, change the `YYYY-MM-DD` portion of the filename.
+The post date comes from the filename. If you want a post to land on a different day, change the `YYYY-MM-DD` portion of the filename or use `--use-exif` with an image that contains a capture date.
 
-## Valid Categories
+## Categories
 
 Use one of these `category` values:
 
@@ -49,27 +134,11 @@ Use one of these `category` values:
 - `camping`
 - `marksmanship`
 
-If `category` is omitted, the site will display the post as `Field Note`.
-
-## Tags
-
-Add a `tags` array when you want small non-clickable pills to appear on post cards and individual post pages:
-
-```yaml
-tags: [backyard, tuning, suspension]
-```
-
-Tags are display-only. There are no tag archive pages yet.
+If `category` is omitted, the site displays the post as `Field Note`.
 
 ## Modes
 
-Add `mode` when a post should show a work-state indicator:
-
-```yaml
-mode: test
-```
-
-Use one of these `mode` values:
+Use one of these `mode` values when a post should show a work-state indicator:
 
 - `build`
 - `explore`
@@ -79,74 +148,15 @@ Use one of these `mode` values:
 
 If `mode` is omitted, nothing is shown.
 
-## Add Images
+## Images, Locations, and Map Coordinates
 
-1. Place image files in the `images/` directory.
-2. Reference the file from front matter with a site-root path such as `/images/camp.jpg`.
-3. Add `alt` text when you can so the image is described for screen readers.
+- Store post images in `images/`.
+- Reference them from front matter with a site-root path such as `/images/camp.jpg`.
+- Add `alt` text when possible so the image is described for screen readers.
+- Add `location` when a note should show where it happened.
+- Add both `coordinates.lat` and `coordinates.lng` when a post should appear on `/map/`.
 
-If `alt` is omitted, the templates fall back to the post title and then to a neutral default description.
-
-## Optional Location Field
-
-Add `location` when a note should show where it happened:
-
-```yaml
-location: "Somewhere off the main road"
-```
-
-Leave it out when the place is not important to the entry.
-
-## Add Coordinates for the Map
-
-Add a `coordinates` object when you want a post to appear on the map page:
-
-```yaml
-coordinates:
-  lat: 43.615
-  lng: -116.202
-```
-
-- `lat` and `lng` must both be present for the marker to appear.
-- Posts without coordinates are ignored on the map page.
-- The map page lives at `/map/` and is linked in the top navigation.
-
-The marker popup shows:
-
-- post title
-- date
-- category
-- location
-- link to the full post
-
-If no posts contain coordinates, `/map/` shows a helpful empty-state message instead of an empty map.
-
-## Add Conditions
-
-Add a `conditions` object when you want the site to show a compact field log on the homepage card and the individual post page:
-
-```yaml
-conditions:
-  weather: "Clear"
-  temperature: "58 F"
-  light: "Late afternoon"
-```
-
-You can include any subset of the fields above. Missing values are skipped automatically.
-
-## Add Gear
-
-Add a `gear` list when you want a `Gear Used` section on the post page:
-
-```yaml
-gear:
-  - "Axial SCX6 Jeep"
-  - "Canon camera"
-  - "2 mm hex driver"
-```
-
-- Individual post pages show the full list.
-- Homepage cards show a shortened version when gear is present.
+Posts without coordinates are ignored on the map page. Posts without images, locations, or conditions still render cleanly.
 
 ## Build Log Posts
 
@@ -163,66 +173,22 @@ Build posts support these optional fields:
 - `gear`
 - `coordinates`
 
-Example front matter:
-
-```yaml
----
-layout: build
-title: "SCX6 backyard suspension test"
-image: /images/2026-04-29-backyard-rc-crawling.jpg
-category: rc-crawling
-tags: [backyard, suspension, tuning]
-mode: build
-project: "Axial SCX6 Jeep"
-stage: "Suspension tuning"
-location: "Backyard rock pile"
-coordinates:
-  lat: 43.615
-  lng: -116.202
-conditions:
-  weather: "Clear"
-  temperature: "58 F"
-  light: "Late afternoon"
-gear:
-  - "Axial SCX6 Jeep"
-  - "Wheel hex weights"
-parts:
-  - "Softer rear springs"
-  - "Wheel weights"
-changes:
-  - "Adjusted preload"
-  - "Moved battery slightly forward"
-lessons:
-  - "Better climbing balance"
-alt: "SCX6 crawler on a backyard rock line during suspension testing"
----
-```
-
-The build layout renders:
-
-- project name
-- stage
-- date
-- image
-- main post content
-- parts list
-- changes made
-- lessons learned
-
 See `_posts/2026-04-30-scx6-backyard-suspension-test.md` for a complete working example.
 
-## GitHub Pages Deployment
+## GitHub Pages Compatibility
 
-1. Push changes to the repository's published branch.
-2. GitHub Pages builds the site with Jekyll automatically.
-3. The homepage uses `jekyll-paginate`, so the front page stays at 10 posts per page and generates older pages such as `/page2/`, `/page3/`, and so on.
-4. The map page stays static and only loads Leaflet when at least one post includes coordinates.
-5. Because the site is fully static, there is no CMS, login system, backend service, or database to maintain.
+- The site uses standard Jekyll templates and `jekyll-paginate`.
+- Search works from a generated static JSON file and browser-side JavaScript.
+- On This Day also uses browser-side JavaScript against the generated static JSON file.
+- EXIF processing is local only in Node and does not run on GitHub Pages.
+- The deployed site remains static and maintainable.
 
 ## Project Structure
 
 - `_config.yml` holds the site identity and Jekyll pagination settings.
-- `index.html` renders the homepage hero and paginated feed.
+- `index.html` renders the homepage hero, the `On This Day` section, and the paginated feed.
+- `search.html` provides the client-side search page at `/search/`.
+- `search.json` generates the static search index with Liquid.
 - `map.html` builds the optional field map page at `/map/`.
 - `archive.html` builds the archive page at `/archive/`.
 - `category/index.html` builds the category directory page at `/category/`.
@@ -233,4 +199,5 @@ See `_posts/2026-04-30-scx6-backyard-suspension-test.md` for a complete working 
 - `_includes/post-card.html` renders homepage post cards.
 - `_posts/` stores Markdown entries named with date-based filenames.
 - `images/` stores post images.
-- `assets/styles.css` contains the field notebook / workbench theme.
+- `assets/styles.css` contains the field notebook and workbench theme.
+- `scripts/newpost.js` handles local post generation and optional EXIF extraction.
