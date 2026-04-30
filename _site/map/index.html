@@ -1,0 +1,219 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    
+    
+    
+    <title>
+      
+        Map | CainCraft Circadia
+      
+    </title>
+    <meta name="description" content="Field Notes and Anecdotes">
+    
+      <link
+        rel="stylesheet"
+        href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+        integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+        crossorigin=""
+      >
+      <script
+        src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+        integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+        crossorigin=""
+        defer
+      ></script>
+    
+    <link rel="stylesheet" href="/assets/styles.css">
+  </head>
+  <body class="page-inner page-map">
+    <div class="page-shell">
+      <header class="site-banner ">
+        
+          <a class="site-banner-image-link" href="/" aria-label="Return to homepage">
+            <img
+              class="site-banner-image site-banner-image--compact"
+              src="/images/caincraft_banner.png"
+              alt="CainCraft Circadia banner"
+            >
+          </a>
+        
+
+        <div class="site-banner-top">
+          <a class="site-brand" href="/">CainCraft Circadia</a>
+
+          <nav class="site-nav" aria-label="Primary navigation">
+            <a class="site-nav-link" href="/">Home</a>
+            <a class="site-nav-link" href="/archive/">Archive</a>
+            <a class="site-nav-link" href="/search/">Search</a>
+            <a class="site-nav-link" href="/category/">Categories</a>
+            <a class="site-nav-link is-current" href="/map/">Map</a>
+          </nav>
+        </div>
+
+        
+          <p class="site-description">Field Notes and Anecdotes</p>
+        
+
+        <div class="category-links category-links--compact" aria-label="Browse categories">
+          <a class="category-link" href="/category/gardening/">Garden</a>
+          <a class="category-link" href="/category/rc-crawling/">RC Crawling</a>
+          <a class="category-link" href="/category/fpv/">FPV</a>
+          <a class="category-link" href="/category/photography/">Photography</a>
+          <a class="category-link" href="/category/amateur-radio/">Amateur Radio</a>
+          <a class="category-link" href="/category/motorcycling/">Motorcycling</a>
+          <a class="category-link" href="/category/camping/">Camping</a>
+          <a class="category-link" href="/category/marksmanship/">Marksmanship</a>
+        </div>
+      </header>
+
+      <main class="site-content">
+        
+
+
+<section class="section-panel fade-in" aria-labelledby="map-title">
+  <p class="section-kicker">Field Map</p>
+  <h1 class="section-title" id="map-title">Notes pinned to the map</h1>
+  <p class="section-copy">
+    Posts with saved coordinates show up here as markers. Each pin opens a small ledger entry with the title, date,
+    category, location, and a link back to the full note.
+  </p>
+</section>
+
+
+  <section class="map-shell fade-in" aria-label="Mapped field notes">
+    <div class="section-panel map-panel">
+      <div id="field-map" class="map-canvas" aria-label="Map of field note locations"></div>
+      <noscript>
+        <p class="map-note">This map needs JavaScript enabled to draw markers. The post list alongside it still works.</p>
+      </noscript>
+    </div>
+
+    <aside class="section-panel map-ledger" aria-labelledby="map-ledger-title">
+      <h2 class="map-ledger-title" id="map-ledger-title">Mapped posts</h2>
+      <p class="map-note">Only entries with `coordinates.lat` and `coordinates.lng` are listed here.</p>
+      <ol class="map-entry-list">
+        
+          
+            
+            
+            <li class="map-entry">
+              <a class="map-entry-link" href="/2026/04/30/scx6-backyard-suspension-test/">SCX6 backyard suspension test</a>
+              <div class="map-entry-meta">
+                <span>April 30, 2026</span>
+                
+                  <span>RC Crawling</span>
+                
+                
+                  <span>Backyard rock pile</span>
+                
+              </div>
+            </li>
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+      </ol>
+    </aside>
+  </section>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      if (!window.L) {
+        return;
+      }
+
+      
+      const mapPosts = [
+        
+          
+            
+            
+            
+            {
+              title: "SCX6 backyard suspension test",
+              date: "April 30, 2026",
+              category: "RC Crawling",
+              location: "Backyard rock pile",
+              url: "/2026/04/30/scx6-backyard-suspension-test/",
+              lat: 43.615,
+              lng: -116.202
+            }
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+      ];
+
+      if (!mapPosts.length) {
+        return;
+      }
+
+      const escapeHtml = function (value) {
+        return String(value).replace(/[&<>"']/g, function (character) {
+          const entities = {
+            "&": "&amp;",
+            "<": "&lt;",
+            ">": "&gt;",
+            "\"": "&quot;",
+            "'": "&#39;"
+          };
+          return entities[character];
+        });
+      };
+
+      const map = L.map("field-map", {
+        scrollWheelZoom: false
+      });
+
+      L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+        maxZoom: 18,
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+      }).addTo(map);
+
+      const bounds = [];
+
+      mapPosts.forEach(function (post) {
+        const marker = L.marker([post.lat, post.lng]).addTo(map);
+        bounds.push([post.lat, post.lng]);
+
+        marker.bindPopup(
+          '<div class="map-popup">' +
+            '<strong class="map-popup-title">' + escapeHtml(post.title) + '</strong>' +
+            '<span>' + escapeHtml(post.date) + '</span>' +
+            '<span>' + escapeHtml(post.category) + '</span>' +
+            '<span>' + escapeHtml(post.location) + '</span>' +
+            '<a class="map-popup-link" href="' + post.url + '">Read post</a>' +
+          '</div>'
+        );
+      });
+
+      if (bounds.length === 1) {
+        map.setView(bounds[0], 11);
+      } else {
+        map.fitBounds(bounds, {
+          padding: [28, 28]
+        });
+      }
+    });
+  </script>
+
+
+      </main>
+    </div>
+  </body>
+</html>

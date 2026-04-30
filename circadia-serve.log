@@ -1,0 +1,1108 @@
+Configuration file: C:/Users/terb0/source/repos/circadia.github.io/_config.yml
+            Source: C:/Users/terb0/source/repos/circadia.github.io
+       Destination: C:/Users/terb0/source/repos/circadia.github.io/_site
+ Incremental build: disabled. Enable with --incremental
+      Generating... 
+                    done in 0.217 seconds.
+ Auto-regeneration: enabled for 'C:/Users/terb0/source/repos/circadia.github.io'
+    Server address: http://127.0.0.1:4000
+  Server running... press ctrl-c to stop.
+      Regenerating: 1 file(s) changed at 2026-04-30 11:58:13
+                    circadia-serve.log
+                    ...done in 0.167645 seconds.
+                    
+      Regenerating: 1 file(s) changed at 2026-04-30 11:58:14
+                    circadia-serve.log
+                    ...done in 0.1430364 seconds.
+                    
+      Regenerating: 1 file(s) changed at 2026-04-30 11:58:15
+                    circadia-serve.log
+                    ...done in 0.1093672 seconds.
+                    
+[2026-04-30 11:58:15] ERROR Errno::ECONNRESET: An existing connection was forcibly closed by the remote host. @ io_fillbuf - fd:6 
+	C:/Ruby40-x64/lib/ruby/gems/4.0.0/gems/webrick-1.9.2/lib/webrick/httpserver.rb:82:in 'IO#eof?'
+	C:/Ruby40-x64/lib/ruby/gems/4.0.0/gems/webrick-1.9.2/lib/webrick/httpserver.rb:82:in 'WEBrick::HTTPServer#run'
+	C:/Ruby40-x64/lib/ruby/gems/4.0.0/gems/webrick-1.9.2/lib/webrick/server.rb:309:in 'block in WEBrick::GenericServer#start_thread'
+      Regenerating: 1 file(s) changed at 2026-04-30 11:58:16
+                    circadia-serve.log
+                    ...done in 0.1106195 seconds.
+                    
+      Regenerating: 1 file(s) changed at 2026-04-30 11:58:17
+                    circadia-serve.log
+                    ...done in 0.1110776 seconds.
+                    
+      Regenerating: 1 file(s) changed at 2026-04-30 11:58:18
+                    circadia-serve.log
+                    ...done in 0.1096682 seconds.
+                    
+      Regenerating: 1 file(s) changed at 2026-04-30 11:58:19
+                    circadia-serve.log
+                    ...done in 0.1084417 seconds.
+                    
+      Regenerating: 1 file(s) changed at 2026-04-30 11:58:20
+                    circadia-serve.log
+                    ...done in 0.1131407 seconds.
+                    
+      Regenerating: 1 file(s) changed at 2026-04-30 11:58:21
+                    circadia-serve.log
+                    ...done in 0.1117204 seconds.
+                    
+      Regenerating: 1 file(s) changed at 2026-04-30 11:58:22
+                    circadia-serve.log
+                    ...done in 0.1084542 seconds.
+                    
+      Regenerating: 1 file(s) changed at 2026-04-30 11:58:23
+                    circadia-serve.log
+                    ...done in 0.1141749 seconds.
+                    
+      Regenerating: 1 file(s) changed at 2026-04-30 11:58:24
+                    circadia-serve.log
+                    ...done in 0.1151437 seconds.
+                    
+      Regenerating: 1 file(s) changed at 2026-04-30 11:58:25
+                    circadia-serve.log
+                    ...done in 0.1075641 seconds.
+                    
+      Regenerating: 1 file(s) changed at 2026-04-30 11:58:26
+                    circadia-serve.log
+                    ...done in 0.132462 seconds.
+                    
+      Regenerating: 1 file(s) changed at 2026-04-30 11:58:27
+                    circadia-serve.log
+                    ...done in 0.1292926 seconds.
+                    
+      Regenerating: 1 file(s) changed at 2026-04-30 11:58:28
+                    circadia-serve.log
+                    ...done in 0.1130851 seconds.
+                    
+      Regenerating: 1 file(s) changed at 2026-04-30 11:58:29
+                    circadia-serve.log
+                    ...done in 0.1303809 seconds.
+                    
+      Regenerating: 1 file(s) changed at 2026-04-30 11:58:30
+                    circadia-serve.log
+                    ...done in 0.1078579 seconds.
+                    
+      Regenerating: 1 file(s) changed at 2026-04-30 11:58:31
+                    circadia-serve.log
+                    ...done in 0.1121036 seconds.
+                    
+      Regenerating: 1 file(s) changed at 2026-04-30 11:58:32
+                    circadia-serve.log
+                    ...done in 0.1148855 seconds.
+                    
+      Regenerating: 1 file(s) changed at 2026-04-30 11:58:33
+                    circadia-serve.log
+                    ...done in 0.1103204 seconds.
+                    
+      Regenerating: 1 file(s) changed at 2026-04-30 11:58:34
+                    circadia-serve.log
+                    ...done in 0.1072359 seconds.
+                    
+      Regenerating: 1 file(s) changed at 2026-04-30 11:58:35
+                    circadia-serve.log
+                    ...done in 0.1581784 seconds.
+                    
+      Regenerating: 1 file(s) changed at 2026-04-30 11:58:36
+                    circadia-serve.log
+                    ...done in 0.1144718 seconds.
+                    
+      Regenerating: 1 file(s) changed at 2026-04-30 11:58:37
+                    circadia-serve.log
+                    ...done in 0.1117629 seconds.
+                    
+      Regenerating: 1 file(s) changed at 2026-04-30 11:58:38
+                    circadia-serve.log
+                    ...done in 0.1099623 seconds.
+                    
+      Regenerating: 1 file(s) changed at 2026-04-30 11:58:39
+                    circadia-serve.log
+                    ...done in 0.1086621 seconds.
+                    
+      Regenerating: 1 file(s) changed at 2026-04-30 11:58:40
+                    circadia-serve.log
+                    ...done in 0.1115394 seconds.
+                    
+      Regenerating: 1 file(s) changed at 2026-04-30 11:58:41
+                    circadia-serve.log
+                    ...done in 0.1118635 seconds.
+                    
+      Regenerating: 1 file(s) changed at 2026-04-30 11:58:42
+                    circadia-serve.log
+                    ...done in 0.1133055 seconds.
+                    
+      Regenerating: 1 file(s) changed at 2026-04-30 11:58:43
+                    circadia-serve.log
+                    ...done in 0.1119878 seconds.
+                    
+      Regenerating: 1 file(s) changed at 2026-04-30 11:58:44
+                    circadia-serve.log
+                    ...done in 0.1091295 seconds.
+                    
+      Regenerating: 1 file(s) changed at 2026-04-30 11:58:45
+                    circadia-serve.log
+                    ...done in 0.1090268 seconds.
+                    
+      Regenerating: 1 file(s) changed at 2026-04-30 11:58:46
+                    circadia-serve.log
+                    ...done in 0.115195 seconds.
+                    
+      Regenerating: 1 file(s) changed at 2026-04-30 11:58:47
+                    circadia-serve.log
+                    ...done in 0.1247182 seconds.
+                    
+      Regenerating: 1 file(s) changed at 2026-04-30 11:58:48
+                    circadia-serve.log
+                    ...done in 0.1218201 seconds.
+                    
+      Regenerating: 1 file(s) changed at 2026-04-30 11:58:49
+                    circadia-serve.log
+                    ...done in 0.1353414 seconds.
+                    
+      Regenerating: 1 file(s) changed at 2026-04-30 11:58:50
+                    circadia-serve.log
+                    ...done in 0.1221032 seconds.
+                    
+      Regenerating: 1 file(s) changed at 2026-04-30 11:58:51
+                    circadia-serve.log
+                    ...done in 0.1120703 seconds.
+                    
+      Regenerating: 1 file(s) changed at 2026-04-30 11:58:52
+                    circadia-serve.log
+                    ...done in 0.1166606 seconds.
+                    
+      Regenerating: 1 file(s) changed at 2026-04-30 11:58:53
+                    circadia-serve.log
+                    ...done in 0.1132803 seconds.
+                    
+      Regenerating: 1 file(s) changed at 2026-04-30 11:58:54
+                    circadia-serve.log
+                    ...done in 0.1102373 seconds.
+                    
+      Regenerating: 1 file(s) changed at 2026-04-30 11:58:55
+                    circadia-serve.log
+                    ...done in 0.1088623 seconds.
+                    
+      Regenerating: 1 file(s) changed at 2026-04-30 11:58:56
+                    circadia-serve.log
+                    ...done in 0.1096596 seconds.
+                    
+      Regenerating: 1 file(s) changed at 2026-04-30 11:58:57
+                    circadia-serve.log
+                    ...done in 0.1117465 seconds.
+                    
+      Regenerating: 1 file(s) changed at 2026-04-30 11:58:58
+                    circadia-serve.log
+                    ...done in 0.1212216 seconds.
+                    
+      Regenerating: 1 file(s) changed at 2026-04-30 11:58:59
+                    circadia-serve.log
+                    ...done in 0.1092962 seconds.
+                    
+      Regenerating: 1 file(s) changed at 2026-04-30 11:59:00
+                    circadia-serve.log
+                    ...done in 0.1088024 seconds.
+                    
+      Regenerating: 1 file(s) changed at 2026-04-30 11:59:01
+                    circadia-serve.log
+                    ...done in 0.1073272 seconds.
+                    
+      Regenerating: 1 file(s) changed at 2026-04-30 11:59:02
+                    circadia-serve.log
+                    ...done in 0.1086767 seconds.
+                    
+      Regenerating: 1 file(s) changed at 2026-04-30 11:59:03
+                    circadia-serve.log
+                    ...done in 0.109262 seconds.
+                    
+      Regenerating: 1 file(s) changed at 2026-04-30 11:59:04
+                    circadia-serve.log
+                    ...done in 0.1092899 seconds.
+                    
+      Regenerating: 1 file(s) changed at 2026-04-30 11:59:05
+                    circadia-serve.log
+                    ...done in 0.1164431 seconds.
+                    
+      Regenerating: 1 file(s) changed at 2026-04-30 11:59:06
+                    circadia-serve.log
+                    ...done in 0.1097294 seconds.
+                    
+      Regenerating: 1 file(s) changed at 2026-04-30 11:59:07
+                    circadia-serve.log
+                    ...done in 0.119714 seconds.
+                    
+      Regenerating: 1 file(s) changed at 2026-04-30 11:59:08
+                    circadia-serve.log
+                    ...done in 0.1164069 seconds.
+                    
+      Regenerating: 1 file(s) changed at 2026-04-30 11:59:09
+                    circadia-serve.log
+                    ...done in 0.1106079 seconds.
+                    
+      Regenerating: 1 file(s) changed at 2026-04-30 11:59:10
+                    circadia-serve.log
+                    ...done in 0.1187575 seconds.
+                    
+      Regenerating: 1 file(s) changed at 2026-04-30 11:59:11
+                    circadia-serve.log
+                    ...done in 0.1079207 seconds.
+                    
+      Regenerating: 1 file(s) changed at 2026-04-30 11:59:12
+                    circadia-serve.log
+                    ...done in 0.1063992 seconds.
+                    
+      Regenerating: 1 file(s) changed at 2026-04-30 11:59:13
+                    circadia-serve.log
+                    ...done in 0.1082967 seconds.
+                    
+      Regenerating: 1 file(s) changed at 2026-04-30 11:59:14
+                    circadia-serve.log
+                    ...done in 0.1079948 seconds.
+                    
+      Regenerating: 1 file(s) changed at 2026-04-30 11:59:15
+                    circadia-serve.log
+                    ...done in 0.1085655 seconds.
+                    
+      Regenerating: 1 file(s) changed at 2026-04-30 11:59:16
+                    circadia-serve.log
+                    ...done in 0.1146043 seconds.
+                    
+      Regenerating: 1 file(s) changed at 2026-04-30 11:59:17
+                    circadia-serve.log
+                    ...done in 0.1429333 seconds.
+                    
+      Regenerating: 1 file(s) changed at 2026-04-30 11:59:18
+                    circadia-serve.log
+                    ...done in 0.1111909 seconds.
+                    
+      Regenerating: 1 file(s) changed at 2026-04-30 11:59:19
+                    circadia-serve.log
+                    ...done in 0.1139371 seconds.
+                    
+      Regenerating: 1 file(s) changed at 2026-04-30 11:59:20
+                    circadia-serve.log
+                    ...done in 0.1133284 seconds.
+                    
+      Regenerating: 1 file(s) changed at 2026-04-30 11:59:21
+                    circadia-serve.log
+                    ...done in 0.1183386 seconds.
+                    
+      Regenerating: 1 file(s) changed at 2026-04-30 11:59:22
+                    circadia-serve.log
+                    ...done in 0.1076377 seconds.
+                    
+[2026-04-30 11:59:23] ERROR '/favicon.ico' not found.
+      Regenerating: 1 file(s) changed at 2026-04-30 11:59:23
+                    circadia-serve.log
+                    ...done in 0.1320725 seconds.
+                    
+      Regenerating: 1 file(s) changed at 2026-04-30 11:59:24
+                    circadia-serve.log
+                    ...done in 0.1057582 seconds.
+                    
+      Regenerating: 1 file(s) changed at 2026-04-30 11:59:25
+                    circadia-serve.log
+                    ...done in 0.110161 seconds.
+                    
+      Regenerating: 1 file(s) changed at 2026-04-30 11:59:26
+                    circadia-serve.log
+                    ...done in 0.1069403 seconds.
+                    
+      Regenerating: 1 file(s) changed at 2026-04-30 11:59:27
+                    circadia-serve.log
+                    ...done in 0.1057893 seconds.
+                    
+      Regenerating: 1 file(s) changed at 2026-04-30 11:59:28
+                    circadia-serve.log
+                    ...done in 0.1036784 seconds.
+                    
+      Regenerating: 1 file(s) changed at 2026-04-30 11:59:29
+                    circadia-serve.log
+                    ...done in 0.1046757 seconds.
+                    
+      Regenerating: 1 file(s) changed at 2026-04-30 11:59:30
+                    circadia-serve.log
+                    ...done in 0.1143625 seconds.
+                    
+      Regenerating: 1 file(s) changed at 2026-04-30 11:59:31
+                    circadia-serve.log
+                    ...done in 0.1044906 seconds.
+                    
+      Regenerating: 1 file(s) changed at 2026-04-30 11:59:32
+                    circadia-serve.log
+                    ...done in 0.1143827 seconds.
+                    
+      Regenerating: 1 file(s) changed at 2026-04-30 11:59:33
+                    circadia-serve.log
+                    ...done in 0.115787 seconds.
+                    
+      Regenerating: 1 file(s) changed at 2026-04-30 11:59:34
+                    circadia-serve.log
+                    ...done in 0.1102377 seconds.
+                    
+      Regenerating: 1 file(s) changed at 2026-04-30 11:59:35
+                    circadia-serve.log
+                    ...done in 0.1240063 seconds.
+                    
+      Regenerating: 1 file(s) changed at 2026-04-30 11:59:36
+                    circadia-serve.log
+                    ...done in 0.1113866 seconds.
+                    
+      Regenerating: 1 file(s) changed at 2026-04-30 11:59:37
+                    circadia-serve.log
+                    ...done in 0.1137543 seconds.
+                    
+      Regenerating: 1 file(s) changed at 2026-04-30 11:59:38
+                    circadia-serve.log
+                    ...done in 0.1063645 seconds.
+                    
+      Regenerating: 1 file(s) changed at 2026-04-30 11:59:39
+                    circadia-serve.log
+                    ...done in 0.1039494 seconds.
+                    
+      Regenerating: 1 file(s) changed at 2026-04-30 11:59:40
+                    circadia-serve.log
+                    ...done in 0.1048147 seconds.
+                    
+      Regenerating: 1 file(s) changed at 2026-04-30 11:59:41
+                    circadia-serve.log
+                    ...done in 0.1133551 seconds.
+                    
+      Regenerating: 1 file(s) changed at 2026-04-30 11:59:42
+                    circadia-serve.log
+                    ...done in 0.1052674 seconds.
+                    
+      Regenerating: 1 file(s) changed at 2026-04-30 11:59:43
+                    circadia-serve.log
+                    ...done in 0.116408 seconds.
+                    
+      Regenerating: 1 file(s) changed at 2026-04-30 11:59:44
+                    circadia-serve.log
+                    ...done in 0.1159707 seconds.
+                    
+      Regenerating: 1 file(s) changed at 2026-04-30 11:59:45
+                    circadia-serve.log
+                    ...done in 0.1104427 seconds.
+                    
+      Regenerating: 1 file(s) changed at 2026-04-30 11:59:46
+                    circadia-serve.log
+                    ...done in 0.1225889 seconds.
+                    
+      Regenerating: 1 file(s) changed at 2026-04-30 11:59:47
+                    circadia-serve.log
+                    ...done in 0.1120477 seconds.
+                    
+      Regenerating: 1 file(s) changed at 2026-04-30 11:59:48
+                    circadia-serve.log
+                    ...done in 0.1073571 seconds.
+                    
+      Regenerating: 1 file(s) changed at 2026-04-30 11:59:49
+                    circadia-serve.log
+                    ...done in 0.1105294 seconds.
+                    
+      Regenerating: 1 file(s) changed at 2026-04-30 11:59:50
+                    circadia-serve.log
+                    ...done in 0.11262 seconds.
+                    
+      Regenerating: 1 file(s) changed at 2026-04-30 11:59:51
+                    circadia-serve.log
+                    ...done in 0.1147676 seconds.
+                    
+      Regenerating: 1 file(s) changed at 2026-04-30 11:59:52
+                    circadia-serve.log
+                    ...done in 0.1093464 seconds.
+                    
+      Regenerating: 1 file(s) changed at 2026-04-30 11:59:53
+                    circadia-serve.log
+                    ...done in 0.1108003 seconds.
+                    
+      Regenerating: 1 file(s) changed at 2026-04-30 11:59:54
+                    circadia-serve.log
+                    ...done in 0.1088283 seconds.
+                    
+      Regenerating: 1 file(s) changed at 2026-04-30 11:59:55
+                    circadia-serve.log
+                    ...done in 0.1128374 seconds.
+                    
+      Regenerating: 1 file(s) changed at 2026-04-30 11:59:56
+                    circadia-serve.log
+                    ...done in 0.1097423 seconds.
+                    
+      Regenerating: 1 file(s) changed at 2026-04-30 11:59:58
+                    circadia-serve.log
+                    ...done in 0.1078017 seconds.
+                    
+      Regenerating: 1 file(s) changed at 2026-04-30 11:59:58
+                    circadia-serve.log
+                    ...done in 0.108195 seconds.
+                    
+      Regenerating: 1 file(s) changed at 2026-04-30 11:59:59
+                    circadia-serve.log
+                    ...done in 0.1092119 seconds.
+                    
+      Regenerating: 1 file(s) changed at 2026-04-30 12:00:00
+                    circadia-serve.log
+                    ...done in 0.1177701 seconds.
+                    
+      Regenerating: 1 file(s) changed at 2026-04-30 12:00:01
+                    circadia-serve.log
+                    ...done in 0.1108641 seconds.
+                    
+      Regenerating: 1 file(s) changed at 2026-04-30 12:00:03
+                    circadia-serve.log
+                    ...done in 0.1072363 seconds.
+                    
+      Regenerating: 1 file(s) changed at 2026-04-30 12:00:04
+                    circadia-serve.log
+                    ...done in 0.1128662 seconds.
+                    
+      Regenerating: 1 file(s) changed at 2026-04-30 12:00:05
+                    circadia-serve.log
+                    ...done in 0.109012 seconds.
+                    
+      Regenerating: 1 file(s) changed at 2026-04-30 12:00:06
+                    circadia-serve.log
+                    ...done in 0.1114052 seconds.
+                    
+      Regenerating: 1 file(s) changed at 2026-04-30 12:00:07
+                    circadia-serve.log
+                    ...done in 0.1098204 seconds.
+                    
+      Regenerating: 1 file(s) changed at 2026-04-30 12:00:08
+                    circadia-serve.log
+                    ...done in 0.1091551 seconds.
+                    
+      Regenerating: 1 file(s) changed at 2026-04-30 12:00:09
+                    circadia-serve.log
+                    ...done in 0.1096505 seconds.
+                    
+      Regenerating: 1 file(s) changed at 2026-04-30 12:00:10
+                    circadia-serve.log
+                    ...done in 0.1817054 seconds.
+                    
+      Regenerating: 1 file(s) changed at 2026-04-30 12:00:11
+                    circadia-serve.log
+                    ...done in 0.1384279 seconds.
+                    
+      Regenerating: 1 file(s) changed at 2026-04-30 12:00:12
+                    circadia-serve.log
+                    ...done in 0.1627742 seconds.
+                    
+      Regenerating: 1 file(s) changed at 2026-04-30 12:00:13
+                    circadia-serve.log
+                    ...done in 0.2431316 seconds.
+                    
+      Regenerating: 1 file(s) changed at 2026-04-30 12:00:14
+                    circadia-serve.log
+                    ...done in 0.1692104 seconds.
+                    
+      Regenerating: 1 file(s) changed at 2026-04-30 12:00:15
+                    circadia-serve.log
+                    ...done in 0.3690276 seconds.
+                    
+      Regenerating: 1 file(s) changed at 2026-04-30 12:00:16
+                    circadia-serve.log
+                    ...done in 0.3938883 seconds.
+                    
+      Regenerating: 1 file(s) changed at 2026-04-30 12:00:17
+                    circadia-serve.log
+                    ...done in 0.1646799 seconds.
+                    
+      Regenerating: 1 file(s) changed at 2026-04-30 12:00:18
+                    circadia-serve.log
+                    ...done in 0.1890327 seconds.
+                    
+      Regenerating: 1 file(s) changed at 2026-04-30 12:00:19
+                    circadia-serve.log
+                    ...done in 0.3446854 seconds.
+                    
+      Regenerating: 1 file(s) changed at 2026-04-30 12:00:20
+                    circadia-serve.log
+                    ...done in 0.2028228 seconds.
+                    
+      Regenerating: 1 file(s) changed at 2026-04-30 12:00:21
+                    circadia-serve.log
+                    ...done in 0.2441947 seconds.
+                    
+      Regenerating: 1 file(s) changed at 2026-04-30 12:00:22
+                    circadia-serve.log
+                    ...done in 0.3116832 seconds.
+                    
+      Regenerating: 1 file(s) changed at 2026-04-30 12:00:23
+                    circadia-serve.log
+                    ...done in 0.2693988 seconds.
+                    
+      Regenerating: 1 file(s) changed at 2026-04-30 12:00:24
+                    circadia-serve.log
+                    ...done in 0.1184543 seconds.
+                    
+      Regenerating: 1 file(s) changed at 2026-04-30 12:00:25
+                    circadia-serve.log
+                    ...done in 0.1139387 seconds.
+                    
+      Regenerating: 1 file(s) changed at 2026-04-30 12:00:26
+                    circadia-serve.log
+                    ...done in 0.1052511 seconds.
+                    
+      Regenerating: 1 file(s) changed at 2026-04-30 12:00:27
+                    circadia-serve.log
+                    ...done in 0.1143003 seconds.
+                    
+      Regenerating: 1 file(s) changed at 2026-04-30 12:00:28
+                    circadia-serve.log
+                    ...done in 0.1159165 seconds.
+                    
+      Regenerating: 1 file(s) changed at 2026-04-30 12:00:29
+                    circadia-serve.log
+                    ...done in 0.1079279 seconds.
+                    
+      Regenerating: 1 file(s) changed at 2026-04-30 12:00:30
+                    circadia-serve.log
+                    ...done in 0.1166016 seconds.
+                    
+      Regenerating: 1 file(s) changed at 2026-04-30 12:00:31
+                    circadia-serve.log
+                    ...done in 0.1143386 seconds.
+                    
+      Regenerating: 1 file(s) changed at 2026-04-30 12:00:32
+                    circadia-serve.log
+                    ...done in 0.1076126 seconds.
+                    
+      Regenerating: 1 file(s) changed at 2026-04-30 12:00:33
+                    circadia-serve.log
+                    ...done in 0.1045319 seconds.
+                    
+      Regenerating: 1 file(s) changed at 2026-04-30 12:00:34
+                    circadia-serve.log
+                    ...done in 0.1109605 seconds.
+                    
+      Regenerating: 1 file(s) changed at 2026-04-30 12:00:35
+                    circadia-serve.log
+                    ...done in 0.108221 seconds.
+                    
+      Regenerating: 1 file(s) changed at 2026-04-30 12:00:36
+                    circadia-serve.log
+                    ...done in 0.1198777 seconds.
+                    
+      Regenerating: 1 file(s) changed at 2026-04-30 12:00:37
+                    circadia-serve.log
+                    ...done in 0.1120532 seconds.
+                    
+      Regenerating: 1 file(s) changed at 2026-04-30 12:00:38
+                    circadia-serve.log
+                    ...done in 0.1092786 seconds.
+                    
+      Regenerating: 1 file(s) changed at 2026-04-30 12:00:39
+                    circadia-serve.log
+                    ...done in 0.1118806 seconds.
+                    
+      Regenerating: 1 file(s) changed at 2026-04-30 12:00:40
+                    circadia-serve.log
+                    ...done in 0.1771956 seconds.
+                    
+      Regenerating: 1 file(s) changed at 2026-04-30 12:00:41
+                    circadia-serve.log
+                    ...done in 0.1388031 seconds.
+                    
+      Regenerating: 1 file(s) changed at 2026-04-30 12:00:42
+                    circadia-serve.log
+                    ...done in 0.1088189 seconds.
+                    
+      Regenerating: 1 file(s) changed at 2026-04-30 12:00:43
+                    circadia-serve.log
+                    ...done in 0.1337188 seconds.
+                    
+      Regenerating: 1 file(s) changed at 2026-04-30 12:00:44
+                    circadia-serve.log
+                    ...done in 0.1145576 seconds.
+                    
+      Regenerating: 1 file(s) changed at 2026-04-30 12:00:45
+                    circadia-serve.log
+                    ...done in 0.1087214 seconds.
+                    
+      Regenerating: 1 file(s) changed at 2026-04-30 12:00:46
+                    circadia-serve.log
+                    ...done in 0.1122924 seconds.
+                    
+      Regenerating: 1 file(s) changed at 2026-04-30 12:00:47
+                    circadia-serve.log
+                    ...done in 0.1071922 seconds.
+                    
+      Regenerating: 1 file(s) changed at 2026-04-30 12:00:48
+                    circadia-serve.log
+                    ...done in 0.1081058 seconds.
+                    
+      Regenerating: 1 file(s) changed at 2026-04-30 12:00:49
+                    circadia-serve.log
+                    ...done in 0.1063559 seconds.
+                    
+      Regenerating: 1 file(s) changed at 2026-04-30 12:00:50
+                    circadia-serve.log
+                    ...done in 0.1068545 seconds.
+                    
+      Regenerating: 1 file(s) changed at 2026-04-30 12:00:51
+                    circadia-serve.log
+                    ...done in 0.1053247 seconds.
+                    
+      Regenerating: 1 file(s) changed at 2026-04-30 12:00:52
+                    circadia-serve.log
+                    ...done in 0.1097912 seconds.
+                    
+      Regenerating: 1 file(s) changed at 2026-04-30 12:00:53
+                    circadia-serve.log
+                    ...done in 0.1115157 seconds.
+                    
+      Regenerating: 1 file(s) changed at 2026-04-30 12:00:54
+                    circadia-serve.log
+                    ...done in 0.1133978 seconds.
+                    
+      Regenerating: 1 file(s) changed at 2026-04-30 12:00:55
+                    circadia-serve.log
+                    ...done in 0.1059157 seconds.
+                    
+      Regenerating: 1 file(s) changed at 2026-04-30 12:00:56
+                    circadia-serve.log
+                    ...done in 0.1056331 seconds.
+                    
+      Regenerating: 1 file(s) changed at 2026-04-30 12:00:57
+                    circadia-serve.log
+                    ...done in 0.1062944 seconds.
+                    
+      Regenerating: 1 file(s) changed at 2026-04-30 12:00:58
+                    circadia-serve.log
+                    ...done in 0.1101962 seconds.
+                    
+      Regenerating: 1 file(s) changed at 2026-04-30 12:00:59
+                    circadia-serve.log
+                    ...done in 0.1160689 seconds.
+                    
+      Regenerating: 1 file(s) changed at 2026-04-30 12:01:00
+                    circadia-serve.log
+                    ...done in 0.1134694 seconds.
+                    
+      Regenerating: 1 file(s) changed at 2026-04-30 12:01:01
+                    circadia-serve.log
+                    ...done in 0.1063213 seconds.
+                    
+      Regenerating: 1 file(s) changed at 2026-04-30 12:01:02
+                    circadia-serve.log
+                    ...done in 0.1069977 seconds.
+                    
+      Regenerating: 1 file(s) changed at 2026-04-30 12:01:03
+                    circadia-serve.log
+                    ...done in 0.1071776 seconds.
+                    
+      Regenerating: 1 file(s) changed at 2026-04-30 12:01:04
+                    circadia-serve.log
+                    ...done in 0.1104022 seconds.
+                    
+      Regenerating: 1 file(s) changed at 2026-04-30 12:01:05
+                    circadia-serve.log
+                    ...done in 0.119164 seconds.
+                    
+      Regenerating: 1 file(s) changed at 2026-04-30 12:01:06
+                    circadia-serve.log
+                    ...done in 0.1054644 seconds.
+                    
+      Regenerating: 1 file(s) changed at 2026-04-30 12:01:07
+                    circadia-serve.log
+                    ...done in 0.1066374 seconds.
+                    
+      Regenerating: 1 file(s) changed at 2026-04-30 12:01:08
+                    circadia-serve.log
+                    ...done in 0.115767 seconds.
+                    
+      Regenerating: 1 file(s) changed at 2026-04-30 12:01:09
+                    circadia-serve.log
+                    ...done in 0.106622 seconds.
+                    
+      Regenerating: 1 file(s) changed at 2026-04-30 12:01:10
+                    circadia-serve.log
+                    ...done in 0.1059253 seconds.
+                    
+      Regenerating: 1 file(s) changed at 2026-04-30 12:01:11
+                    circadia-serve.log
+                    ...done in 0.1271124 seconds.
+                    
+      Regenerating: 1 file(s) changed at 2026-04-30 12:01:12
+                    circadia-serve.log
+                    ...done in 0.1563244 seconds.
+                    
+      Regenerating: 1 file(s) changed at 2026-04-30 12:01:13
+                    circadia-serve.log
+                    ...done in 0.1220732 seconds.
+                    
+      Regenerating: 1 file(s) changed at 2026-04-30 12:01:14
+                    circadia-serve.log
+                    ...done in 0.1135016 seconds.
+                    
+      Regenerating: 1 file(s) changed at 2026-04-30 12:01:15
+                    circadia-serve.log
+                    ...done in 0.1164262 seconds.
+                    
+      Regenerating: 1 file(s) changed at 2026-04-30 12:01:16
+                    circadia-serve.log
+                    ...done in 0.1163055 seconds.
+                    
+      Regenerating: 1 file(s) changed at 2026-04-30 12:01:17
+                    circadia-serve.log
+                    ...done in 0.1119822 seconds.
+                    
+      Regenerating: 1 file(s) changed at 2026-04-30 12:01:18
+                    circadia-serve.log
+                    ...done in 0.1192252 seconds.
+                    
+      Regenerating: 1 file(s) changed at 2026-04-30 12:01:19
+                    circadia-serve.log
+                    ...done in 0.1056944 seconds.
+                    
+      Regenerating: 1 file(s) changed at 2026-04-30 12:01:20
+                    circadia-serve.log
+                    ...done in 0.1049254 seconds.
+                    
+      Regenerating: 1 file(s) changed at 2026-04-30 12:01:21
+                    circadia-serve.log
+                    ...done in 0.114411 seconds.
+                    
+      Regenerating: 1 file(s) changed at 2026-04-30 12:01:22
+                    circadia-serve.log
+                    ...done in 0.1135851 seconds.
+                    
+      Regenerating: 1 file(s) changed at 2026-04-30 12:01:23
+                    circadia-serve.log
+                    ...done in 0.1121821 seconds.
+                    
+      Regenerating: 1 file(s) changed at 2026-04-30 12:01:24
+                    circadia-serve.log
+                    ...done in 0.1070325 seconds.
+                    
+      Regenerating: 1 file(s) changed at 2026-04-30 12:01:25
+                    circadia-serve.log
+                    ...done in 0.1068554 seconds.
+                    
+      Regenerating: 1 file(s) changed at 2026-04-30 12:01:26
+                    circadia-serve.log
+                    ...done in 0.1131546 seconds.
+                    
+      Regenerating: 1 file(s) changed at 2026-04-30 12:01:27
+                    circadia-serve.log
+                    ...done in 0.1085159 seconds.
+                    
+      Regenerating: 1 file(s) changed at 2026-04-30 12:01:28
+                    circadia-serve.log
+                    ...done in 0.1039586 seconds.
+                    
+      Regenerating: 1 file(s) changed at 2026-04-30 12:01:29
+                    circadia-serve.log
+                    ...done in 0.1157724 seconds.
+                    
+      Regenerating: 1 file(s) changed at 2026-04-30 12:01:30
+                    circadia-serve.log
+                    ...done in 0.1090033 seconds.
+                    
+      Regenerating: 1 file(s) changed at 2026-04-30 12:01:31
+                    circadia-serve.log
+                    ...done in 0.1095538 seconds.
+                    
+      Regenerating: 1 file(s) changed at 2026-04-30 12:01:32
+                    circadia-serve.log
+                    ...done in 0.1079701 seconds.
+                    
+      Regenerating: 1 file(s) changed at 2026-04-30 12:01:33
+                    circadia-serve.log
+                    ...done in 0.1122449 seconds.
+                    
+      Regenerating: 1 file(s) changed at 2026-04-30 12:01:34
+                    circadia-serve.log
+                    ...done in 0.1156615 seconds.
+                    
+      Regenerating: 1 file(s) changed at 2026-04-30 12:01:35
+                    circadia-serve.log
+                    ...done in 0.1048444 seconds.
+                    
+      Regenerating: 1 file(s) changed at 2026-04-30 12:01:36
+                    circadia-serve.log
+                    ...done in 0.1063147 seconds.
+                    
+      Regenerating: 1 file(s) changed at 2026-04-30 12:01:37
+                    circadia-serve.log
+                    ...done in 0.1151553 seconds.
+                    
+      Regenerating: 1 file(s) changed at 2026-04-30 12:01:38
+                    circadia-serve.log
+                    ...done in 0.1088561 seconds.
+                    
+      Regenerating: 1 file(s) changed at 2026-04-30 12:01:39
+                    circadia-serve.log
+                    ...done in 0.1107602 seconds.
+                    
+      Regenerating: 1 file(s) changed at 2026-04-30 12:01:40
+                    circadia-serve.log
+                    ...done in 0.126871 seconds.
+                    
+      Regenerating: 1 file(s) changed at 2026-04-30 12:01:41
+                    circadia-serve.log
+                    ...done in 0.1314323 seconds.
+                    
+      Regenerating: 1 file(s) changed at 2026-04-30 12:01:42
+                    circadia-serve.log
+                    ...done in 0.1117998 seconds.
+                    
+      Regenerating: 1 file(s) changed at 2026-04-30 12:01:43
+                    circadia-serve.log
+                    ...done in 0.1142415 seconds.
+                    
+      Regenerating: 1 file(s) changed at 2026-04-30 12:01:44
+                    circadia-serve.log
+                    ...done in 0.1158851 seconds.
+                    
+      Regenerating: 1 file(s) changed at 2026-04-30 12:01:45
+                    circadia-serve.log
+                    ...done in 0.1058244 seconds.
+                    
+      Regenerating: 1 file(s) changed at 2026-04-30 12:01:46
+                    circadia-serve.log
+                    ...done in 0.1064044 seconds.
+                    
+      Regenerating: 1 file(s) changed at 2026-04-30 12:01:47
+                    circadia-serve.log
+                    ...done in 0.1019617 seconds.
+                    
+      Regenerating: 1 file(s) changed at 2026-04-30 12:01:48
+                    circadia-serve.log
+                    ...done in 0.1036073 seconds.
+                    
+      Regenerating: 1 file(s) changed at 2026-04-30 12:01:49
+                    circadia-serve.log
+                    ...done in 0.1040418 seconds.
+                    
+      Regenerating: 1 file(s) changed at 2026-04-30 12:01:50
+                    circadia-serve.log
+                    ...done in 0.1062608 seconds.
+                    
+      Regenerating: 1 file(s) changed at 2026-04-30 12:01:51
+                    circadia-serve.log
+                    ...done in 0.104607 seconds.
+                    
+      Regenerating: 1 file(s) changed at 2026-04-30 12:01:52
+                    circadia-serve.log
+                    ...done in 0.1065344 seconds.
+                    
+      Regenerating: 1 file(s) changed at 2026-04-30 12:01:53
+                    circadia-serve.log
+                    ...done in 0.125072 seconds.
+                    
+      Regenerating: 1 file(s) changed at 2026-04-30 12:01:54
+                    circadia-serve.log
+                    ...done in 0.1076714 seconds.
+                    
+      Regenerating: 1 file(s) changed at 2026-04-30 12:01:55
+                    circadia-serve.log
+                    ...done in 0.1054955 seconds.
+                    
+      Regenerating: 1 file(s) changed at 2026-04-30 12:01:56
+                    circadia-serve.log
+                    ...done in 0.1115953 seconds.
+                    
+      Regenerating: 1 file(s) changed at 2026-04-30 12:01:57
+                    circadia-serve.log
+                    ...done in 0.1058282 seconds.
+                    
+      Regenerating: 1 file(s) changed at 2026-04-30 12:01:58
+                    circadia-serve.log
+                    ...done in 0.1053513 seconds.
+                    
+      Regenerating: 1 file(s) changed at 2026-04-30 12:01:59
+                    circadia-serve.log
+                    ...done in 0.1099362 seconds.
+                    
+      Regenerating: 1 file(s) changed at 2026-04-30 12:02:00
+                    circadia-serve.log
+                    ...done in 0.105016 seconds.
+                    
+      Regenerating: 1 file(s) changed at 2026-04-30 12:02:01
+                    circadia-serve.log
+                    ...done in 0.1067602 seconds.
+                    
+      Regenerating: 1 file(s) changed at 2026-04-30 12:02:02
+                    circadia-serve.log
+                    ...done in 0.1028025 seconds.
+                    
+      Regenerating: 1 file(s) changed at 2026-04-30 12:02:03
+                    circadia-serve.log
+                    ...done in 0.1095264 seconds.
+                    
+      Regenerating: 1 file(s) changed at 2026-04-30 12:02:04
+                    circadia-serve.log
+                    ...done in 0.1039712 seconds.
+                    
+      Regenerating: 1 file(s) changed at 2026-04-30 12:02:05
+                    circadia-serve.log
+                    ...done in 0.1141927 seconds.
+                    
+      Regenerating: 1 file(s) changed at 2026-04-30 12:02:06
+                    circadia-serve.log
+                    ...done in 0.1085712 seconds.
+                    
+      Regenerating: 1 file(s) changed at 2026-04-30 12:02:07
+                    circadia-serve.log
+                    ...done in 0.1053999 seconds.
+                    
+      Regenerating: 1 file(s) changed at 2026-04-30 12:02:08
+                    circadia-serve.log
+                    ...done in 0.1034319 seconds.
+                    
+      Regenerating: 1 file(s) changed at 2026-04-30 12:02:09
+                    circadia-serve.log
+                    ...done in 0.1059109 seconds.
+                    
+      Regenerating: 1 file(s) changed at 2026-04-30 12:02:10
+                    circadia-serve.log
+                    ...done in 0.1059203 seconds.
+                    
+      Regenerating: 1 file(s) changed at 2026-04-30 12:02:11
+                    circadia-serve.log
+                    ...done in 0.1044824 seconds.
+                    
+      Regenerating: 1 file(s) changed at 2026-04-30 12:02:12
+                    circadia-serve.log
+                    ...done in 0.1209147 seconds.
+                    
+      Regenerating: 1 file(s) changed at 2026-04-30 12:02:13
+                    circadia-serve.log
+                    ...done in 0.1058761 seconds.
+                    
+      Regenerating: 1 file(s) changed at 2026-04-30 12:02:14
+                    circadia-serve.log
+                    ...done in 0.1150206 seconds.
+                    
+      Regenerating: 1 file(s) changed at 2026-04-30 12:02:15
+                    circadia-serve.log
+                    ...done in 0.1097377 seconds.
+                    
+      Regenerating: 1 file(s) changed at 2026-04-30 12:02:16
+                    circadia-serve.log
+                    ...done in 0.1051538 seconds.
+                    
+      Regenerating: 1 file(s) changed at 2026-04-30 12:02:17
+                    circadia-serve.log
+                    ...done in 0.1090202 seconds.
+                    
+      Regenerating: 1 file(s) changed at 2026-04-30 12:02:18
+                    circadia-serve.log
+                    ...done in 0.1088972 seconds.
+                    
+      Regenerating: 1 file(s) changed at 2026-04-30 12:02:19
+                    circadia-serve.log
+                    ...done in 0.1125622 seconds.
+                    
+      Regenerating: 1 file(s) changed at 2026-04-30 12:02:20
+                    circadia-serve.log
+                    ...done in 0.1072905 seconds.
+                    
+      Regenerating: 1 file(s) changed at 2026-04-30 12:02:21
+                    circadia-serve.log
+                    ...done in 0.1048873 seconds.
+                    
+      Regenerating: 1 file(s) changed at 2026-04-30 12:02:22
+                    circadia-serve.log
+                    ...done in 0.105736 seconds.
+                    
+      Regenerating: 1 file(s) changed at 2026-04-30 12:02:23
+                    circadia-serve.log
+                    ...done in 0.1067094 seconds.
+                    
+      Regenerating: 1 file(s) changed at 2026-04-30 12:02:24
+                    circadia-serve.log
+                    ...done in 0.1105028 seconds.
+                    
+      Regenerating: 1 file(s) changed at 2026-04-30 12:02:25
+                    circadia-serve.log
+                    ...done in 0.1118086 seconds.
+                    
+      Regenerating: 1 file(s) changed at 2026-04-30 12:02:26
+                    circadia-serve.log
+                    ...done in 0.109997 seconds.
+                    
+      Regenerating: 1 file(s) changed at 2026-04-30 12:02:27
+                    circadia-serve.log
+                    ...done in 0.107019 seconds.
+                    
+      Regenerating: 1 file(s) changed at 2026-04-30 12:02:28
+                    circadia-serve.log
+                    ...done in 0.1141154 seconds.
+                    
+      Regenerating: 1 file(s) changed at 2026-04-30 12:02:29
+                    circadia-serve.log
+                    ...done in 0.1105733 seconds.
+                    
+      Regenerating: 1 file(s) changed at 2026-04-30 12:02:30
+                    circadia-serve.log
+                    ...done in 0.105532 seconds.
+                    
+      Regenerating: 1 file(s) changed at 2026-04-30 12:02:31
+                    circadia-serve.log
+                    ...done in 0.1056975 seconds.
+                    
+      Regenerating: 1 file(s) changed at 2026-04-30 12:02:32
+                    circadia-serve.log
+                    ...done in 0.1089082 seconds.
+                    
+      Regenerating: 1 file(s) changed at 2026-04-30 12:02:33
+                    circadia-serve.log
+                    ...done in 0.1103308 seconds.
+                    
+      Regenerating: 1 file(s) changed at 2026-04-30 12:02:34
+                    circadia-serve.log
+                    ...done in 0.1056862 seconds.
+                    
+      Regenerating: 1 file(s) changed at 2026-04-30 12:02:35
+                    circadia-serve.log
+                    ...done in 0.1206036 seconds.
+                    
+      Regenerating: 1 file(s) changed at 2026-04-30 12:02:36
+                    circadia-serve.log
+                    ...done in 0.1101062 seconds.
+                    
+      Regenerating: 1 file(s) changed at 2026-04-30 12:02:37
+                    circadia-serve.log
+                    ...done in 0.1048669 seconds.
+                    
+      Regenerating: 1 file(s) changed at 2026-04-30 12:02:38
+                    circadia-serve.log
+                    ...done in 0.1098598 seconds.
+                    
+      Regenerating: 1 file(s) changed at 2026-04-30 12:02:39
+                    circadia-serve.log
+                    ...done in 0.1052017 seconds.
+                    
+      Regenerating: 1 file(s) changed at 2026-04-30 12:02:40
+                    circadia-serve.log
+                    ...done in 0.1270878 seconds.
+                    
+      Regenerating: 1 file(s) changed at 2026-04-30 12:02:41
+                    circadia-serve.log
+                    ...done in 0.1103015 seconds.
+                    
+      Regenerating: 1 file(s) changed at 2026-04-30 12:02:42
+                    circadia-serve.log
+                    ...done in 0.1040959 seconds.
+                    
+      Regenerating: 1 file(s) changed at 2026-04-30 12:02:43
+                    circadia-serve.log
+                    ...done in 0.1089429 seconds.
+                    
+      Regenerating: 1 file(s) changed at 2026-04-30 12:02:44
+                    circadia-serve.log
+                    ...done in 0.1065117 seconds.
+                    
+      Regenerating: 1 file(s) changed at 2026-04-30 12:02:45
+                    circadia-serve.log
+                    ...done in 0.1093682 seconds.
+                    
+      Regenerating: 1 file(s) changed at 2026-04-30 12:02:46
+                    circadia-serve.log
+                    ...done in 0.1261526 seconds.
+                    
+      Regenerating: 1 file(s) changed at 2026-04-30 12:02:47
+                    circadia-serve.log
