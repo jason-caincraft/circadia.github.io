@@ -24,10 +24,6 @@
         "${input:mode}",
         "--location",
         "${input:location}",
-        "--coordinates-lat",
-        "${input:coordinatesLat}",
-        "--coordinates-lng",
-        "${input:coordinatesLng}",
         "--weather",
         "${input:weather}",
         "--temperature",
@@ -148,18 +144,6 @@
       "id": "location",
       "type": "promptString",
       "description": "Optional location",
-      "default": ""
-    },
-    {
-      "id": "coordinatesLat",
-      "type": "promptString",
-      "description": "Optional latitude",
-      "default": ""
-    },
-    {
-      "id": "coordinatesLng",
-      "type": "promptString",
-      "description": "Optional longitude",
       "default": ""
     },
     {
