@@ -47,7 +47,8 @@
         "--lessons",
         "${input:lessons}",
         "--alt",
-        "${input:alt}"
+        "${input:alt}",
+        "${input:useExifFlag}"
       ],
       "problemMatcher": []
     },
@@ -220,6 +221,16 @@
       "type": "promptString",
       "description": "Optional image alt text",
       "default": ""
+    },
+    {
+      "id": "useExifFlag",
+      "type": "pickString",
+      "description": "Optional EXIF helper",
+      "default": "",
+      "options": [
+        "",
+        "--use-exif"
+      ]
     },
     {
       "id": "commitMessage",
