@@ -5,6 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Circadia Admin</title>
     <meta name="robots" content="noindex, nofollow">
+    <script>
+      window.CMS_MANUAL_INIT = true;
+    </script>
     <style>
       :root {
         color-scheme: light;
@@ -109,6 +112,663 @@
         </section>
       </main>
     </div>
+    <script src="https://unpkg.com/exifr@7.1.3/dist/lite.umd.js"></script>
     <script src="https://unpkg.com/decap-cms@^3.12.2/dist/decap-cms.js"></script>
+    <script>
+      (function() {
+        const CMS = window.CMS;
+        const exifr = window.exifr;
+        const widgetFactory = window.createClass;
+        const h = window.h;
+        const EVENT_NAME = "circadia:exif-meta";
+
+        if (!CMS || !widgetFactory || !h) {
+          return;
+        }
+
+        function isFiniteNumber(value) {
+          return typeof value === "number" && Number.isFinite(value);
+        }
+
+        function normalizeCoordinates(value) {
+          const source = value && typeof value.toJS === "function" ? value.toJS() : value;
+          const next = {};
+
+          if (source && isFiniteNumber(Number(source.lat))) {
+            next.lat = Number(source.lat);
+          }
+
+          if (source && isFiniteNumber(Number(source.lng))) {
+            next.lng = Number(source.lng);
+          }
+
+          return Object.keys(next).length > 0 ? next : null;
+        }
+
+        function isValidDate(value) {
+          return value instanceof Date && !Number.isNaN(value.getTime());
+        }
+
+        function pickExifDate(metadata) {
+          if (!metadata || typeof metadata !== "object") {
+            return null;
+          }
+
+          const candidates = [
+            metadata.DateTimeOriginal,
+            metadata.CreateDate,
+            metadata.ModifyDate,
+            metadata.DateTimeDigitized
+          ];
+
+          for (const candidate of candidates) {
+            if (isValidDate(candidate)) {
+              return candidate;
+            }
+
+            if (typeof candidate === "string" || typeof candidate === "number") {
+              const parsed = new Date(candidate);
+              if (isValidDate(parsed)) {
+                return parsed;
+              }
+            }
+          }
+
+          return null;
+        }
+
+        function pickExifCoordinates(metadata) {
+          if (!metadata || typeof metadata !== "object") {
+            return null;
+          }
+
+          const latitudeCandidates = [metadata.latitude, metadata.lat, metadata.GPSLatitude];
+          const longitudeCandidates = [metadata.longitude, metadata.lon, metadata.lng, metadata.GPSLongitude];
+
+          for (const latitude of latitudeCandidates) {
+            for (const longitude of longitudeCandidates) {
+              if (Number.isFinite(Number(latitude)) && Number.isFinite(Number(longitude))) {
+                return {
+                  lat: Number(latitude),
+                  lng: Number(longitude)
+                };
+              }
+            }
+          }
+
+          return null;
+        }
+
+        function padNumber(value) {
+          return String(value).padStart(2, "0");
+        }
+
+        function formatDateForFrontMatter(date) {
+          const offsetMinutes = -date.getTimezoneOffset();
+          const sign = offsetMinutes >= 0 ? "+" : "-";
+          const absoluteOffset = Math.abs(offsetMinutes);
+          const offsetHours = padNumber(Math.floor(absoluteOffset / 60));
+          const offsetRemainderMinutes = padNumber(absoluteOffset % 60);
+
+          return [
+            `${date.getFullYear()}-${padNumber(date.getMonth() + 1)}-${padNumber(date.getDate())}`,
+            `${padNumber(date.getHours())}:${padNumber(date.getMinutes())}:${padNumber(date.getSeconds())}`,
+            `${sign}${offsetHours}${offsetRemainderMinutes}`
+          ].join(" ");
+        }
+
+        function coordinatesSignature(value) {
+          const normalized = normalizeCoordinates(value);
+          return normalized ? `${normalized.lat},${normalized.lng}` : "";
+        }
+
+        function cloneCoordinates(value) {
+          const normalized = normalizeCoordinates(value);
+          return normalized ? { lat: normalized.lat, lng: normalized.lng } : {};
+        }
+
+        function emitExifCoordinates(detail) {
+          window.dispatchEvent(new CustomEvent(EVENT_NAME, { detail }));
+        }
+
+        function buildAssetUrl(path) {
+          if (!path || typeof path !== "string") {
+            return "";
+          }
+
+          try {
+            return new URL(path, window.location.origin).toString();
+          } catch (_error) {
+            return path;
+          }
+        }
+
+        const exifState = {
+          latest: null,
+          cache: new Map(),
+          setLatest(detail) {
+            if (!detail) {
+              return;
+            }
+
+            this.latest = {
+              lat: detail.lat,
+              lng: detail.lng,
+              captureDate: detail.captureDate || null,
+              dateValue: detail.dateValue || "",
+              imagePath: detail.imagePath || "",
+              sourceName: detail.sourceName || ""
+            };
+
+            emitExifCoordinates(this.latest);
+          },
+          getLatest() {
+            return this.latest;
+          },
+          async read(source, context) {
+            if (!exifr) {
+              return null;
+            }
+
+            const cacheKey = context && context.cacheKey ? context.cacheKey : "";
+            if (cacheKey && this.cache.has(cacheKey)) {
+              const cached = this.cache.get(cacheKey);
+              this.setLatest(cached);
+              return cached;
+            }
+
+            const metadata = await exifr.parse(source, [
+              "DateTimeOriginal",
+              "CreateDate",
+              "ModifyDate",
+              "DateTimeDigitized",
+              "latitude",
+              "longitude",
+              "lat",
+              "lng",
+              "GPSLatitude",
+              "GPSLongitude"
+            ]);
+
+            const captureDate = pickExifDate(metadata);
+            const coordinates = pickExifCoordinates(metadata);
+            const detail = {
+              lat: coordinates ? coordinates.lat : null,
+              lng: coordinates ? coordinates.lng : null,
+              captureDate,
+              dateValue: captureDate ? formatDateForFrontMatter(captureDate) : "",
+              imagePath: context && context.imagePath ? context.imagePath : "",
+              sourceName: context && context.sourceName ? context.sourceName : ""
+            };
+
+            if (cacheKey) {
+              this.cache.set(cacheKey, detail);
+            }
+
+            this.setLatest(detail);
+            return detail;
+          }
+        };
+
+        window.CircadiaExifState = exifState;
+
+        const imageWidget = CMS.getWidget("image");
+        if (imageWidget && imageWidget.control && exifr) {
+          const BaseImageControl = imageWidget.control;
+
+          const CircadiaExifImageControl = widgetFactory({
+            getInitialState: function() {
+              return {
+                note: "GPS coordinates and capture date will auto-fill when the selected image contains EXIF metadata."
+              };
+            },
+
+            componentDidMount: function() {
+              this.bindFileInput();
+            },
+
+            componentDidUpdate: function() {
+              this.bindFileInput();
+            },
+
+            componentWillUnmount: function() {
+              this.unbindFileInput();
+            },
+
+            setWrapperRef: function(element) {
+              this.wrapper = element;
+            },
+
+            bindFileInput: function() {
+              if (!this.wrapper) {
+                return;
+              }
+
+              const input = this.wrapper.querySelector('input[type="file"]');
+              if (input === this.boundInput) {
+                return;
+              }
+
+              this.unbindFileInput();
+
+              this.boundInput = input;
+              if (this.boundInput) {
+                this.boundInput.addEventListener("change", this.handleFileSelection);
+              }
+            },
+
+            unbindFileInput: function() {
+              if (!this.boundInput) {
+                return;
+              }
+
+              this.boundInput.removeEventListener("change", this.handleFileSelection);
+              this.boundInput = null;
+            },
+
+            handleFileSelection: async function(event) {
+              const file = event.target && event.target.files ? event.target.files[0] : null;
+              this.pendingExif = null;
+              this.pendingExifPromise = null;
+
+              if (!file) {
+                this.setState({
+                  note: "GPS coordinates and capture date will auto-fill when the selected image contains EXIF metadata."
+                });
+                return;
+              }
+
+              this.setState({
+                note: "Reading EXIF metadata from the selected image..."
+              });
+
+              this.pendingExifPromise = exifState.read(file, {
+                cacheKey: `file:${file.name}:${file.size}:${file.lastModified}`,
+                sourceName: file.name,
+                imagePath: typeof this.props.value === "string" ? this.props.value : ""
+              }).then((detail) => {
+                this.pendingExif = detail;
+
+                if (!detail || (!isFiniteNumber(detail.lat) && !detail.dateValue)) {
+                  this.setState({
+                    note: "No GPS or capture-date EXIF metadata was found in the selected image. You can still enter values manually."
+                  });
+                  return null;
+                }
+
+                const noteParts = [];
+                if (isFiniteNumber(detail.lat) && isFiniteNumber(detail.lng)) {
+                  noteParts.push("GPS coordinates");
+                }
+                if (detail.dateValue) {
+                  noteParts.push("capture date");
+                }
+
+                this.setState({
+                  note: `${noteParts.join(" and ")} found in ${file.name}. Matching fields will be filled automatically.`
+                });
+
+                if (typeof this.props.value === "string" && this.props.value) {
+                  exifState.setLatest(Object.assign({}, detail, {
+                    imagePath: this.props.value
+                  }));
+                }
+
+                return detail;
+              }).catch((_error) => {
+                this.setState({
+                  note: "Unable to read EXIF metadata from the selected image. You can still enter values manually."
+                });
+                return null;
+              });
+            },
+
+            handleChange: function(value) {
+              this.props.onChange(value);
+
+              if (typeof value !== "string" || !value) {
+                return;
+              }
+
+              if (this.pendingExifPromise) {
+                this.pendingExifPromise.then((detail) => {
+                  if (detail) {
+                    exifState.setLatest(Object.assign({}, detail, {
+                      imagePath: value
+                    }));
+                  }
+                });
+                return;
+              }
+
+              exifState.read(buildAssetUrl(value), {
+                cacheKey: `path:${value}`,
+                imagePath: value,
+                sourceName: value.split("/").pop() || value
+              }).then((detail) => {
+                if (!detail || (!isFiniteNumber(detail.lat) && !detail.dateValue)) {
+                  this.setState({
+                    note: "This stored image does not expose GPS or capture-date EXIF metadata. You can still enter values manually."
+                  });
+                  return;
+                }
+
+                const noteParts = [];
+                if (isFiniteNumber(detail.lat) && isFiniteNumber(detail.lng)) {
+                  noteParts.push("GPS coordinates");
+                }
+                if (detail.dateValue) {
+                  noteParts.push("capture date");
+                }
+
+                this.setState({
+                  note: `${noteParts.join(" and ")} loaded from the selected library image. Matching fields will be filled automatically.`
+                });
+              }).catch((_error) => {
+                this.setState({
+                  note: "Unable to read EXIF metadata from the selected library image. You can still enter values manually."
+                });
+              });
+            },
+
+            render: function() {
+              return h("div", { ref: this.setWrapperRef }, [
+                h(BaseImageControl, Object.assign({}, this.props, {
+                  key: "image-control",
+                  onChange: this.handleChange
+                })),
+                h("p", {
+                  key: "image-note",
+                  style: {
+                    margin: "0.5rem 0 0",
+                    color: "#6b6258",
+                    fontSize: "0.92rem",
+                    lineHeight: "1.5"
+                  }
+                }, this.state.note)
+              ]);
+            }
+          });
+
+          CMS.registerWidget("circadia-exif-image", CircadiaExifImageControl);
+        } else {
+          CMS.registerWidget("circadia-exif-image", "image");
+        }
+
+        const CircadiaCoordinatesControl = widgetFactory({
+          getInitialState: function() {
+            return {
+              note: "GPS coordinates will auto-fill from the selected image when EXIF location data is present.",
+              lastAutoSignature: ""
+            };
+          },
+
+          componentDidMount: function() {
+            window.addEventListener(EVENT_NAME, this.handleExifCoordinates);
+
+            const latest = exifState.getLatest();
+            if (latest) {
+              this.applyCoordinates(latest);
+            }
+          },
+
+          componentWillUnmount: function() {
+            window.removeEventListener(EVENT_NAME, this.handleExifCoordinates);
+          },
+
+          handleExifCoordinates: function(event) {
+            this.applyCoordinates(event.detail);
+          },
+
+          applyCoordinates: function(detail) {
+            if (!detail || !isFiniteNumber(detail.lat) || !isFiniteNumber(detail.lng)) {
+              return;
+            }
+
+            const current = normalizeCoordinates(this.props.value);
+            const currentSignature = coordinatesSignature(current);
+            const canOverwrite = !current || currentSignature === this.state.lastAutoSignature;
+
+            if (!canOverwrite) {
+              return;
+            }
+
+            const next = {
+              lat: detail.lat,
+              lng: detail.lng
+            };
+
+            this.setState({
+              note: detail.sourceName
+                ? `Coordinates loaded from ${detail.sourceName}.`
+                : "Coordinates loaded from the selected image.",
+              lastAutoSignature: coordinatesSignature(next)
+            });
+
+            this.props.onChange(next);
+          },
+
+          handleInputChange: function(key, event) {
+            const raw = String(event.target.value || "").trim();
+            const next = cloneCoordinates(this.props.value);
+
+            if (raw === "") {
+              delete next[key];
+            } else {
+              const parsed = Number(raw);
+              if (Number.isFinite(parsed)) {
+                next[key] = parsed;
+              }
+            }
+
+            this.setState({
+              lastAutoSignature: "",
+              note: "GPS coordinates will auto-fill from the selected image when EXIF location data is present."
+            });
+
+            this.props.onChange(Object.keys(next).length > 0 ? next : null);
+          },
+
+          render: function() {
+            const current = normalizeCoordinates(this.props.value) || {};
+
+            return h("div", { className: this.props.classNameWrapper }, [
+              h("div", {
+                key: "coords-grid",
+                style: {
+                  display: "grid",
+                  gap: "0.85rem",
+                  gridTemplateColumns: "repeat(auto-fit, minmax(12rem, 1fr))"
+                }
+              }, [
+                h("label", {
+                  key: "lat-label",
+                  htmlFor: `${this.props.forID}-lat`,
+                  style: {
+                    display: "grid",
+                    gap: "0.35rem",
+                    color: "#1d1a16",
+                    fontWeight: "600"
+                  }
+                }, [
+                  h("span", { key: "lat-text" }, "Latitude"),
+                  h("input", {
+                    key: "lat-input",
+                    id: `${this.props.forID}-lat`,
+                    type: "number",
+                    step: "any",
+                    value: current.lat ?? "",
+                    onChange: this.handleInputChange.bind(this, "lat"),
+                    style: {
+                      width: "100%",
+                      padding: "0.75rem 0.85rem",
+                      border: "1px solid rgba(81, 66, 48, 0.2)",
+                      borderRadius: "0.8rem",
+                      backgroundColor: "rgba(255, 252, 246, 0.96)",
+                      fontSize: "1rem"
+                    }
+                  })
+                ]),
+                h("label", {
+                  key: "lng-label",
+                  htmlFor: `${this.props.forID}-lng`,
+                  style: {
+                    display: "grid",
+                    gap: "0.35rem",
+                    color: "#1d1a16",
+                    fontWeight: "600"
+                  }
+                }, [
+                  h("span", { key: "lng-text" }, "Longitude"),
+                  h("input", {
+                    key: "lng-input",
+                    id: `${this.props.forID}-lng`,
+                    type: "number",
+                    step: "any",
+                    value: current.lng ?? "",
+                    onChange: this.handleInputChange.bind(this, "lng"),
+                    style: {
+                      width: "100%",
+                      padding: "0.75rem 0.85rem",
+                      border: "1px solid rgba(81, 66, 48, 0.2)",
+                      borderRadius: "0.8rem",
+                      backgroundColor: "rgba(255, 252, 246, 0.96)",
+                      fontSize: "1rem"
+                    }
+                  })
+                ])
+              ]),
+              h("p", {
+                key: "coords-note",
+                style: {
+                  margin: "0.65rem 0 0",
+                  color: "#6b6258",
+                  fontSize: "0.92rem",
+                  lineHeight: "1.5"
+                }
+              }, this.state.note)
+            ]);
+          }
+        });
+
+        CMS.registerWidget("circadia-coordinates", CircadiaCoordinatesControl);
+
+        const dateWidget = CMS.getWidget("datetime");
+        if (dateWidget && dateWidget.control) {
+          const BaseDateTimeControl = dateWidget.control;
+
+          const CircadiaExifDateControl = widgetFactory({
+            getInitialState: function() {
+              return {
+                note: "Capture date will auto-fill from the selected image when EXIF date metadata is present.",
+                lastAutoValue: ""
+              };
+            },
+
+            componentDidMount: function() {
+              this.initialValue = typeof this.props.value === "string" ? this.props.value : "";
+              window.addEventListener(EVENT_NAME, this.handleExifMeta);
+            },
+
+            componentWillUnmount: function() {
+              window.removeEventListener(EVENT_NAME, this.handleExifMeta);
+            },
+
+            handleExifMeta: function(event) {
+              const detail = event.detail;
+              if (!detail || !detail.dateValue) {
+                return;
+              }
+
+              const currentValue = typeof this.props.value === "string" ? this.props.value : "";
+              const canOverwrite =
+                !currentValue ||
+                currentValue === this.state.lastAutoValue ||
+                (this.state.lastAutoValue === "" && currentValue === this.initialValue);
+
+              if (!canOverwrite) {
+                return;
+              }
+
+              this.setState({
+                note: detail.sourceName
+                  ? `Capture date loaded from ${detail.sourceName}.`
+                  : "Capture date loaded from the selected image.",
+                lastAutoValue: detail.dateValue
+              });
+
+              this.props.onChange(detail.dateValue);
+            },
+
+            handleChange: function(value) {
+              this.setState({
+                lastAutoValue: "",
+                note: "Capture date will auto-fill from the selected image when EXIF date metadata is present."
+              });
+
+              this.props.onChange(value);
+            },
+
+            render: function() {
+              return h("div", null, [
+                h(BaseDateTimeControl, Object.assign({}, this.props, {
+                  key: "date-control",
+                  onChange: this.handleChange
+                })),
+                h("p", {
+                  key: "date-note",
+                  style: {
+                    margin: "0.5rem 0 0",
+                    color: "#6b6258",
+                    fontSize: "0.92rem",
+                    lineHeight: "1.5"
+                  }
+                }, this.state.note)
+              ]);
+            }
+          });
+
+          CMS.registerWidget("circadia-exif-datetime", CircadiaExifDateControl);
+        } else {
+          CMS.registerWidget("circadia-exif-datetime", "datetime");
+        }
+
+        CMS.registerEventListener({
+          name: "preSave",
+          handler: function(_ref) {
+            const entry = _ref.entry;
+            const latest = exifState.getLatest();
+            const data = entry.get("data");
+            const hasCoordinates = normalizeCoordinates(data.get("coordinates"));
+            const hasDateValue = typeof data.get("date") === "string" && data.get("date").trim();
+            const imagePath = data.get("image");
+            let nextData = data;
+
+            if (!latest) {
+              return data;
+            }
+
+            if (latest.imagePath && imagePath && latest.imagePath !== imagePath) {
+              return data;
+            }
+
+            if (!hasCoordinates && isFiniteNumber(latest.lat) && isFiniteNumber(latest.lng)) {
+              nextData = nextData.set("coordinates", {
+                lat: latest.lat,
+                lng: latest.lng
+              });
+            }
+
+            if (!hasDateValue && latest.dateValue) {
+              nextData = nextData.set("date", latest.dateValue);
+            }
+
+            return nextData;
+          }
+        });
+
+        CMS.init();
+      })();
+    </script>
   </body>
 </html>

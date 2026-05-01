@@ -51,12 +51,14 @@ The script:
 - The CMS writes Markdown posts into `_posts/` and uploads selected images into `images/`.
 - The CMS logs in through GitHub OAuth using a separately deployed proxy service.
 - Browser-created posts use the same front matter fields as the existing Jekyll layouts, search index, archive pages, category pages, and map page.
+- When a selected image contains EXIF metadata, the browser editor now auto-fills `coordinates.lat`, `coordinates.lng`, and the publish date from the image capture timestamp when available.
 
 ### CMS Files
 
 - `admin/index.html` is the browser editor shell.
 - `admin/config.yml` defines the GitHub-backed post collection and image upload behavior.
 - `oauth-proxy/` contains the Cloudflare Worker used for the GitHub OAuth popup flow.
+- EXIF extraction in `/admin/` runs in the browser with `exifr`; it fills map coordinates and capture date automatically when the selected image includes that metadata, including images chosen from the existing media library.
 
 ### One-Time OAuth Setup
 
@@ -215,6 +217,7 @@ See `_posts/2026-04-30-scx6-backyard-suspension-test.md` for a complete working 
 - Search works from a generated static JSON file and browser-side JavaScript.
 - On This Day also uses browser-side JavaScript against the generated static JSON file.
 - EXIF processing is local only in Node and does not run on GitHub Pages.
+- Browser authoring now reads EXIF metadata client-side inside `/admin/` to fill coordinates and capture date before save.
 - `/admin/` is a static route, while authentication is delegated to the separate OAuth proxy deployment.
 - The deployed public site remains static and maintainable.
 
