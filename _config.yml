@@ -9,6 +9,8 @@ paginate_path: "/page:num/"
 plugins:
   - jekyll-paginate
 permalink: /:year/:month/:day/:title/
+exclude:
+  - oauth-proxy
 defaults:
   - scope:
       path: ""
