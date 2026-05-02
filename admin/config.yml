@@ -51,13 +51,13 @@ collections:
         widget: string
       - label: Publish Date
         name: date
-        widget: circadia-exif-datetime
+        widget: datetime
         default: "{{now}}"
         format: "YYYY-MM-DD HH:mm:ss Z"
         picker_utc: false
       - label: Featured Image
         name: image
-        widget: circadia-exif-image
+        widget: image
         required: false
         choose_url: false
       - label: Image Alt Text
@@ -103,8 +103,20 @@ collections:
         required: false
       - label: Coordinates
         name: coordinates
-        widget: circadia-coordinates
+        widget: object
         required: false
+        collapsed: true
+        fields:
+          - label: Latitude
+            name: lat
+            widget: number
+            required: false
+            value_type: float
+          - label: Longitude
+            name: lng
+            widget: number
+            required: false
+            value_type: float
       - label: Conditions
         name: conditions
         widget: object
