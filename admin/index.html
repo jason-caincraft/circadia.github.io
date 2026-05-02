@@ -243,6 +243,52 @@
           }
         }
 
+        function isBlobLike(value) {
+          return typeof Blob !== "undefined" && value instanceof Blob;
+        }
+
+        function extractExifSource(args, value) {
+          const fallbackName = typeof value === "string" && value
+            ? value.split("/").pop() || value
+            : "";
+
+          for (const candidate of args.slice(1)) {
+            if (isBlobLike(candidate)) {
+              return {
+                source: candidate,
+                sourceName: candidate.name || fallbackName,
+                cacheKey: `file:${candidate.name || "blob"}:${candidate.size}:${candidate.lastModified || 0}`
+              };
+            }
+
+            if (!candidate || typeof candidate !== "object") {
+              continue;
+            }
+
+            const nestedFile = isBlobLike(candidate.file)
+              ? candidate.file
+              : isBlobLike(candidate.asset)
+                ? candidate.asset
+                : null;
+
+            if (nestedFile) {
+              return {
+                source: nestedFile,
+                sourceName: nestedFile.name || fallbackName,
+                cacheKey: `file:${nestedFile.name || "blob"}:${nestedFile.size}:${nestedFile.lastModified || 0}`
+              };
+            }
+          }
+
+          return typeof value === "string" && value
+            ? {
+                source: buildAssetUrl(value),
+                sourceName: fallbackName,
+                cacheKey: `path:${value}`
+              }
+            : null;
+        }
+
         const exifState = {
           latest: null,
           cache: new Map(),
@@ -324,54 +370,39 @@
             },
 
             componentDidMount: function() {
-              this.bindFileInput();
+              this.lastValue = typeof this.props.value === "string" ? this.props.value : "";
             },
 
             componentDidUpdate: function() {
-              this.bindFileInput();
-            },
+              const nextValue = typeof this.props.value === "string" ? this.props.value : "";
 
-            componentWillUnmount: function() {
-              this.unbindFileInput();
-            },
-
-            setWrapperRef: function(element) {
-              this.wrapper = element;
-            },
-
-            bindFileInput: function() {
-              if (!this.wrapper) {
+              if (nextValue === this.lastValue) {
                 return;
               }
 
-              const input = this.wrapper.querySelector('input[type="file"]');
-              if (input === this.boundInput) {
+              this.lastValue = nextValue;
+
+              if (!nextValue) {
+                this.pendingExif = null;
+                this.pendingExifPromise = null;
+                this.lastSelectionArgs = null;
+                this.setState({
+                  note: "GPS coordinates and capture date will auto-fill when the selected image contains EXIF metadata."
+                });
                 return;
               }
 
-              this.unbindFileInput();
-
-              this.boundInput = input;
-              if (this.boundInput) {
-                this.boundInput.addEventListener("change", this.handleFileSelection);
-              }
+              this.readSelectedImageExif(nextValue, this.lastSelectionArgs || [nextValue]);
+              this.lastSelectionArgs = null;
             },
 
-            unbindFileInput: function() {
-              if (!this.boundInput) {
-                return;
-              }
+            readSelectedImageExif: function(value, args) {
+              const selection = extractExifSource(args, value);
 
-              this.boundInput.removeEventListener("change", this.handleFileSelection);
-              this.boundInput = null;
-            },
-
-            handleFileSelection: async function(event) {
-              const file = event.target && event.target.files ? event.target.files[0] : null;
               this.pendingExif = null;
               this.pendingExifPromise = null;
 
-              if (!file) {
+              if (!selection || !selection.source) {
                 this.setState({
                   note: "GPS coordinates and capture date will auto-fill when the selected image contains EXIF metadata."
                 });
@@ -382,10 +413,10 @@
                 note: "Reading EXIF metadata from the selected image..."
               });
 
-              this.pendingExifPromise = exifState.read(file, {
-                cacheKey: `file:${file.name}:${file.size}:${file.lastModified}`,
-                sourceName: file.name,
-                imagePath: typeof this.props.value === "string" ? this.props.value : ""
+              this.pendingExifPromise = exifState.read(selection.source, {
+                cacheKey: selection.cacheKey,
+                sourceName: selection.sourceName,
+                imagePath: value
               }).then((detail) => {
                 this.pendingExif = detail;
 
@@ -405,14 +436,12 @@
                 }
 
                 this.setState({
-                  note: `${noteParts.join(" and ")} found in ${file.name}. Matching fields will be filled automatically.`
+                  note: `${noteParts.join(" and ")} found in ${selection.sourceName}. Matching fields will be filled automatically.`
                 });
 
-                if (typeof this.props.value === "string" && this.props.value) {
-                  exifState.setLatest(Object.assign({}, detail, {
-                    imagePath: this.props.value
-                  }));
-                }
+                exifState.setLatest(Object.assign({}, detail, {
+                  imagePath: value
+                }));
 
                 return detail;
               }).catch((_error) => {
@@ -423,56 +452,14 @@
               });
             },
 
-            handleChange: function(value) {
-              this.props.onChange(value);
-
-              if (typeof value !== "string" || !value) {
-                return;
-              }
-
-              if (this.pendingExifPromise) {
-                this.pendingExifPromise.then((detail) => {
-                  if (detail) {
-                    exifState.setLatest(Object.assign({}, detail, {
-                      imagePath: value
-                    }));
-                  }
-                });
-                return;
-              }
-
-              exifState.read(buildAssetUrl(value), {
-                cacheKey: `path:${value}`,
-                imagePath: value,
-                sourceName: value.split("/").pop() || value
-              }).then((detail) => {
-                if (!detail || (!isFiniteNumber(detail.lat) && !detail.dateValue)) {
-                  this.setState({
-                    note: "This stored image does not expose GPS or capture-date EXIF metadata. You can still enter values manually."
-                  });
-                  return;
-                }
-
-                const noteParts = [];
-                if (isFiniteNumber(detail.lat) && isFiniteNumber(detail.lng)) {
-                  noteParts.push("GPS coordinates");
-                }
-                if (detail.dateValue) {
-                  noteParts.push("capture date");
-                }
-
-                this.setState({
-                  note: `${noteParts.join(" and ")} loaded from the selected library image. Matching fields will be filled automatically.`
-                });
-              }).catch((_error) => {
-                this.setState({
-                  note: "Unable to read EXIF metadata from the selected library image. You can still enter values manually."
-                });
-              });
+            handleChange: function() {
+              const args = Array.prototype.slice.call(arguments);
+              this.lastSelectionArgs = args;
+              this.props.onChange.apply(null, args);
             },
 
             render: function() {
-              return h("div", { ref: this.setWrapperRef }, [
+              return h("div", null, [
                 h(BaseImageControl, Object.assign({}, this.props, {
                   key: "image-control",
                   onChange: this.handleChange
