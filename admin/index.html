@@ -369,6 +369,30 @@
               };
             },
 
+            setBaseControlRef: function(ref) {
+              this.baseControl = ref;
+            },
+
+            shouldComponentUpdate: function(nextProps, nextState) {
+              if (!nextState || nextState.note !== this.state.note) {
+                return true;
+              }
+
+              if (this.baseControl && typeof this.baseControl.shouldComponentUpdate === "function") {
+                return this.baseControl.shouldComponentUpdate(nextProps);
+              }
+
+              return this.props.value !== nextProps.value || this.props.getAsset !== nextProps.getAsset;
+            },
+
+            getValidateValue: function() {
+              if (this.baseControl && typeof this.baseControl.getValidateValue === "function") {
+                return this.baseControl.getValidateValue();
+              }
+
+              return this.props.value || "";
+            },
+
             componentDidMount: function() {
               this.lastValue = typeof this.props.value === "string" ? this.props.value : "";
             },
@@ -462,6 +486,7 @@
               return h("div", null, [
                 h(BaseImageControl, Object.assign({}, this.props, {
                   key: "image-control",
+                  ref: this.setBaseControlRef,
                   onChange: this.handleChange
                 })),
                 h("p", {
