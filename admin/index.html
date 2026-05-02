@@ -112,11 +112,251 @@
         </section>
       </main>
     </div>
+    <script src="https://unpkg.com/exifr/dist/lite.umd.js"></script>
     <script src="https://unpkg.com/decap-cms@^3.12.2/dist/decap-cms.js"></script>
     <script>
       (function() {
         const CMS = window.CMS;
+        const exifr = window.exifr;
+        const FALLBACK_COORDINATES = {
+          lat: 43.618611,
+          lng: -116.425167
+        };
+
+        function getValue(source, key) {
+          if (!source) {
+            return undefined;
+          }
+
+          if (typeof source.get === "function") {
+            return source.get(key);
+          }
+
+          return source[key];
+        }
+
+        function toPlainArray(value) {
+          if (!value) {
+            return [];
+          }
+
+          if (Array.isArray(value)) {
+            return value;
+          }
+
+          if (typeof value.toArray === "function") {
+            return value.toArray();
+          }
+
+          if (typeof value.toJS === "function") {
+            const plain = value.toJS();
+            return Array.isArray(plain) ? plain : [];
+          }
+
+          return [];
+        }
+
+        function toPlainObject(value) {
+          if (!value) {
+            return {};
+          }
+
+          if (typeof value.toJS === "function") {
+            return value.toJS();
+          }
+
+          return { ...value };
+        }
+
+        function toCoordinateNumber(value) {
+          const number = Number(value);
+          return Number.isFinite(number) ? number : null;
+        }
+
+        function hasCompleteCoordinates(coordinates) {
+          return Boolean(
+            coordinates &&
+            toCoordinateNumber(coordinates.lat) !== null &&
+            toCoordinateNumber(coordinates.lng) !== null
+          );
+        }
+
+        function normalizeAssetPath(value) {
+          if (typeof value !== "string") {
+            return "";
+          }
+
+          return value.trim();
+        }
+
+        function pathsMatch(candidatePath, imagePath) {
+          if (!candidatePath || !imagePath) {
+            return false;
+          }
+
+          if (candidatePath === imagePath) {
+            return true;
+          }
+
+          const candidateName = candidatePath.split("/").pop();
+          const imageName = imagePath.split("/").pop();
+          return Boolean(candidateName && imageName && candidateName === imageName);
+        }
+
+        function pickMediaBlob(candidate) {
+          if (!candidate) {
+            return null;
+          }
+
+          if (candidate instanceof Blob) {
+            return candidate;
+          }
+
+          const blobKeys = ["file", "rawFile", "blob", "asset", "value"];
+          for (const key of blobKeys) {
+            const value = getValue(candidate, key);
+            if (value instanceof Blob) {
+              return value;
+            }
+          }
+
+          return null;
+        }
+
+        function pickMediaPath(candidate) {
+          const keys = ["path", "public_path", "publicPath", "url", "value", "id"];
+
+          for (const key of keys) {
+            const value = normalizeAssetPath(getValue(candidate, key));
+            if (value) {
+              return value;
+            }
+          }
+
+          return "";
+        }
+
+        function findDraftMediaBlob(entry, imagePath) {
+          const mediaFiles = toPlainArray(getValue(entry, "mediaFiles"));
+
+          for (const candidate of mediaFiles) {
+            const candidatePath = pickMediaPath(candidate);
+            if (pathsMatch(candidatePath, imagePath)) {
+              const blob = pickMediaBlob(candidate);
+              if (blob) {
+                return blob;
+              }
+            }
+          }
+
+          for (const candidate of mediaFiles) {
+            const blob = pickMediaBlob(candidate);
+            if (blob) {
+              return blob;
+            }
+          }
+
+          return null;
+        }
+
+        async function fetchExistingImageBlob(imagePath) {
+          if (!imagePath) {
+            return null;
+          }
+
+          const url = new URL(imagePath, window.location.origin);
+          if (url.origin !== window.location.origin) {
+            return null;
+          }
+
+          const response = await fetch(url.toString(), { credentials: "same-origin" });
+          if (!response.ok) {
+            throw new Error(`Image fetch failed with status ${response.status}`);
+          }
+
+          return response.blob();
+        }
+
+        async function resolveImageBlob(entry, imagePath) {
+          const draftBlob = findDraftMediaBlob(entry, imagePath);
+          if (draftBlob) {
+            return draftBlob;
+          }
+
+          return fetchExistingImageBlob(imagePath);
+        }
+
+        async function extractCoordinatesFromImage(entry, imagePath) {
+          if (!imagePath || !exifr || typeof exifr.gps !== "function") {
+            return null;
+          }
+
+          try {
+            const imageBlob = await resolveImageBlob(entry, imagePath);
+            if (!imageBlob) {
+              return null;
+            }
+
+            const gps = await exifr.gps(imageBlob);
+            const lat = toCoordinateNumber(gps && gps.latitude);
+            const lng = toCoordinateNumber(gps && gps.longitude);
+
+            if (lat === null || lng === null) {
+              return null;
+            }
+
+            return { lat, lng };
+          } catch (error) {
+            console.warn("Circadia admin GPS lookup failed:", error);
+            return null;
+          }
+        }
+
+        async function buildCoordinates(entry, data) {
+          const coordinates = toPlainObject(getValue(data, "coordinates"));
+          if (hasCompleteCoordinates(coordinates)) {
+            return null;
+          }
+
+          const imagePath = normalizeAssetPath(getValue(data, "image"));
+          const exifCoordinates = await extractCoordinatesFromImage(entry, imagePath);
+          return exifCoordinates || FALLBACK_COORDINATES;
+        }
+
         if (CMS) {
+          CMS.registerEventListener({
+            name: "preSave",
+            handler: async ({ entry, collection }) => {
+              const collectionName = normalizeAssetPath(getValue(collection, "name"));
+              if (collectionName && collectionName !== "posts") {
+                return getValue(entry, "data");
+              }
+
+              const data = getValue(entry, "data");
+              if (!data) {
+                return data;
+              }
+
+              const resolvedCoordinates = await buildCoordinates(entry, data);
+              if (!resolvedCoordinates) {
+                return data;
+              }
+
+              if (typeof data.setIn === "function") {
+                return data
+                  .setIn(["coordinates", "lat"], resolvedCoordinates.lat)
+                  .setIn(["coordinates", "lng"], resolvedCoordinates.lng);
+              }
+
+              const nextData = toPlainObject(data);
+              nextData.coordinates = {
+                lat: resolvedCoordinates.lat,
+                lng: resolvedCoordinates.lng
+              };
+              return nextData;
+            }
+          });
+
           CMS.init();
         }
       })();
