@@ -122,6 +122,8 @@
           lat: 43.618611,
           lng: -116.425167
         };
+        const MEDIA_PATH_KEYS = ["path", "public_path", "publicPath", "url", "value", "id"];
+        const MEDIA_BLOB_KEYS = ["file", "rawFile", "blob", "asset", "value"];
 
         function getValue(source, key) {
           if (!source) {
@@ -135,7 +137,7 @@
           return source[key];
         }
 
-        function toPlainArray(value) {
+        function toArray(value) {
           if (!value) {
             return [];
           }
@@ -173,95 +175,62 @@
           return Number.isFinite(number) ? number : null;
         }
 
-        function hasCompleteCoordinates(coordinates) {
-          return Boolean(
-            coordinates &&
-            toCoordinateNumber(coordinates.lat) !== null &&
-            toCoordinateNumber(coordinates.lng) !== null
-          );
+        function normalizePath(value) {
+          return typeof value === "string" ? value.trim() : "";
         }
 
-        function normalizeAssetPath(value) {
-          if (typeof value !== "string") {
-            return "";
-          }
-
-          return value.trim();
-        }
-
-        function pathsMatch(candidatePath, imagePath) {
-          if (!candidatePath || !imagePath) {
-            return false;
-          }
-
-          if (candidatePath === imagePath) {
-            return true;
-          }
-
-          const candidateName = candidatePath.split("/").pop();
-          const imageName = imagePath.split("/").pop();
-          return Boolean(candidateName && imageName && candidateName === imageName);
-        }
-
-        function pickMediaBlob(candidate) {
-          if (!candidate) {
-            return null;
-          }
-
-          if (candidate instanceof Blob) {
-            return candidate;
-          }
-
-          const blobKeys = ["file", "rawFile", "blob", "asset", "value"];
-          for (const key of blobKeys) {
-            const value = getValue(candidate, key);
-            if (value instanceof Blob) {
-              return value;
-            }
-          }
-
-          return null;
-        }
-
-        function pickMediaPath(candidate) {
-          const keys = ["path", "public_path", "publicPath", "url", "value", "id"];
-
-          for (const key of keys) {
-            const value = normalizeAssetPath(getValue(candidate, key));
-            if (value) {
-              return value;
-            }
-          }
-
-          return "";
+        function getCoordinatesIfComplete(data) {
+          const coordinates = toPlainObject(getValue(data, "coordinates"));
+          const lat = toCoordinateNumber(coordinates.lat);
+          const lng = toCoordinateNumber(coordinates.lng);
+          return lat === null || lng === null ? null : { lat, lng };
         }
 
         function findDraftMediaBlob(entry, imagePath) {
-          const mediaFiles = toPlainArray(getValue(entry, "mediaFiles"));
+          const mediaFiles = toArray(getValue(entry, "mediaFiles"));
+          const targetName = imagePath.split("/").pop();
+          let firstBlob = null;
 
           for (const candidate of mediaFiles) {
-            const candidatePath = pickMediaPath(candidate);
-            if (pathsMatch(candidatePath, imagePath)) {
-              const blob = pickMediaBlob(candidate);
-              if (blob) {
-                return blob;
+            let candidateBlob = candidate instanceof Blob ? candidate : null;
+            if (!candidateBlob) {
+              for (const key of MEDIA_BLOB_KEYS) {
+                const value = getValue(candidate, key);
+                if (value instanceof Blob) {
+                  candidateBlob = value;
+                  break;
+                }
+              }
+            }
+
+            if (!candidateBlob) {
+              continue;
+            }
+
+            if (!firstBlob) {
+              firstBlob = candidateBlob;
+            }
+
+            for (const key of MEDIA_PATH_KEYS) {
+              const candidatePath = normalizePath(getValue(candidate, key));
+              const candidateName = candidatePath.split("/").pop();
+              if (candidatePath === imagePath || (candidateName && candidateName === targetName)) {
+                return candidateBlob;
               }
             }
           }
 
-          for (const candidate of mediaFiles) {
-            const blob = pickMediaBlob(candidate);
-            if (blob) {
-              return blob;
-            }
-          }
-
-          return null;
+          return firstBlob;
         }
 
-        async function fetchExistingImageBlob(imagePath) {
+        async function resolveImageBlob(entry, imagePath) {
           if (!imagePath) {
             return null;
+          }
+
+          const draftBlob = findDraftMediaBlob(entry, imagePath);
+          if (draftBlob) {
+            return draftBlob;
           }
 
           const url = new URL(imagePath, window.location.origin);
@@ -275,15 +244,6 @@
           }
 
           return response.blob();
-        }
-
-        async function resolveImageBlob(entry, imagePath) {
-          const draftBlob = findDraftMediaBlob(entry, imagePath);
-          if (draftBlob) {
-            return draftBlob;
-          }
-
-          return fetchExistingImageBlob(imagePath);
         }
 
         async function extractCoordinatesFromImage(entry, imagePath) {
@@ -312,13 +272,12 @@
           }
         }
 
-        async function buildCoordinates(entry, data) {
-          const coordinates = toPlainObject(getValue(data, "coordinates"));
-          if (hasCompleteCoordinates(coordinates)) {
+        async function resolveCoordinates(entry, data) {
+          if (getCoordinatesIfComplete(data)) {
             return null;
           }
 
-          const imagePath = normalizeAssetPath(getValue(data, "image"));
+          const imagePath = normalizePath(getValue(data, "image"));
           const exifCoordinates = await extractCoordinatesFromImage(entry, imagePath);
           return exifCoordinates || FALLBACK_COORDINATES;
         }
@@ -327,7 +286,7 @@
           CMS.registerEventListener({
             name: "preSave",
             handler: async ({ entry, collection }) => {
-              const collectionName = normalizeAssetPath(getValue(collection, "name"));
+              const collectionName = normalizePath(getValue(collection, "name"));
               if (collectionName && collectionName !== "posts") {
                 return getValue(entry, "data");
               }
@@ -337,7 +296,7 @@
                 return data;
               }
 
-              const resolvedCoordinates = await buildCoordinates(entry, data);
+              const resolvedCoordinates = await resolveCoordinates(entry, data);
               if (!resolvedCoordinates) {
                 return data;
               }
