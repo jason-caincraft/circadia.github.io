@@ -51,14 +51,14 @@ The script:
 - The CMS writes Markdown posts into `_posts/` and uploads selected images into `images/`.
 - The CMS logs in through GitHub OAuth using a separately deployed proxy service.
 - Browser-created posts use the same front matter fields as the existing Jekyll layouts, search index, archive pages, category pages, and map page.
-- When a selected image contains EXIF metadata, the browser editor now auto-fills `coordinates.lat`, `coordinates.lng`, and the publish date from the image capture timestamp when available.
+- Before save, the browser editor keeps manual coordinates when both are present, otherwise it fills `coordinates.lat` and `coordinates.lng` from the selected image's EXIF GPS data or falls back to `43.618611, -116.425167`.
 
 ### CMS Files
 
 - `admin/index.html` is the browser editor shell.
 - `admin/config.yml` defines the GitHub-backed post collection and image upload behavior.
 - `oauth-proxy/` contains the Cloudflare Worker used for the GitHub OAuth popup flow.
-- EXIF extraction in `/admin/` runs in the browser with `exifr`; it fills map coordinates and capture date automatically when the selected image includes that metadata, including images chosen from the existing media library.
+- EXIF extraction in `/admin/` runs in the browser with `exifr`; it fills map coordinates from the selected image when GPS is present and otherwise writes the fallback coordinate pair `43.618611, -116.425167`, including when the post has no image.
 
 ### One-Time OAuth Setup
 
@@ -90,8 +90,9 @@ When `--use-exif` is passed:
 
 - the script tries to read the image's capture date and uses that same timestamp for the front matter `date:` field
 - the script uses the capture day in the post filename and copied image filename
-- the script tries to read GPS coordinates and adds them to front matter when found
-- if EXIF data is incomplete or missing, the script continues gracefully and falls back to the current local date and time
+- the script tries to read GPS coordinates and uses them for front matter when found
+- if GPS data is missing, unavailable, or no image is provided, the script writes fallback coordinates `43.618611` and `-116.425167`
+- if EXIF date data is incomplete or missing, the script continues gracefully and falls back to the current local date and time
 - if you already pass `--coordinates-lat` and `--coordinates-lng`, those manual values win
 
 EXIF fields that may be detected:
@@ -217,7 +218,7 @@ See `_posts/2026-04-30-scx6-backyard-suspension-test.md` for a complete working 
 - Search works from a generated static JSON file and browser-side JavaScript.
 - On This Day also uses browser-side JavaScript against the generated static JSON file.
 - EXIF processing is local only in Node and does not run on GitHub Pages.
-- Browser authoring now reads EXIF metadata client-side inside `/admin/` to fill coordinates and capture date before save.
+- Browser authoring reads EXIF metadata client-side inside `/admin/` to fill coordinates before save and falls back to `43.618611, -116.425167` when GPS is unavailable.
 - `/admin/` is a static route, while authentication is delegated to the separate OAuth proxy deployment.
 - The deployed public site remains static and maintainable.
 

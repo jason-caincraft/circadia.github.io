@@ -79,6 +79,10 @@ const VALID_CATEGORIES = new Set([
   "marksmanship"
 ]);
 const VALID_MODES = new Set(["build", "explore", "test", "maintain", "observe"]);
+const FALLBACK_COORDINATES = {
+  lat: 43.618611,
+  lng: -116.425167
+};
 
 const titleParts = [];
 const options = {
@@ -474,6 +478,11 @@ async function main() {
       coordinatesLat = String(exifMeta.coordinates.lat);
       coordinatesLng = String(exifMeta.coordinates.lng);
     }
+  }
+
+  if (!coordinatesLat && !coordinatesLng) {
+    coordinatesLat = String(FALLBACK_COORDINATES.lat);
+    coordinatesLng = String(FALLBACK_COORDINATES.lng);
   }
 
   let imageFrontMatter = "";
