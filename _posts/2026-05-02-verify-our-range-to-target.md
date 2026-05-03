@@ -1,7 +1,7 @@
 ---
 layout: post
 title: Verify our range to target
-date: 2026-05-02 17:56:00 -06:00
+date: 2026-02-28 12:30:00 -07:00
 image: /images/2026-04-30-calculate-our-range-to-target.jpg
 tags: []
 coordinates:
