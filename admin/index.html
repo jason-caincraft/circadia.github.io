@@ -176,11 +176,94 @@
           return typeof value === "string" ? value.trim() : "";
         }
 
+        function padNumber(value) {
+          return String(value).padStart(2, "0");
+        }
+
+        function formatDateForFrontMatter(date) {
+          const offsetMinutes = -date.getTimezoneOffset();
+          const sign = offsetMinutes >= 0 ? "+" : "-";
+          const absoluteOffset = Math.abs(offsetMinutes);
+          const offsetHours = padNumber(Math.floor(absoluteOffset / 60));
+          const offsetRemainderMinutes = padNumber(absoluteOffset % 60);
+
+          return [
+            `${date.getFullYear()}-${padNumber(date.getMonth() + 1)}-${padNumber(date.getDate())}`,
+            `${padNumber(date.getHours())}:${padNumber(date.getMinutes())}:${padNumber(date.getSeconds())}`,
+            `${sign}${offsetHours}${offsetRemainderMinutes}`
+          ].join(" ");
+        }
+
+        function pickExifDate(metadata) {
+          if (!metadata || typeof metadata !== "object") {
+            return null;
+          }
+
+          const candidates = [
+            metadata.DateTimeOriginal,
+            metadata.CreateDate,
+            metadata.ModifyDate,
+            metadata.DateTimeDigitized
+          ];
+
+          for (const candidate of candidates) {
+            if (candidate instanceof Date && !Number.isNaN(candidate.getTime())) {
+              return candidate;
+            }
+
+            if (typeof candidate === "string" || typeof candidate === "number") {
+              const parsed = new Date(candidate);
+              if (!Number.isNaN(parsed.getTime())) {
+                return parsed;
+              }
+            }
+          }
+
+          return null;
+        }
+
+        function pickExifCoordinates(metadata) {
+          if (!metadata || typeof metadata !== "object") {
+            return null;
+          }
+
+          const latitudeCandidates = [metadata.latitude, metadata.lat, metadata.GPSLatitude];
+          const longitudeCandidates = [metadata.longitude, metadata.lon, metadata.lng, metadata.GPSLongitude];
+
+          for (const latitude of latitudeCandidates) {
+            for (const longitude of longitudeCandidates) {
+              const lat = toCoordinateNumber(latitude);
+              const lng = toCoordinateNumber(longitude);
+              if (lat !== null && lng !== null) {
+                return { lat, lng };
+              }
+            }
+          }
+
+          return null;
+        }
+
         function getCoordinatesIfComplete(data) {
           const coordinates = toPlainObject(getValue(data, "coordinates"));
           const lat = toCoordinateNumber(coordinates.lat);
           const lng = toCoordinateNumber(coordinates.lng);
           return lat === null || lng === null ? null : { lat, lng };
+        }
+
+        function getImageSelection(data) {
+          const rawImages = getValue(data, "images");
+          const imagePaths = toArray(rawImages).map(normalizePath).filter(Boolean);
+
+          if (imagePaths.length > 0) {
+            return { imagePaths, source: "images" };
+          }
+
+          if (typeof rawImages !== "undefined") {
+            return { imagePaths: [], source: "images" };
+          }
+
+          const imagePath = normalizePath(getValue(data, "image"));
+          return imagePath ? { imagePaths: [imagePath], source: "image" } : { imagePaths: [], source: "none" };
         }
 
         function findDraftMediaBlob(entry, imagePath) {
@@ -243,40 +326,79 @@
           return response.blob();
         }
 
-        async function extractCoordinatesFromImage(entry, imagePath) {
-          if (!imagePath || !exifr || typeof exifr.gps !== "function") {
-            return null;
+        async function extractExifFromImage(entry, imagePath) {
+          if (!imagePath || !exifr || typeof exifr.parse !== "function") {
+            return {
+              imagePath,
+              captureDate: null,
+              coordinates: null
+            };
           }
 
           try {
             const imageBlob = await resolveImageBlob(entry, imagePath);
             if (!imageBlob) {
-              return null;
+              return {
+                imagePath,
+                captureDate: null,
+                coordinates: null
+              };
             }
 
-            const gps = await exifr.gps(imageBlob);
-            const lat = toCoordinateNumber(gps && gps.latitude);
-            const lng = toCoordinateNumber(gps && gps.longitude);
+            const metadata = await exifr.parse(imageBlob);
 
-            if (lat === null || lng === null) {
-              return null;
-            }
-
-            return { lat, lng };
+            return {
+              imagePath,
+              captureDate: pickExifDate(metadata),
+              coordinates: pickExifCoordinates(metadata)
+            };
           } catch (error) {
-            console.warn("Circadia admin GPS lookup failed:", error);
-            return null;
+            console.warn("Circadia admin EXIF lookup failed:", error);
+            return {
+              imagePath,
+              captureDate: null,
+              coordinates: null
+            };
           }
         }
 
-        async function resolveCoordinates(entry, data) {
-          if (getCoordinatesIfComplete(data)) {
-            return null;
+        async function resolveImageMetadata(entry, data) {
+          const selection = getImageSelection(data);
+          if (selection.imagePaths.length === 0) {
+            return {
+              source: selection.source,
+              imagePaths: [],
+              featuredImage: "",
+              featuredExif: null
+            };
           }
 
-          const imagePath = normalizePath(getValue(data, "image"));
-          const exifCoordinates = await extractCoordinatesFromImage(entry, imagePath);
-          return exifCoordinates;
+          const exifRecords = await Promise.all(
+            selection.imagePaths.map((imagePath) => extractExifFromImage(entry, imagePath))
+          );
+
+          let featuredIndex = 0;
+          let oldestTimestamp = Number.POSITIVE_INFINITY;
+
+          for (let i = 0; i < exifRecords.length; i++) {
+            const captureDate = exifRecords[i].captureDate;
+            if (!(captureDate instanceof Date) || Number.isNaN(captureDate.getTime())) {
+              continue;
+            }
+
+            const timestamp = captureDate.getTime();
+            if (timestamp < oldestTimestamp) {
+              oldestTimestamp = timestamp;
+              featuredIndex = i;
+            }
+          }
+
+          return {
+            source: selection.source,
+            imagePaths: selection.imagePaths,
+            featuredImage: selection.imagePaths[featuredIndex] || selection.imagePaths[0] || "",
+            featuredExif: exifRecords[featuredIndex] || null
+          };
         }
 
         if (CMS) {
@@ -293,22 +415,41 @@
                 return data;
               }
 
-              const resolvedCoordinates = await resolveCoordinates(entry, data);
-              if (!resolvedCoordinates) {
-                return data;
-              }
-
-              if (typeof data.setIn === "function") {
-                return data
-                  .setIn(["coordinates", "lat"], resolvedCoordinates.lat)
-                  .setIn(["coordinates", "lng"], resolvedCoordinates.lng);
-              }
-
               const nextData = toPlainObject(data);
-              nextData.coordinates = {
-                lat: resolvedCoordinates.lat,
-                lng: resolvedCoordinates.lng
-              };
+              const resolvedImageMetadata = await resolveImageMetadata(entry, data);
+              const manualCoordinates = getCoordinatesIfComplete(data);
+
+              if (resolvedImageMetadata.source === "images") {
+                if (resolvedImageMetadata.imagePaths.length > 0) {
+                  nextData.images = resolvedImageMetadata.imagePaths;
+                  nextData.image = resolvedImageMetadata.featuredImage;
+                } else {
+                  delete nextData.images;
+                  delete nextData.image;
+                }
+              } else if (resolvedImageMetadata.featuredImage) {
+                nextData.image = resolvedImageMetadata.featuredImage;
+              }
+
+              if (
+                resolvedImageMetadata.featuredExif &&
+                resolvedImageMetadata.featuredExif.captureDate instanceof Date &&
+                Number.isNaN(resolvedImageMetadata.featuredExif.captureDate.getTime()) === false
+              ) {
+                nextData.date = formatDateForFrontMatter(resolvedImageMetadata.featuredExif.captureDate);
+              }
+
+              if (
+                !manualCoordinates &&
+                resolvedImageMetadata.featuredExif &&
+                resolvedImageMetadata.featuredExif.coordinates
+              ) {
+                nextData.coordinates = {
+                  lat: resolvedImageMetadata.featuredExif.coordinates.lat,
+                  lng: resolvedImageMetadata.featuredExif.coordinates.lng
+                };
+              }
+
               return nextData;
             }
           });

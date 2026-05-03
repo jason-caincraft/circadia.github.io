@@ -10,7 +10,7 @@
         "newpost",
         "${input:title}",
         "--",
-        "--image",
+        "--images",
         "${input:image}",
         "--text",
         "${input:text}",
@@ -117,9 +117,11 @@
       "command": "extension.commandvariable.file.openDialog",
       "args": {
         "canSelect": "files",
+        "canSelectMany": true,
+        "separator": "|",
         "defaultUri": "C:\\Users\\terb0\\Downloads\\PostImages",
-        "title": "Select an image for the new Circadia post",
-        "openLabel": "Use this image",
+        "title": "Select one or more images for the new Circadia post",
+        "openLabel": "Use these images",
         "filters": {
           "Images": [
             "jpg",
