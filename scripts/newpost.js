@@ -15,6 +15,7 @@ if (args.length === 0) {
   console.error(`
 Usage:
 npm run newpost "Post title" -- --image ./path/to/photo.jpg --text "Short note text"
+npm run newpost "Post title" -- --images "./path/to/photo-a.jpg|./path/to/photo-b.jpg" --text "Short note text"
 
 Optional metadata:
   --layout post|build
@@ -39,15 +40,16 @@ Optional metadata:
 
 Examples:
 npm run newpost "First spring garden check" -- --image ./photos/garden.jpg --text "Checked the lettuce and onions after the rain."
+npm run newpost "Camp dawn" -- --images "./photos/camp-dawn.jpg|./photos/camp-kitchen.jpg" --text "Cold air and quiet coffee." --use-exif
 npm run newpost "Creek crossing clip" -- --video ./clips/creek-crossing.mp4 --location "Thorne Creek" --text "Short line choice test with the truck."
 npm run newpost "SCX6 backyard suspension test" -- --layout build --mode build --project "Axial SCX6 Jeep" --stage "Suspension tuning" --parts "Softer rear springs | Wheel weights"
-npm run newpost "Camp dawn" -- --image ./photos/camp-dawn.jpg --text "Cold air and quiet coffee." --use-exif
 `);
   process.exit(1);
 }
 
 const FLAG_NAMES = new Set([
   "--image",
+  "--images",
   "--video",
   "--text",
   "--layout",
@@ -86,6 +88,7 @@ const VALID_MODES = new Set(["build", "explore", "test", "maintain", "observe"])
 const titleParts = [];
 const options = {
   image: "",
+  images: "",
   video: "",
   text: "",
   layout: "post",
@@ -124,6 +127,9 @@ for (let i = 0; i < args.length; i++) {
     continue;
   } else if (arg === "--image") {
     options.image = readFlagValue(i);
+    i++;
+  } else if (arg === "--images") {
+    options.images = readFlagValue(i);
     i++;
   } else if (arg === "--video") {
     options.video = readFlagValue(i);
@@ -341,13 +347,18 @@ function pickExifCoordinates(metadata) {
   return null;
 }
 
-async function readExifMeta(imagePath) {
-  const meta = {
+function buildEmptyExifMeta(imagePath) {
+  return {
+    imagePath,
     captureDate: null,
     fileDate: "",
     coordinates: null,
     warnings: []
   };
+}
+
+async function readExifMeta(imagePath) {
+  const meta = buildEmptyExifMeta(imagePath);
 
   if (!imagePath) {
     meta.warnings.push("EXIF lookup skipped because no image path was provided.");
@@ -372,19 +383,85 @@ async function readExifMeta(imagePath) {
     if (coordinates) {
       meta.coordinates = coordinates;
     }
-
-    if (!meta.captureDate) {
-      meta.warnings.push("No EXIF capture date was found. Using the current local date and time instead.");
-    }
-
-    if (!meta.coordinates) {
-      meta.warnings.push("No EXIF GPS coordinates were found.");
-    }
   } catch (error) {
-    meta.warnings.push(`EXIF lookup failed: ${error.message}`);
+    meta.warnings.push(`EXIF lookup failed for ${path.basename(imagePath)}: ${error.message}`);
   }
 
   return meta;
+}
+
+function dedupeImagePaths(imagePaths) {
+  const seen = new Set();
+  const unique = [];
+
+  for (const imagePath of imagePaths) {
+    const key = imagePath.toLowerCase();
+    if (seen.has(key)) {
+      continue;
+    }
+    seen.add(key);
+    unique.push(imagePath);
+  }
+
+  return unique;
+}
+
+function resolveImageInputValues() {
+  return [
+    ...parseList(options.images, /\|/),
+    ...parseList(options.image, /\|/)
+  ];
+}
+
+function choosePrimaryImageIndex(imageMetaList) {
+  let oldestIndex = -1;
+
+  for (let i = 0; i < imageMetaList.length; i++) {
+    const currentMeta = imageMetaList[i];
+    if (!(currentMeta.captureDate instanceof Date) || Number.isNaN(currentMeta.captureDate.getTime())) {
+      continue;
+    }
+
+    if (oldestIndex === -1 || currentMeta.captureDate.getTime() < imageMetaList[oldestIndex].captureDate.getTime()) {
+      oldestIndex = i;
+    }
+  }
+
+  return oldestIndex;
+}
+
+async function readExifMetaForImages(imagePaths) {
+  const imageMetaList = imagePaths.length === 0
+    ? []
+    : await Promise.all(imagePaths.map((imagePath) => readExifMeta(imagePath)));
+  const oldestIndex = choosePrimaryImageIndex(imageMetaList);
+
+  return {
+    imageMetaList,
+    featuredSourceIndex: oldestIndex >= 0 ? oldestIndex : 0,
+    oldestIndex,
+    oldestMeta: oldestIndex >= 0 ? imageMetaList[oldestIndex] : buildEmptyExifMeta(imagePaths[0] || ""),
+    warnings: imageMetaList.flatMap((meta) => meta.warnings)
+  };
+}
+
+function copyImages(resolvedImagePaths, featuredSourceIndex, imagesDir, postDate, slug) {
+  const copiedImagePaths = [];
+  let suffixNumber = 2;
+
+  for (let i = 0; i < resolvedImagePaths.length; i++) {
+    const resolvedImagePath = resolvedImagePaths[i];
+    const ext = path.extname(resolvedImagePath).toLowerCase();
+    const suffix = i === featuredSourceIndex ? "" : `-${padNumber(suffixNumber++)}`;
+    const imageFilename = `${postDate}-${slug}${suffix}${ext}`;
+    const destination = path.join(imagesDir, imageFilename);
+    const publicPath = `/images/${imageFilename}`;
+
+    fs.copyFileSync(resolvedImagePath, destination);
+    copiedImagePaths.push(publicPath);
+  }
+
+  return copiedImagePaths;
 }
 
 async function main() {
@@ -440,8 +517,6 @@ async function main() {
   const imagesDir = path.join(process.cwd(), "images");
   const videosDir = path.join(process.cwd(), "videos");
   const slug = slugify(title);
-  const imagePath = normalizeValue(options.image);
-  const videoPath = normalizeValue(options.video);
   const defaultTimestamp = new Date();
   const defaultDate = formatDateForFilename(defaultTimestamp);
 
@@ -455,16 +530,19 @@ async function main() {
     fs.mkdirSync(videosDir);
   }
 
-  let resolvedImagePath = "";
-  if (imagePath) {
-    resolvedImagePath = path.resolve(process.cwd(), imagePath);
+  const requestedImagePaths = resolveImageInputValues();
+  const resolvedImagePaths = dedupeImagePaths(
+    requestedImagePaths.map((imagePath) => path.resolve(process.cwd(), imagePath))
+  );
 
+  for (const resolvedImagePath of resolvedImagePaths) {
     if (!fs.existsSync(resolvedImagePath)) {
-      console.error(`Image not found: ${imagePath}`);
+      console.error(`Image not found: ${resolvedImagePath}`);
       process.exit(1);
     }
   }
 
+  const videoPath = normalizeValue(options.video);
   let resolvedVideoPath = "";
   if (videoPath) {
     resolvedVideoPath = path.resolve(process.cwd(), videoPath);
@@ -477,28 +555,40 @@ async function main() {
 
   let postDate = defaultDate;
   let postTimestamp = defaultTimestamp;
-  let exifMeta = {
-    captureDate: null,
-    fileDate: "",
-    coordinates: null,
+  let featuredSourceIndex = 0;
+  let exifState = {
+    imageMetaList: [],
+    featuredSourceIndex: 0,
+    oldestIndex: -1,
+    oldestMeta: buildEmptyExifMeta(resolvedImagePaths[0] || ""),
     warnings: []
   };
 
   if (options.useExif) {
-    exifMeta = await readExifMeta(resolvedImagePath);
+    if (resolvedImagePaths.length === 0) {
+      exifState.warnings.push("EXIF lookup skipped because no image path was provided.");
+    } else {
+      exifState = await readExifMetaForImages(resolvedImagePaths);
+      featuredSourceIndex = exifState.oldestIndex >= 0 ? exifState.featuredSourceIndex : 0;
 
-    if (exifMeta.captureDate) {
-      postTimestamp = exifMeta.captureDate;
-      postDate = exifMeta.fileDate;
-    }
+      if (exifState.oldestMeta.captureDate) {
+        postTimestamp = exifState.oldestMeta.captureDate;
+        postDate = exifState.oldestMeta.fileDate;
+      } else {
+        exifState.warnings.push("No EXIF capture date was found in the selected photos. Using the current local date and time instead.");
+      }
 
-    if (!coordinatesLat && !coordinatesLng && exifMeta.coordinates) {
-      coordinatesLat = String(exifMeta.coordinates.lat);
-      coordinatesLng = String(exifMeta.coordinates.lng);
+      if (!coordinatesLat && !coordinatesLng && exifState.oldestMeta.coordinates) {
+        coordinatesLat = String(exifState.oldestMeta.coordinates.lat);
+        coordinatesLng = String(exifState.oldestMeta.coordinates.lng);
+      } else if (!coordinatesLat && !coordinatesLng) {
+        exifState.warnings.push("No EXIF GPS coordinates were found on the oldest selected photo.");
+      }
     }
   }
 
-  let imageFrontMatter = "";
+  let featuredImageFrontMatter = "";
+  let imageFrontMatterList = [];
   let videoFrontMatter = "";
   let altText = normalizeValue(options.alt) || `${title} - ${category.replace(/-/g, " ")} field note`;
   const filename = `${postDate}-${slug}.md`;
@@ -509,14 +599,10 @@ async function main() {
     process.exit(1);
   }
 
-  if (imagePath) {
-    const ext = path.extname(resolvedImagePath).toLowerCase();
-    const imageFilename = `${postDate}-${slug}${ext}`;
-    const destination = path.join(imagesDir, imageFilename);
+  if (resolvedImagePaths.length > 0) {
+    imageFrontMatterList = copyImages(resolvedImagePaths, featuredSourceIndex, imagesDir, postDate, slug);
+    featuredImageFrontMatter = imageFrontMatterList[featuredSourceIndex] || imageFrontMatterList[0] || "";
 
-    fs.copyFileSync(resolvedImagePath, destination);
-
-    imageFrontMatter = `/images/${imageFilename}`;
     if (!normalizeValue(options.alt)) {
       altText = title;
     }
@@ -542,8 +628,11 @@ async function main() {
   if (videoFrontMatter) {
     frontMatter.push(`video: ${videoFrontMatter}`);
   }
-  if (imageFrontMatter) {
-    frontMatter.push(`image: ${imageFrontMatter}`);
+  if (featuredImageFrontMatter) {
+    frontMatter.push(`image: ${featuredImageFrontMatter}`);
+  }
+  if (imageFrontMatterList.length > 1) {
+    appendListBlock(frontMatter, "images", imageFrontMatterList);
   }
   frontMatter.push(`category: ${category}`);
   if (tags.length > 0) {
@@ -588,7 +677,7 @@ async function main() {
   appendListBlock(frontMatter, "changes", changes);
   appendListBlock(frontMatter, "lessons", lessons);
 
-  if (altText && imageFrontMatter) {
+  if (altText && featuredImageFrontMatter) {
     frontMatter.push(`alt: ${yamlString(altText)}`);
   }
 
@@ -601,24 +690,31 @@ async function main() {
 
   console.log(`Created post: _posts/${filename}`);
 
-  if (imagePath) {
-    console.log(`Copied image: ${imageFrontMatter}`);
+  if (featuredImageFrontMatter) {
+    console.log(`Copied ${imageFrontMatterList.length} image${imageFrontMatterList.length === 1 ? "" : "s"}.`);
+    console.log(`Featured image: ${featuredImageFrontMatter}`);
+  }
+  if (imageFrontMatterList.length > 1) {
+    console.log("Gallery images:");
+    for (const imageFrontMatterPath of imageFrontMatterList) {
+      console.log(`- ${imageFrontMatterPath}`);
+    }
   }
   if (videoPath) {
     console.log(`Copied video: ${videoFrontMatter}`);
   }
 
   if (options.useExif) {
-    for (const warning of exifMeta.warnings) {
+    for (const warning of exifState.warnings) {
       console.warn(`EXIF: ${warning}`);
     }
 
-    if (exifMeta.captureDate) {
-      console.log(`EXIF capture date applied: ${formatDateForFrontMatter(postTimestamp)}`);
+    if (exifState.oldestMeta.captureDate) {
+      console.log(`EXIF capture date applied from oldest photo: ${formatDateForFrontMatter(postTimestamp)}`);
     }
 
-    if (exifMeta.coordinates) {
-      console.log(`EXIF coordinates detected: ${exifMeta.coordinates.lat}, ${exifMeta.coordinates.lng}`);
+    if (exifState.oldestMeta.coordinates) {
+      console.log(`EXIF coordinates detected on oldest photo: ${exifState.oldestMeta.coordinates.lat}, ${exifState.oldestMeta.coordinates.lng}`);
     }
   }
 

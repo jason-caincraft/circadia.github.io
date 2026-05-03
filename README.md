@@ -37,6 +37,12 @@ Create a new post with the helper script:
 npm run newpost "Post title" -- --image ./path/to/photo.jpg --text "Short note text"
 ```
 
+Create a multi-photo post with:
+
+```bash
+npm run newpost "Post title" -- --images "./path/to/photo-a.jpg|./path/to/photo-b.jpg" --text "Short note text"
+```
+
 Create a video post with:
 
 ```bash
@@ -46,12 +52,13 @@ npm run newpost "Post title" -- --video ./path/to/clip.mp4 --location "Trail nam
 The script:
 
 - creates a dated Markdown file in `_posts/`
-- copies the selected image into `images/`
+- copies the selected image or images into `images/`
 - copies the selected video into `videos/` when `--video` is used
 - suggests a category from the title and text unless you override it
 - keeps working even if optional metadata is omitted
 - writes an explicit front matter `date:` so the post timestamp and filename stay aligned
-- only writes `coordinates` when you provide them manually or EXIF GPS data is extracted from an image
+- writes `image` as the featured image path and adds `images` when multiple photos are selected
+- only writes `coordinates` when you provide them manually or EXIF GPS data is extracted from the oldest selected image
 
 ## Browser Authoring Workflow
 
@@ -59,14 +66,15 @@ The script:
 - The CMS writes Markdown posts into `_posts/`, uploads selected images into `images/`, and uploads selected videos into `videos/`.
 - The CMS logs in through GitHub OAuth using a separately deployed proxy service.
 - Browser-created posts use the same front matter fields as the existing Jekyll layouts, search index, archive pages, category pages, and map page.
-- Before save, the browser editor keeps manual coordinates when both are present, otherwise it fills `coordinates.lat` and `coordinates.lng` from the selected image's EXIF GPS data when available.
+- Before save, the browser editor uses the oldest selected photo as the featured `image` and EXIF source for `date` and GPS coordinates.
+- Manual coordinates still win when both latitude and longitude are already present.
 
 ### CMS Files
 
 - `admin/index.html` is the browser editor shell.
 - `admin/config.yml` defines the GitHub-backed post collection and image upload behavior.
 - `oauth-proxy/` contains the Cloudflare Worker used for the GitHub OAuth popup flow.
-- EXIF extraction in `/admin/` runs in the browser with `exifr`; it fills map coordinates from the selected image when GPS is present and otherwise leaves coordinates unset.
+- EXIF extraction in `/admin/` runs in the browser with `exifr`; it picks the oldest selected photo to fill the featured image, publish date, and map coordinates when available.
 
 ### One-Time OAuth Setup
 
@@ -86,21 +94,21 @@ For deployment details, see `oauth-proxy/README.md`.
 
 The EXIF helper is local only. It runs in `scripts/newpost.js` through Node and never runs during the GitHub Pages build.
 
-The VS Code `New Circadia Post` task now enables EXIF automatically for the selected image. A separate `New Circadia Video Post` task creates video-first entries without EXIF. Direct CLI use can still opt in with `--use-exif`.
+The VS Code `New Circadia Post` task now enables EXIF automatically for the selected image set. A separate `New Circadia Video Post` task creates video-first entries without EXIF. Direct CLI use can still opt in with `--use-exif`.
 
 Example:
 
 ```bash
-npm run newpost "Camp dawn" -- --image ./photos/camp-dawn.jpg --text "Cold air and quiet coffee." --use-exif
+npm run newpost "Camp dawn" -- --images "./photos/camp-dawn.jpg|./photos/camp-kitchen.jpg" --text "Cold air and quiet coffee." --use-exif
 ```
 
 When `--use-exif` is passed:
 
-- the script tries to read the image's capture date and uses that same timestamp for the front matter `date:` field
-- the script uses the capture day in the post filename and copied image filename
-- the script tries to read GPS coordinates and uses them for front matter when found
+- the script tries to read every selected image's capture date and picks the oldest photo as the featured `image`
+- the script uses that oldest photo's timestamp for the front matter `date:` field and the copied file name prefix
+- the script tries to read GPS coordinates from that same oldest photo and uses them for front matter when found
 - if GPS data is missing, unavailable, or no image is provided, the script leaves coordinates unset unless you pass manual coordinates
-- if EXIF date data is incomplete or missing, the script continues gracefully and falls back to the current local date and time
+- if EXIF date data is incomplete or missing across the selected images, the script continues gracefully, falls back to the current local date and time, and keeps the first selected image as featured
 - if you already pass `--coordinates-lat` and `--coordinates-lng`, those manual values win
 
 EXIF fields that may be detected:
@@ -114,6 +122,8 @@ If the `exifr` dependency is not installed yet, `--use-exif` warns and continues
 
 Optional flags for `npm run newpost`:
 
+- `--image ./path/to/photo.jpg`
+- `--images "./path/to/photo-a.jpg|./path/to/photo-b.jpg"`
 - `--layout post|build`
 - `--video ./path/to/video.mp4`
 - `--category auto|gardening|rc-crawling|fpv|photography|amateur-radio|motorcycling|camping|marksmanship`
@@ -144,6 +154,9 @@ title: "Post Title"
 date: 2026-04-30 07:18:00 -0600
 video: /videos/example.mp4
 image: /images/example.jpg
+images:
+  - "/images/example.jpg"
+  - "/images/example-02.jpg"
 category: rc-crawling
 tags: [backyard, testing, suspension]
 mode: test
@@ -162,7 +175,7 @@ alt: "Optional image description"
 ---
 ```
 
-Everything except `title` is optional. The helper now writes `date:` automatically for new posts. Existing posts without coordinates, conditions, gear, tags, mode, video, or image still render normally.
+Everything except `title` is optional. The helper now writes `date:` automatically for new posts. Existing posts without coordinates, conditions, gear, tags, mode, video, image, or `images` still render normally.
 
 For a minimal video post, this is enough:
 
@@ -211,12 +224,14 @@ If `mode` is omitted, nothing is shown.
 - Store post images in `images/`.
 - Store post videos in `videos/`.
 - Reference them from front matter with a site-root path such as `/images/camp.jpg`.
+- Use `image` for the featured hero or card image.
+- Use `images` for ordered gallery photos when a post has more than one image.
 - Reference videos from front matter with a site-root path such as `/videos/camp-fire.mp4`.
 - Add `alt` text when possible so the image is described for screen readers.
 - Add `location` when a note should show where it happened. The helper also adds that location text to `tags` for easier filtering and search.
 - Add both `coordinates.lat` and `coordinates.lng` when a post should appear on `/map/`.
 
-Posts without coordinates are ignored on the map page. Posts without images, videos, locations, or conditions still render cleanly.
+Posts without coordinates are ignored on the map page. Posts without images, videos, locations, or conditions still render cleanly. Multi-photo posts render the featured image first and the remaining `images` entries as a gallery.
 
 ## Build Log Posts
 
@@ -241,7 +256,7 @@ See `_posts/2026-04-30-scx6-backyard-suspension-test.md` for a complete working 
 - Search works from a generated static JSON file and browser-side JavaScript.
 - On This Day also uses browser-side JavaScript against the generated static JSON file.
 - EXIF processing is local only in Node and does not run on GitHub Pages.
-- Browser authoring reads EXIF metadata client-side inside `/admin/` to fill coordinates before save when a selected image contains GPS data.
+- Browser authoring reads EXIF metadata client-side inside `/admin/` and uses the oldest selected photo to fill the featured image, publish date, and coordinates before save when available.
 - `/admin/` is a static route, while authentication is delegated to the separate OAuth proxy deployment.
 - The deployed public site remains static and maintainable.
 
@@ -265,5 +280,5 @@ See `_posts/2026-04-30-scx6-backyard-suspension-test.md` for a complete working 
 - `images/` stores post images.
 - `videos/` stores post videos.
 - `assets/styles.css` contains the field notebook and workbench theme.
-- `scripts/newpost.js` handles local post generation and optional EXIF extraction.
+- `scripts/newpost.js` handles local post generation, multi-photo copying, and optional EXIF extraction.
 - `oauth-proxy/` contains the separate GitHub OAuth Worker for browser login.

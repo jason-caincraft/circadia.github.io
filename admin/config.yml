@@ -62,11 +62,24 @@ collections:
         choose_url: false
         media_folder: /videos
         hint: Optional full-post video. Video-only posts are supported.
+      - label: Photos
+        name: images
+        widget: list
+        required: false
+        default: []
+        collapsed: false
+        hint: Add one or more photos. The oldest photo becomes the featured image and EXIF source when available.
+        summary: "{{fields.photo}}"
+        field:
+          label: Photo
+          name: photo
+          widget: image
+          required: false
+          choose_url: false
       - label: Featured Image
         name: image
-        widget: image
+        widget: hidden
         required: false
-        choose_url: false
       - label: Location
         name: location
         widget: string
@@ -78,7 +91,7 @@ collections:
         modes:
           - raw
           - rich_text
-      - label: Image Alt Text
+      - label: Featured Image Alt Text
         name: alt
         widget: string
         required: false

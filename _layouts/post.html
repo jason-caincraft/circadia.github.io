@@ -33,11 +33,21 @@ layout: default
 {% assign condition_light = page.conditions.light | default: "" %}
 {% assign has_conditions = false %}
 {% assign has_gear = false %}
+{% assign gallery_images = page.images | default: empty %}
+{% assign has_gallery = false %}
 {% if condition_weather != blank or condition_temperature != blank or condition_light != blank %}
   {% assign has_conditions = true %}
 {% endif %}
 {% if page.gear and page.gear != empty %}
   {% assign has_gear = true %}
+{% endif %}
+{% if gallery_images and gallery_images != empty %}
+  {% for gallery_image in gallery_images %}
+    {% if gallery_image != page.image %}
+      {% assign has_gallery = true %}
+      {% break %}
+    {% endif %}
+  {% endfor %}
 {% endif %}
 
 <article class="post-card post-card--single fade-in">
@@ -125,6 +135,27 @@ layout: default
   <div class="post-content">
     {{ content }}
   </div>
+
+  {% if has_gallery %}
+    <section class="post-gallery" aria-labelledby="gallery-heading">
+      <h2 class="meta-panel-title" id="gallery-heading">Photo Gallery</h2>
+      <div class="post-gallery-grid">
+        {% assign gallery_index = 0 %}
+        {% for gallery_image in gallery_images %}
+          {% unless gallery_image == page.image %}
+            {% assign gallery_index = gallery_index | plus: 1 %}
+            <figure class="post-gallery-item">
+              <img
+                class="post-gallery-image"
+                src="{{ gallery_image | relative_url }}"
+                alt="{{ page.title | default: 'Field journal photo' | escape }} photo {{ gallery_index }}"
+              >
+            </figure>
+          {% endunless %}
+        {% endfor %}
+      </div>
+    </section>
+  {% endif %}
 
   {% if page.tags and page.tags != empty %}
     <ul class="tag-pills" aria-label="Post tags">
