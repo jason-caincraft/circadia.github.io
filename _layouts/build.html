@@ -93,7 +93,18 @@ layout: default
     </div>
   {% endif %}
 
-  {% if page.image %}
+  {% if page.video %}
+    <video
+      class="post-image build-hero"
+      controls
+      preload="metadata"
+      playsinline
+      aria-label="{{ page.title | default: 'Build log video' | escape }}"
+    >
+      <source src="{{ page.video | relative_url }}">
+      Your browser does not support the video tag.
+    </video>
+  {% elsif page.image %}
     <img
       class="post-image build-hero"
       src="{{ page.image | relative_url }}"

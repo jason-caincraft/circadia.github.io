@@ -103,7 +103,8 @@
           <p class="admin-copy">
             This editor saves posts directly into the GitHub repository that powers
             <strong>caincraft.com</strong>. Use your GitHub login, then create or update entries in
-            <code>_posts/</code> and upload images into <code>images/</code>.
+            <code>_posts/</code>, upload images into <code>images/</code>, and upload videos into
+            <code>videos/</code>.
           </p>
           <p class="admin-note">
             If login does not open, verify the separate OAuth proxy has been deployed and that
@@ -118,10 +119,6 @@
       (function() {
         const CMS = window.CMS;
         const exifr = window.exifr;
-        const FALLBACK_COORDINATES = {
-          lat: 43.618611,
-          lng: -116.425167
-        };
         const MEDIA_PATH_KEYS = ["path", "public_path", "publicPath", "url", "value", "id"];
         const MEDIA_BLOB_KEYS = ["file", "rawFile", "blob", "asset", "value"];
 
@@ -279,7 +276,7 @@
 
           const imagePath = normalizePath(getValue(data, "image"));
           const exifCoordinates = await extractCoordinatesFromImage(entry, imagePath);
-          return exifCoordinates || FALLBACK_COORDINATES;
+          return exifCoordinates;
         }
 
         if (CMS) {

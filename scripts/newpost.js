@@ -18,6 +18,7 @@ npm run newpost "Post title" -- --image ./path/to/photo.jpg --text "Short note t
 
 Optional metadata:
   --layout post|build
+  --video ./path/to/video.mp4
   --category auto|gardening|rc-crawling|fpv|photography|amateur-radio|motorcycling|camping|marksmanship
   --tags "tag one, tag two"
   --mode build|explore|test|maintain|observe
@@ -38,6 +39,7 @@ Optional metadata:
 
 Examples:
 npm run newpost "First spring garden check" -- --image ./photos/garden.jpg --text "Checked the lettuce and onions after the rain."
+npm run newpost "Creek crossing clip" -- --video ./clips/creek-crossing.mp4 --location "Thorne Creek" --text "Short line choice test with the truck."
 npm run newpost "SCX6 backyard suspension test" -- --layout build --mode build --project "Axial SCX6 Jeep" --stage "Suspension tuning" --parts "Softer rear springs | Wheel weights"
 npm run newpost "Camp dawn" -- --image ./photos/camp-dawn.jpg --text "Cold air and quiet coffee." --use-exif
 `);
@@ -46,6 +48,7 @@ npm run newpost "Camp dawn" -- --image ./photos/camp-dawn.jpg --text "Cold air a
 
 const FLAG_NAMES = new Set([
   "--image",
+  "--video",
   "--text",
   "--layout",
   "--category",
@@ -79,14 +82,11 @@ const VALID_CATEGORIES = new Set([
   "marksmanship"
 ]);
 const VALID_MODES = new Set(["build", "explore", "test", "maintain", "observe"]);
-const FALLBACK_COORDINATES = {
-  lat: 43.618611,
-  lng: -116.425167
-};
 
 const titleParts = [];
 const options = {
   image: "",
+  video: "",
   text: "",
   layout: "post",
   category: "auto",
@@ -124,6 +124,9 @@ for (let i = 0; i < args.length; i++) {
     continue;
   } else if (arg === "--image") {
     options.image = readFlagValue(i);
+    i++;
+  } else if (arg === "--video") {
+    options.video = readFlagValue(i);
     i++;
   } else if (arg === "--text") {
     options.text = readFlagValue(i);
@@ -435,8 +438,10 @@ async function main() {
 
   const postsDir = path.join(process.cwd(), "_posts");
   const imagesDir = path.join(process.cwd(), "images");
+  const videosDir = path.join(process.cwd(), "videos");
   const slug = slugify(title);
   const imagePath = normalizeValue(options.image);
+  const videoPath = normalizeValue(options.video);
   const defaultTimestamp = new Date();
   const defaultDate = formatDateForFilename(defaultTimestamp);
 
@@ -446,6 +451,9 @@ async function main() {
   if (!fs.existsSync(imagesDir)) {
     fs.mkdirSync(imagesDir);
   }
+  if (!fs.existsSync(videosDir)) {
+    fs.mkdirSync(videosDir);
+  }
 
   let resolvedImagePath = "";
   if (imagePath) {
@@ -453,6 +461,16 @@ async function main() {
 
     if (!fs.existsSync(resolvedImagePath)) {
       console.error(`Image not found: ${imagePath}`);
+      process.exit(1);
+    }
+  }
+
+  let resolvedVideoPath = "";
+  if (videoPath) {
+    resolvedVideoPath = path.resolve(process.cwd(), videoPath);
+
+    if (!fs.existsSync(resolvedVideoPath)) {
+      console.error(`Video not found: ${videoPath}`);
       process.exit(1);
     }
   }
@@ -480,12 +498,8 @@ async function main() {
     }
   }
 
-  if (!coordinatesLat && !coordinatesLng) {
-    coordinatesLat = String(FALLBACK_COORDINATES.lat);
-    coordinatesLng = String(FALLBACK_COORDINATES.lng);
-  }
-
   let imageFrontMatter = "";
+  let videoFrontMatter = "";
   let altText = normalizeValue(options.alt) || `${title} - ${category.replace(/-/g, " ")} field note`;
   const filename = `${postDate}-${slug}.md`;
   const filePath = path.join(postsDir, filename);
@@ -508,6 +522,16 @@ async function main() {
     }
   }
 
+  if (videoPath) {
+    const ext = path.extname(resolvedVideoPath).toLowerCase();
+    const videoFilename = `${postDate}-${slug}${ext}`;
+    const destination = path.join(videosDir, videoFilename);
+
+    fs.copyFileSync(resolvedVideoPath, destination);
+
+    videoFrontMatter = `/videos/${videoFilename}`;
+  }
+
   const frontMatter = [];
   frontMatter.push("---");
   if (normalizedLayout === "build") {
@@ -515,6 +539,9 @@ async function main() {
   }
   frontMatter.push(`title: ${yamlString(title)}`);
   frontMatter.push(`date: ${formatDateForFrontMatter(postTimestamp)}`);
+  if (videoFrontMatter) {
+    frontMatter.push(`video: ${videoFrontMatter}`);
+  }
   if (imageFrontMatter) {
     frontMatter.push(`image: ${imageFrontMatter}`);
   }
@@ -576,6 +603,9 @@ async function main() {
 
   if (imagePath) {
     console.log(`Copied image: ${imageFrontMatter}`);
+  }
+  if (videoPath) {
+    console.log(`Copied video: ${videoFrontMatter}`);
   }
 
   if (options.useExif) {
