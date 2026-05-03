@@ -49,6 +49,50 @@
       "problemMatcher": []
     },
     {
+      "label": "New Circadia Video Post",
+      "type": "process",
+      "command": "npm",
+      "args": [
+        "run",
+        "newpost",
+        "${input:title}",
+        "--",
+        "--video",
+        "${input:video}",
+        "--text",
+        "${input:text}",
+        "--layout",
+        "${input:layout}",
+        "--category",
+        "${input:category}",
+        "--tags",
+        "${input:tags}",
+        "--mode",
+        "${input:mode}",
+        "--location",
+        "${input:location}",
+        "--weather",
+        "${input:weather}",
+        "--temperature",
+        "${input:temperature}",
+        "--light",
+        "${input:light}",
+        "--gear",
+        "${input:gear}",
+        "--project",
+        "${input:project}",
+        "--stage",
+        "${input:stage}",
+        "--parts",
+        "${input:parts}",
+        "--changes",
+        "${input:changes}",
+        "--lessons",
+        "${input:lessons}"
+      ],
+      "problemMatcher": []
+    },
+    {
       "label": "Publish Circadia Post",
       "type": "process",
       "command": "npm",
@@ -92,6 +136,25 @@
       "id": "text",
       "type": "promptString",
       "description": "Post body text"
+    },
+    {
+      "id": "video",
+      "type": "command",
+      "command": "extension.commandvariable.file.openDialog",
+      "args": {
+        "canSelect": "files",
+        "defaultUri": "C:\\Users\\terb0\\Downloads\\PostVideos",
+        "title": "Select a video for the new Circadia post",
+        "openLabel": "Use this video",
+        "filters": {
+          "Videos": [
+            "mp4",
+            "webm",
+            "mov",
+            "m4v"
+          ]
+        }
+      }
     },
     {
       "id": "layout",

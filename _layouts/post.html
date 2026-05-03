@@ -62,7 +62,18 @@ layout: default
     <h1 class="post-title">{{ page.title }}</h1>
   {% endif %}
 
-  {% if page.image %}
+  {% if page.video %}
+    <video
+      class="post-image"
+      controls
+      preload="metadata"
+      playsinline
+      aria-label="{{ page.title | default: 'Field journal video' | escape }}"
+    >
+      <source src="{{ page.video | relative_url }}">
+      Your browser does not support the video tag.
+    </video>
+  {% elsif page.image %}
     <img
       class="post-image"
       src="{{ page.image | relative_url }}"

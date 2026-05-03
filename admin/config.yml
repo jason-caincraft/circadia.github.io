@@ -55,11 +55,29 @@ collections:
         default: "{{now}}"
         format: "YYYY-MM-DD HH:mm:ss Z"
         picker_utc: false
+      - label: Video File
+        name: video
+        widget: file
+        required: false
+        choose_url: false
+        media_folder: /videos
+        hint: Optional full-post video. Video-only posts are supported.
       - label: Featured Image
         name: image
         widget: image
         required: false
         choose_url: false
+      - label: Location
+        name: location
+        widget: string
+        required: false
+      - label: Body
+        name: body
+        widget: markdown
+        required: false
+        modes:
+          - raw
+          - rich_text
       - label: Image Alt Text
         name: alt
         widget: string
@@ -97,10 +115,6 @@ collections:
           - test
           - maintain
           - observe
-      - label: Location
-        name: location
-        widget: string
-        required: false
       - label: Coordinates
         name: coordinates
         widget: object
@@ -184,10 +198,3 @@ collections:
           label: Lesson
           name: item
           widget: string
-      - label: Body
-        name: body
-        widget: markdown
-        required: false
-        modes:
-          - raw
-          - rich_text
