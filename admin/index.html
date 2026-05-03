@@ -176,6 +176,24 @@
           return typeof value === "string" ? value.trim() : "";
         }
 
+        function getListItemPath(item) {
+          if (!item) {
+            return "";
+          }
+
+          if (typeof item === "string") {
+            return normalizePath(item);
+          }
+
+          return normalizePath(
+            getValue(item, "photo") ||
+            getValue(item, "image") ||
+            getValue(item, "path") ||
+            getValue(item, "value") ||
+            getValue(item, "url")
+          );
+        }
+
         function padNumber(value) {
           return String(value).padStart(2, "0");
         }
@@ -252,7 +270,7 @@
 
         function getImageSelection(data) {
           const rawImages = getValue(data, "images");
-          const imagePaths = toArray(rawImages).map(normalizePath).filter(Boolean);
+          const imagePaths = toArray(rawImages).map((item) => getListItemPath(item)).filter(Boolean);
 
           if (imagePaths.length > 0) {
             return { imagePaths, source: "images" };
@@ -313,17 +331,24 @@
             return draftBlob;
           }
 
-          const url = new URL(imagePath, window.location.origin);
-          if (url.origin !== window.location.origin) {
-            return null;
+          const fetchTargets = [imagePath];
+          if (imagePath.startsWith("/") === false) {
+            fetchTargets.push(`/images/${imagePath}`);
           }
 
-          const response = await fetch(url.toString(), { credentials: "same-origin" });
-          if (!response.ok) {
-            throw new Error(`Image fetch failed with status ${response.status}`);
+          for (const target of fetchTargets) {
+            const url = new URL(target, window.location.origin);
+            if (url.origin !== window.location.origin) {
+              continue;
+            }
+
+            const response = await fetch(url.toString(), { credentials: "same-origin" });
+            if (response.ok) {
+              return response.blob();
+            }
           }
 
-          return response.blob();
+          throw new Error(`Image fetch failed for ${imagePath}`);
         }
 
         async function extractExifFromImage(entry, imagePath) {
@@ -415,16 +440,49 @@
                 return data;
               }
 
-              const nextData = toPlainObject(data);
               const resolvedImageMetadata = await resolveImageMetadata(entry, data);
               const manualCoordinates = getCoordinatesIfComplete(data);
 
+              if (typeof data.set === "function") {
+                let nextData = data;
+
+                if (resolvedImageMetadata.source === "images") {
+                  if (resolvedImageMetadata.featuredImage) {
+                    nextData = nextData.set("image", resolvedImageMetadata.featuredImage);
+                  } else if (typeof nextData.delete === "function") {
+                    nextData = nextData.delete("image");
+                  }
+                } else if (resolvedImageMetadata.featuredImage) {
+                  nextData = nextData.set("image", resolvedImageMetadata.featuredImage);
+                }
+
+                if (
+                  resolvedImageMetadata.featuredExif &&
+                  resolvedImageMetadata.featuredExif.captureDate instanceof Date &&
+                  Number.isNaN(resolvedImageMetadata.featuredExif.captureDate.getTime()) === false
+                ) {
+                  nextData = nextData.set("date", formatDateForFrontMatter(resolvedImageMetadata.featuredExif.captureDate));
+                }
+
+                if (
+                  !manualCoordinates &&
+                  resolvedImageMetadata.featuredExif &&
+                  resolvedImageMetadata.featuredExif.coordinates
+                ) {
+                  nextData = nextData
+                    .setIn(["coordinates", "lat"], resolvedImageMetadata.featuredExif.coordinates.lat)
+                    .setIn(["coordinates", "lng"], resolvedImageMetadata.featuredExif.coordinates.lng);
+                }
+
+                return nextData;
+              }
+
+              const nextData = toPlainObject(data);
+
               if (resolvedImageMetadata.source === "images") {
-                if (resolvedImageMetadata.imagePaths.length > 0) {
-                  nextData.images = resolvedImageMetadata.imagePaths;
+                if (resolvedImageMetadata.featuredImage) {
                   nextData.image = resolvedImageMetadata.featuredImage;
                 } else {
-                  delete nextData.images;
                   delete nextData.image;
                 }
               } else if (resolvedImageMetadata.featuredImage) {
