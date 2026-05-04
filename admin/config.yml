@@ -80,6 +80,13 @@ collections:
         name: image
         widget: hidden
         required: false
+      - label: Image Layout
+        name: image_layout
+        widget: select
+        required: false
+        hint: Optional for standard posts. Choose essay to interleave the remaining photos through the story.
+        options:
+          - essay
       - label: Location
         name: location
         widget: string

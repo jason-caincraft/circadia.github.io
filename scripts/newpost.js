@@ -19,6 +19,7 @@ npm run newpost "Post title" -- --images "./path/to/photo-a.jpg|./path/to/photo-
 
 Optional metadata:
   --layout post|build
+  --image-layout essay
   --video ./path/to/video.mp4
   --category auto|gardening|rc-crawling|fpv|photography|amateur-radio|motorcycling|camping|marksmanship
   --tags "tag one, tag two"
@@ -41,6 +42,7 @@ Optional metadata:
 Examples:
 npm run newpost "First spring garden check" -- --image ./photos/garden.jpg --text "Checked the lettuce and onions after the rain."
 npm run newpost "Camp dawn" -- --images "./photos/camp-dawn.jpg|./photos/camp-kitchen.jpg" --text "Cold air and quiet coffee." --use-exif
+npm run newpost "Camp dawn essay" -- --images "./photos/camp-dawn.jpg|./photos/camp-kitchen.jpg" --image-layout essay --text "Cold air and quiet coffee."
 npm run newpost "Creek crossing clip" -- --video ./clips/creek-crossing.mp4 --location "Thorne Creek" --text "Short line choice test with the truck."
 npm run newpost "SCX6 backyard suspension test" -- --layout build --mode build --project "Axial SCX6 Jeep" --stage "Suspension tuning" --parts "Softer rear springs | Wheel weights"
 `);
@@ -53,6 +55,7 @@ const FLAG_NAMES = new Set([
   "--video",
   "--text",
   "--layout",
+  "--image-layout",
   "--category",
   "--tags",
   "--mode",
@@ -73,6 +76,7 @@ const FLAG_NAMES = new Set([
 ]);
 
 const VALID_LAYOUTS = new Set(["post", "build"]);
+const VALID_IMAGE_LAYOUTS = new Set(["essay"]);
 const VALID_CATEGORIES = new Set([
   "gardening",
   "rc-crawling",
@@ -92,6 +96,7 @@ const options = {
   video: "",
   text: "",
   layout: "post",
+  imageLayout: "",
   category: "auto",
   tags: "",
   mode: "",
@@ -139,6 +144,9 @@ for (let i = 0; i < args.length; i++) {
     i++;
   } else if (arg === "--layout") {
     options.layout = readFlagValue(i);
+    i++;
+  } else if (arg === "--image-layout") {
+    options.imageLayout = readFlagValue(i);
     i++;
   } else if (arg === "--category") {
     options.category = readFlagValue(i);
@@ -471,6 +479,16 @@ async function main() {
     process.exit(1);
   }
 
+  const normalizedImageLayout = normalizeValue(options.imageLayout).toLowerCase();
+  if (normalizedImageLayout && !VALID_IMAGE_LAYOUTS.has(normalizedImageLayout)) {
+    console.error(`Invalid image layout: ${options.imageLayout}. Use "essay".`);
+    process.exit(1);
+  }
+  if (normalizedImageLayout && normalizedLayout !== "post") {
+    console.error("Image layout is only supported for standard posts with --layout post.");
+    process.exit(1);
+  }
+
   const normalizedMode = normalizeValue(options.mode).toLowerCase();
   if (normalizedMode && !VALID_MODES.has(normalizedMode)) {
     console.error(`Invalid mode: ${options.mode}.`);
@@ -634,6 +652,9 @@ async function main() {
   if (imageFrontMatterList.length > 1) {
     appendListBlock(frontMatter, "images", imageFrontMatterList);
   }
+  if (normalizedImageLayout) {
+    frontMatter.push(`image_layout: ${normalizedImageLayout}`);
+  }
   frontMatter.push(`category: ${category}`);
   if (tags.length > 0) {
     frontMatter.push(`tags: [${tags.map((tag) => yamlString(tag)).join(", ")}]`);
@@ -695,7 +716,11 @@ async function main() {
     console.log(`Featured image: ${featuredImageFrontMatter}`);
   }
   if (imageFrontMatterList.length > 1) {
-    console.log("Gallery images:");
+    if (normalizedImageLayout === "essay") {
+      console.log("Essay images:");
+    } else {
+      console.log("Gallery images:");
+    }
     for (const imageFrontMatterPath of imageFrontMatterList) {
       console.log(`- ${imageFrontMatterPath}`);
     }
@@ -720,6 +745,9 @@ async function main() {
 
   console.log(`Category: ${category}`);
   console.log(`Layout: ${normalizedLayout}`);
+  if (normalizedImageLayout) {
+    console.log(`Image layout: ${normalizedImageLayout}`);
+  }
 }
 
 main().catch((error) => {
