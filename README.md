@@ -2,6 +2,23 @@
 
 CainCraft Circadia is a GitHub Pages-friendly Jekyll field journal for projects, places, repairs, rides, flights, radio checks, photos, and small observations. The public site stays static: no database, no custom Jekyll plugins, and no JavaScript framework in the published experience. Authoring can happen either locally with Node helper scripts or in the browser through `/admin/`, which commits back to GitHub through a separate OAuth proxy deployment.
 
+## Deployment Model
+
+- The public site is meant to publish as a static Jekyll site.
+- The Cloudflare Worker is only for the `/admin/` GitHub OAuth popup flow.
+- Do not point a repo-root Cloudflare Worker Build at this project for the public site. That is what caused the failing `npx wrangler versions upload` build.
+- If you keep a Cloudflare build connected to this repository, retarget it to the OAuth Worker only by using the `oauth-proxy/` config and one of the scripts below.
+
+Worker-only commands:
+
+```bash
+npm run oauth:dev
+npm run oauth:deploy
+npm run oauth:preview
+```
+
+If you ever move the public site itself off GitHub Pages and onto Cloudflare, replace the repo-root Worker deploy with a static-site build flow instead of uploading the repository root as a Worker.
+
 ## Discovery Features
 
 ### Search
