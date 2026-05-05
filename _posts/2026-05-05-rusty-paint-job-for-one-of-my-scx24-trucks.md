@@ -1,13 +1,13 @@
 ---
 layout: post
 title: Rusty Paint Job for one of my SCX24 trucks
-date: 2026-05-04 21:04:46 -0600
+date: 2026-04-20 08:30:19 -0600
 images:
-  - /images/20260504_210546.jpg
+  - /images/20260420_083019.jpg
   - /images/20260504_210446.jpg
   - /images/20260504_210507.jpg
   - /images/20260504_210546.jpg
-image: /images/20260504_210446.jpg
+image: /images/20260420_083019.jpg
 image_layout: essay
 location: Home Workbench
 tags: []
