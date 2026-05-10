@@ -21,4 +21,4 @@ The truck rolled along a dusty shelf road while the evening light kept getting s
 
 One bend opened into a wider view and made the second stop feel worth taking.
 
-The last frame came the next morning, when the trail looked quieter and more settled.
+During lunch the next day a bushpilot made a full stop landing, turned around at the end of the runway and took off again.
