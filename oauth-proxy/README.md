@@ -43,16 +43,16 @@ If this repository ever becomes private, change the scope to `repo`.
 
 ## Local Development
 
-1. Install Wrangler if you do not already have it.
+1. Install the repository dependencies with `npm install`.
 2. Copy `.dev.vars.example` to `.dev.vars`.
 3. Replace the placeholder values with your GitHub OAuth app credentials.
-4. Run `wrangler dev`.
+4. Run `npm run oauth:dev`.
 
 For local CMS testing, temporarily point `admin/config.yml` to your local Worker URL and make sure the OAuth app's callback URL matches that environment.
 
 ## Production Deployment
 
-1. Deploy the Worker to Cloudflare.
+1. Deploy the Worker with `npm run oauth:deploy`.
 2. Bind the Worker to `auth.caincraft.com`.
 3. Add the Worker secrets in the Cloudflare dashboard or with Wrangler.
 4. Confirm `https://auth.caincraft.com/` responds and `https://auth.caincraft.com/auth` redirects to GitHub.

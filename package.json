@@ -2,6 +2,9 @@
   "name": "circadia",
   "private": true,
   "scripts": {
+    "oauth:dev": "wrangler dev --config oauth-proxy/wrangler.toml",
+    "oauth:deploy": "wrangler deploy --config oauth-proxy/wrangler.toml",
+    "oauth:preview": "wrangler versions upload --config oauth-proxy/wrangler.toml",
     "newpost": "node scripts/newpost.js",
     "publishpost": "node scripts/publishpost.js"
   },

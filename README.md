@@ -2,6 +2,23 @@
 
 CainCraft Circadia is a GitHub Pages-friendly Jekyll field journal for projects, places, repairs, rides, flights, radio checks, photos, and small observations. The public site stays static: no database, no custom Jekyll plugins, and no JavaScript framework in the published experience. Authoring can happen either locally with Node helper scripts or in the browser through `/admin/`, which commits back to GitHub through a separate OAuth proxy deployment.
 
+## Deployment Model
+
+- The public site is meant to publish as a static Jekyll site.
+- The Cloudflare Worker is only for the `/admin/` GitHub OAuth popup flow.
+- Do not point a repo-root Cloudflare Worker Build at this project for the public site. That is what caused the failing `npx wrangler versions upload` build.
+- If you keep a Cloudflare build connected to this repository, retarget it to the OAuth Worker only by using the `oauth-proxy/` config and one of the scripts below.
+
+Worker-only commands:
+
+```bash
+npm run oauth:dev
+npm run oauth:deploy
+npm run oauth:preview
+```
+
+If you ever move the public site itself off GitHub Pages and onto Cloudflare, replace the repo-root Worker deploy with a static-site build flow instead of uploading the repository root as a Worker.
+
 ## Discovery Features
 
 ### Search
@@ -43,6 +60,16 @@ Create a multi-photo post with:
 npm run newpost "Post title" -- --images "./path/to/photo-a.jpg|./path/to/photo-b.jpg" --text "Short note text"
 ```
 
+Create a photo essay post with:
+
+```bash
+npm run newpost "Post title" -- --images "./path/to/photo-a.jpg|./path/to/photo-b.jpg|./path/to/photo-c.jpg" --image-layout essay --text "First paragraph.
+
+Second paragraph.
+
+Third paragraph."
+```
+
 Create a video post with:
 
 ```bash
@@ -58,6 +85,7 @@ The script:
 - keeps working even if optional metadata is omitted
 - writes an explicit front matter `date:` so the post timestamp and filename stay aligned
 - writes `image` as the featured image path and adds `images` when multiple photos are selected
+- writes `image_layout: essay` when you opt into photo-essay rendering
 - only writes `coordinates` when you provide them manually or EXIF GPS data is extracted from the oldest selected image
 
 ## Browser Authoring Workflow
@@ -125,6 +153,7 @@ Optional flags for `npm run newpost`:
 - `--image ./path/to/photo.jpg`
 - `--images "./path/to/photo-a.jpg|./path/to/photo-b.jpg"`
 - `--layout post|build`
+- `--image-layout essay`
 - `--video ./path/to/video.mp4`
 - `--category auto|gardening|rc-crawling|fpv|photography|amateur-radio|motorcycling|camping|marksmanship`
 - `--tags "tag one, tag two"`
@@ -157,6 +186,7 @@ image: /images/example.jpg
 images:
   - "/images/example.jpg"
   - "/images/example-02.jpg"
+image_layout: essay
 category: rc-crawling
 tags: [backyard, testing, suspension]
 mode: test
@@ -225,13 +255,14 @@ If `mode` is omitted, nothing is shown.
 - Store post videos in `videos/`.
 - Reference them from front matter with a site-root path such as `/images/camp.jpg`.
 - Use `image` for the featured hero or card image.
-- Use `images` for ordered gallery photos when a post has more than one image.
+- Use `images` for ordered multi-photo sequences when a post has more than one image.
+- Use `image_layout: essay` on a standard `layout: post` entry when the remaining images should be interleaved through the story instead of collected into a gallery.
 - Reference videos from front matter with a site-root path such as `/videos/camp-fire.mp4`.
 - Add `alt` text when possible so the image is described for screen readers.
 - Add `location` when a note should show where it happened. The helper also adds that location text to `tags` for easier filtering and search.
 - Add both `coordinates.lat` and `coordinates.lng` when a post should appear on `/map/`.
 
-Posts without coordinates are ignored on the map page. Posts without images, videos, locations, or conditions still render cleanly. Multi-photo posts render the featured image first and the remaining `images` entries as a gallery.
+Posts without coordinates are ignored on the map page. Posts without images, videos, locations, or conditions still render cleanly. Multi-photo posts render the featured image first, then either an end-of-post gallery or a photo essay interleave depending on `image_layout`. The v1 essay mode inserts one remaining image after each paragraph in order, then appends any leftovers below the body without captions.
 
 ## Build Log Posts
 

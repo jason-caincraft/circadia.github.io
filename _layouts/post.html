@@ -35,6 +35,10 @@ layout: default
 {% assign has_gear = false %}
 {% assign gallery_images = page.images | default: empty %}
 {% assign has_gallery = false %}
+{% assign normalized_image_layout = page.image_layout | default: "" | downcase %}
+{% assign essay_mode = false %}
+{% assign essay_images_serialized = "" %}
+{% assign essay_image_count = 0 %}
 {% if condition_weather != blank or condition_temperature != blank or condition_light != blank %}
   {% assign has_conditions = true %}
 {% endif %}
@@ -45,10 +49,19 @@ layout: default
   {% for gallery_image in gallery_images %}
     {% if gallery_image != page.image %}
       {% assign has_gallery = true %}
-      {% break %}
+      {% if essay_image_count == 0 %}
+        {% assign essay_images_serialized = gallery_image %}
+      {% else %}
+        {% assign essay_images_serialized = essay_images_serialized | append: "|||" | append: gallery_image %}
+      {% endif %}
+      {% assign essay_image_count = essay_image_count | plus: 1 %}
     {% endif %}
   {% endfor %}
 {% endif %}
+{% if normalized_image_layout == "essay" %}
+  {% assign essay_mode = true %}
+{% endif %}
+{% assign essay_images = essay_images_serialized | split: "|||" %}
 
 <article class="post-card post-card--single fade-in">
   <div class="post-meta">
@@ -132,11 +145,52 @@ layout: default
     </div>
   {% endif %}
 
-  <div class="post-content">
-    {{ content }}
+  <div class="post-content{% if essay_mode and essay_image_count > 0 %} post-content--essay{% endif %}">
+    {% if essay_mode and essay_image_count > 0 %}
+      {% assign essay_image_index = 0 %}
+      {% if content contains '</p>' %}
+        {% assign content_segments = content | split: '</p>' %}
+        {% for content_segment in content_segments %}
+          {% if forloop.last %}
+            {{ content_segment }}
+          {% else %}
+            {{ content_segment }}</p>
+            {% assign essay_image = essay_images[essay_image_index] %}
+            {% if essay_image %}
+              {% assign essay_alt_index = essay_image_index | plus: 1 %}
+              <figure class="post-essay-figure">
+                <img
+                  class="post-essay-image"
+                  src="{{ essay_image | relative_url }}"
+                  alt="{{ page.title | default: 'Field journal photo' | escape }} photo {{ essay_alt_index }}"
+                >
+              </figure>
+              {% assign essay_image_index = essay_image_index | plus: 1 %}
+            {% endif %}
+          {% endif %}
+        {% endfor %}
+      {% else %}
+        {{ content }}
+      {% endif %}
+
+      {% if essay_image_index < essay_image_count %}
+        {% for essay_image in essay_images offset: essay_image_index %}
+          {% assign essay_alt_index = essay_image_index | plus: forloop.index %}
+          <figure class="post-essay-figure">
+            <img
+              class="post-essay-image"
+              src="{{ essay_image | relative_url }}"
+              alt="{{ page.title | default: 'Field journal photo' | escape }} photo {{ essay_alt_index }}"
+            >
+          </figure>
+        {% endfor %}
+      {% endif %}
+    {% else %}
+      {{ content }}
+    {% endif %}
   </div>
 
-  {% if has_gallery %}
+  {% if has_gallery and essay_mode == false %}
     <section class="post-gallery" aria-labelledby="gallery-heading">
       <h2 class="meta-panel-title" id="gallery-heading">Photo Gallery</h2>
       <div class="post-gallery-grid">

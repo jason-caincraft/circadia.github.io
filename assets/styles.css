@@ -414,6 +414,21 @@ a:focus-visible {
   color: var(--muted);
 }
 
+.post-content--essay .post-essay-figure {
+  margin: 0 0 1.25rem;
+  overflow: hidden;
+  border: 1px solid rgba(86, 68, 43, 0.14);
+  border-radius: var(--radius-small);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.48), rgba(255, 255, 255, 0.18)),
+    rgba(255, 250, 241, 0.72);
+}
+
+.post-essay-image {
+  width: 100%;
+  height: auto;
+}
+
 .post-gallery {
   margin-top: 1.25rem;
 }
