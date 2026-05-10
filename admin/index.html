@@ -331,8 +331,14 @@
             return draftBlob;
           }
 
-          const fetchTargets = [imagePath];
-          if (imagePath.startsWith("/") === false) {
+          const fetchTargets = [];
+          if (imagePath.startsWith("/")) {
+            fetchTargets.push(imagePath);
+          } else if (imagePath.startsWith("images/")) {
+            fetchTargets.push(`/${imagePath}`);
+          } else if (imagePath.includes("/")) {
+            fetchTargets.push(`/${imagePath}`, imagePath);
+          } else {
             fetchTargets.push(`/images/${imagePath}`);
           }
 

@@ -68,7 +68,8 @@ collections:
         required: false
         default: []
         collapsed: false
-        hint: Add one or more photos. The oldest photo becomes the featured image and EXIF source when available.
+        label_singular: Photo
+        hint: Add one or more photos. The oldest photo becomes the featured image and EXIF source when available. Reorder here to control gallery order.
         summary: "{{fields.photo}}"
         field:
           label: Photo
@@ -95,6 +96,7 @@ collections:
         name: alt
         widget: string
         required: false
+        hint: Used for the featured hero image. Extra gallery photos currently fall back to the post title.
       - label: Category
         name: category
         widget: select
