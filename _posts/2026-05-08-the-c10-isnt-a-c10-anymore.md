@@ -19,6 +19,7 @@ image_layout: essay
 category: rc-crawling
 tags: []
 mode: build
+trail: "SCX24 Builds"
 coordinates:
   lat: 43.61855489972222
   lng: -116.4252981

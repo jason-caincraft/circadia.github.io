@@ -7,7 +7,7 @@ permalink: /search/
 <section class="section-panel fade-in">
   <p class="section-kicker">Field Index</p>
   <h1 class="section-title">Search</h1>
-  <p class="section-copy">Search titles, categories, tags, locations, and note text without leaving the static site.</p>
+  <p class="section-copy">Search and filter titles, categories, tags, trails, projects, locations, and note text without leaving the static site.</p>
 </section>
 
 <section class="search-shell fade-in" aria-label="Search the field notes">
@@ -22,7 +22,51 @@ permalink: /search/
       autocomplete="off"
       spellcheck="false"
     >
-    <p class="search-hint">Search checks title, category, tags, location, and note text from the generated static index.</p>
+
+    <div class="search-filter-grid" aria-label="Filter field notes">
+      <label class="search-filter">
+        <span class="search-filter-label">Category</span>
+        <select class="search-select" data-filter="category">
+          <option value="">All categories</option>
+        </select>
+      </label>
+
+      <label class="search-filter">
+        <span class="search-filter-label">Year</span>
+        <select class="search-select" data-filter="year">
+          <option value="">All years</option>
+        </select>
+      </label>
+
+      <label class="search-filter">
+        <span class="search-filter-label">Mode</span>
+        <select class="search-select" data-filter="mode">
+          <option value="">All modes</option>
+        </select>
+      </label>
+
+      <label class="search-filter">
+        <span class="search-filter-label">Trail / Project</span>
+        <select class="search-select" data-filter="thread">
+          <option value="">All threads</option>
+        </select>
+      </label>
+    </div>
+
+    <div class="search-toggle-row">
+      <label class="search-toggle">
+        <input type="checkbox" data-filter="mapped">
+        <span>Mapped only</span>
+      </label>
+      <label class="search-toggle">
+        <input type="checkbox" data-filter="media">
+        <span>Has media</span>
+      </label>
+      <button class="search-reset" type="button" data-search-reset>Clear filters</button>
+    </div>
+
+    <div class="active-filters" data-active-filters hidden></div>
+    <p class="search-hint">Filters combine with text search and stay in the URL for sharing.</p>
   </div>
 
   <p class="search-summary" data-search-summary>Loading search index...</p>
@@ -34,8 +78,26 @@ permalink: /search/
   const input = document.getElementById("search-input");
   const summary = document.querySelector("[data-search-summary]");
   const results = document.querySelector("[data-search-results]");
+  const activeFilters = document.querySelector("[data-active-filters]");
+  const reset = document.querySelector("[data-search-reset]");
+  const filterElements = {
+    category: document.querySelector('[data-filter="category"]'),
+    year: document.querySelector('[data-filter="year"]'),
+    mode: document.querySelector('[data-filter="mode"]'),
+    thread: document.querySelector('[data-filter="thread"]'),
+    mapped: document.querySelector('[data-filter="mapped"]'),
+    media: document.querySelector('[data-filter="media"]')
+  };
   const params = new URLSearchParams(window.location.search);
   const initialQuery = params.get("q") || "";
+  const initialFilters = {
+    category: params.get("category") || "",
+    year: params.get("year") || "",
+    mode: params.get("mode") || "",
+    thread: params.get("thread") || "",
+    mapped: params.get("mapped") === "1",
+    media: params.get("media") === "1"
+  };
   const categoryLabels = {
     gardening: "Garden",
     "rc-crawling": "RC Crawling",
@@ -45,6 +107,13 @@ permalink: /search/
     motorcycling: "Motorcycling",
     camping: "Camping",
     marksmanship: "Marksmanship"
+  };
+  const modeLabels = {
+    build: "Build",
+    explore: "Explore",
+    test: "Test",
+    maintain: "Maintain",
+    observe: "Observe"
   };
   const formatDate = new Intl.DateTimeFormat(undefined, {
     year: "numeric",
@@ -62,6 +131,10 @@ permalink: /search/
     return categoryLabels[category] || "Field Note";
   }
 
+  function getModeLabel(mode) {
+    return modeLabels[mode] || mode;
+  }
+
   function parsePostDate(value) {
     const match = String(value || "").match(/^(\d{4})-(\d{2})-(\d{2})$/);
     if (!match) {
@@ -75,6 +148,12 @@ permalink: /search/
     return normalize([
       post.title,
       post.category,
+      getCategoryLabel(post.category),
+      post.mode,
+      getModeLabel(post.mode),
+      post.trail,
+      post.project,
+      post.stage,
       Array.isArray(post.tags) ? post.tags.join(" ") : "",
       post.location,
       post.content,
@@ -82,13 +161,91 @@ permalink: /search/
     ].join(" "));
   }
 
-  function setQueryParam(query) {
-    const next = new URLSearchParams(window.location.search);
+  function uniqueValues(key) {
+    return Array.from(new Set(posts.map((post) => post[key]).filter(Boolean))).sort((left, right) => {
+      return String(left).localeCompare(String(right), undefined, { numeric: true });
+    });
+  }
+
+  function addOptions(select, values, labelForValue) {
+    for (const value of values) {
+      const option = document.createElement("option");
+      option.value = value;
+      option.textContent = labelForValue ? labelForValue(value) : value;
+      select.appendChild(option);
+    }
+  }
+
+  function populateThreadOptions() {
+    const trails = uniqueValues("trail");
+    const projects = uniqueValues("project");
+
+    if (trails.length > 0) {
+      const group = document.createElement("optgroup");
+      group.label = "Trails";
+      for (const trail of trails) {
+        const option = document.createElement("option");
+        option.value = `trail::${trail}`;
+        option.textContent = trail;
+        group.appendChild(option);
+      }
+      filterElements.thread.appendChild(group);
+    }
+
+    if (projects.length > 0) {
+      const group = document.createElement("optgroup");
+      group.label = "Projects";
+      for (const project of projects) {
+        const option = document.createElement("option");
+        option.value = `project::${project}`;
+        option.textContent = project;
+        group.appendChild(option);
+      }
+      filterElements.thread.appendChild(group);
+    }
+  }
+
+  function populateFilters() {
+    addOptions(filterElements.category, uniqueValues("category"), getCategoryLabel);
+    addOptions(filterElements.year, uniqueValues("year").sort((left, right) => Number(right) - Number(left)));
+    addOptions(filterElements.mode, uniqueValues("mode"), getModeLabel);
+    populateThreadOptions();
+
+    filterElements.category.value = initialFilters.category;
+    filterElements.year.value = initialFilters.year;
+    filterElements.mode.value = initialFilters.mode;
+    filterElements.thread.value = initialFilters.thread;
+    filterElements.mapped.checked = initialFilters.mapped;
+    filterElements.media.checked = initialFilters.media;
+  }
+
+  function getFilterState() {
+    return {
+      category: filterElements.category.value,
+      year: filterElements.year.value,
+      mode: filterElements.mode.value,
+      thread: filterElements.thread.value,
+      mapped: filterElements.mapped.checked,
+      media: filterElements.media.checked
+    };
+  }
+
+  function setQueryParams(query, filters) {
+    const next = new URLSearchParams();
 
     if (query) {
       next.set("q", query);
-    } else {
-      next.delete("q");
+    }
+    for (const key of ["category", "year", "mode", "thread"]) {
+      if (filters[key]) {
+        next.set(key, filters[key]);
+      }
+    }
+    if (filters.mapped) {
+      next.set("mapped", "1");
+    }
+    if (filters.media) {
+      next.set("media", "1");
     }
 
     const nextQuery = next.toString();
@@ -104,28 +261,100 @@ permalink: /search/
     results.appendChild(note);
   }
 
-  function renderResults(query) {
-    const trimmed = query.trim();
-    const terms = normalize(trimmed).split(/\s+/).filter(Boolean);
-
-    setQueryParam(trimmed);
-    results.innerHTML = "";
-
-    if (!trimmed) {
-      summary.textContent = `${posts.length} notes indexed. Start typing to filter the journal.`;
-      renderEmpty("Try a place, project, category, or a few words from a note.");
-      return;
+  function getThreadLabel(value) {
+    if (value.startsWith("trail::")) {
+      return `Trail: ${value.replace("trail::", "")}`;
     }
+    if (value.startsWith("project::")) {
+      return `Project: ${value.replace("project::", "")}`;
+    }
+    return value;
+  }
+
+  function renderActiveFilters(query, filters) {
+    activeFilters.innerHTML = "";
+    const labels = [];
+
+    if (query) {
+      labels.push(`Text: ${query}`);
+    }
+    if (filters.category) {
+      labels.push(`Category: ${getCategoryLabel(filters.category)}`);
+    }
+    if (filters.year) {
+      labels.push(`Year: ${filters.year}`);
+    }
+    if (filters.mode) {
+      labels.push(`Mode: ${getModeLabel(filters.mode)}`);
+    }
+    if (filters.thread) {
+      labels.push(getThreadLabel(filters.thread));
+    }
+    if (filters.mapped) {
+      labels.push("Mapped only");
+    }
+    if (filters.media) {
+      labels.push("Has media");
+    }
+
+    activeFilters.hidden = labels.length === 0;
+    for (const label of labels) {
+      const chip = document.createElement("span");
+      chip.className = "active-filter";
+      chip.textContent = label;
+      activeFilters.appendChild(chip);
+    }
+  }
+
+  function postMatchesFilters(post, filters) {
+    if (filters.category && post.category !== filters.category) {
+      return false;
+    }
+    if (filters.year && String(post.year) !== filters.year) {
+      return false;
+    }
+    if (filters.mode && post.mode !== filters.mode) {
+      return false;
+    }
+    if (filters.thread.startsWith("trail::") && post.trail !== filters.thread.replace("trail::", "")) {
+      return false;
+    }
+    if (filters.thread.startsWith("project::") && post.project !== filters.thread.replace("project::", "")) {
+      return false;
+    }
+    if (filters.mapped && post.hasMap !== true) {
+      return false;
+    }
+    if (filters.media && post.hasMedia !== true) {
+      return false;
+    }
+    return true;
+  }
+
+  function renderResults() {
+    const trimmed = input.value.trim();
+    const terms = normalize(trimmed).split(/\s+/).filter(Boolean);
+    const filters = getFilterState();
+
+    setQueryParams(trimmed, filters);
+    renderActiveFilters(trimmed, filters);
+    results.innerHTML = "";
 
     const matches = posts.filter((post) => {
       const haystack = buildHaystack(post);
-      return terms.every((term) => haystack.includes(term));
+      return terms.every((term) => haystack.includes(term)) && postMatchesFilters(post, filters);
     });
 
-    summary.textContent = `${matches.length} result${matches.length === 1 ? "" : "s"} for "${trimmed}".`;
+    if (!trimmed && Object.values(filters).every((value) => !value)) {
+      summary.textContent = `${posts.length} notes indexed. Start typing or choose filters to explore the journal.`;
+      renderEmpty("Try a place, project, category, trail, or a few words from a note.");
+      return;
+    }
+
+    summary.textContent = `${matches.length} result${matches.length === 1 ? "" : "s"} matched.`;
 
     if (matches.length === 0) {
-      renderEmpty("No notes matched that search yet.");
+      renderEmpty("No notes matched that search and filter set yet.");
       return;
     }
 
@@ -144,7 +373,14 @@ permalink: /search/
 
       const meta = document.createElement("p");
       meta.className = "search-result-meta";
-      meta.textContent = `${formatDate.format(parsePostDate(post.date))} / ${getCategoryLabel(post.category)}`;
+      const metaParts = [
+        formatDate.format(parsePostDate(post.date)),
+        getCategoryLabel(post.category)
+      ];
+      if (post.mode) {
+        metaParts.push(getModeLabel(post.mode));
+      }
+      meta.textContent = metaParts.join(" / ");
 
       const excerpt = document.createElement("p");
       excerpt.className = "search-result-excerpt";
@@ -152,6 +388,17 @@ permalink: /search/
 
       article.appendChild(title);
       article.appendChild(meta);
+
+      if (post.trail || post.project || post.stage) {
+        const thread = document.createElement("p");
+        thread.className = "search-result-tags";
+        thread.textContent = [
+          post.trail ? `Trail: ${post.trail}` : "",
+          post.project ? `Project: ${post.project}` : "",
+          post.stage ? `Stage: ${post.stage}` : ""
+        ].filter(Boolean).join(" / ");
+        article.appendChild(thread);
+      }
 
       if (post.location) {
         const location = document.createElement("p");
@@ -184,7 +431,8 @@ permalink: /search/
     })
     .then((data) => {
       posts = Array.isArray(data) ? data : [];
-      renderResults(initialQuery);
+      populateFilters();
+      renderResults();
     })
     .catch((error) => {
       console.error(error);
@@ -192,6 +440,20 @@ permalink: /search/
       renderEmpty("The static search index is unavailable right now.");
     });
 
-  input.addEventListener("input", () => renderResults(input.value));
+  input.addEventListener("input", renderResults);
+  for (const element of Object.values(filterElements)) {
+    element.addEventListener("change", renderResults);
+  }
+  reset.addEventListener("click", () => {
+    input.value = "";
+    filterElements.category.value = "";
+    filterElements.year.value = "";
+    filterElements.mode.value = "";
+    filterElements.thread.value = "";
+    filterElements.mapped.checked = false;
+    filterElements.media.checked = false;
+    renderResults();
+    input.focus();
+  });
 })();
 </script>

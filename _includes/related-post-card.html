@@ -1,0 +1,25 @@
+{% assign related_category_key = include.post.category | downcase %}
+{% capture related_category_label %}
+  {% case related_category_key %}
+    {% when "gardening" %}Garden
+    {% when "rc-crawling" %}RC Crawling
+    {% when "fpv" %}FPV / Aircraft
+    {% when "photography" %}Photography
+    {% when "amateur-radio" %}Amateur Radio
+    {% when "motorcycling" %}Motorcycling
+    {% when "camping" %}Camping
+    {% when "marksmanship" %}Marksmanship
+    {% else %}Field Note
+  {% endcase %}
+{% endcapture %}
+
+<article class="related-card">
+  <p class="related-reason">{{ include.reason }}</p>
+  <h3 class="related-title">
+    <a class="related-link" href="{{ include.post.url | relative_url }}">{{ include.post.title | default: "Untitled note" }}</a>
+  </h3>
+  <p class="related-meta">
+    <time datetime="{{ include.post.date | date_to_xmlschema }}">{{ include.post.date | date: "%b %-d, %Y" }}</time>
+    <span>{{ related_category_label | strip }}</span>
+  </p>
+</article>
