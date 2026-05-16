@@ -31,6 +31,7 @@ Optional metadata:
   --temperature "58 F"
   --light "Late afternoon"
   --gear "Axial SCX6 Jeep | Canon camera"
+  --trail "SCX24 Builds"
   --project "Axial SCX6 Jeep"
   --stage "Suspension tuning"
   --parts "Softer rear springs | Wheel weights"
@@ -66,6 +67,7 @@ const FLAG_NAMES = new Set([
   "--temperature",
   "--light",
   "--gear",
+  "--trail",
   "--project",
   "--stage",
   "--parts",
@@ -107,6 +109,7 @@ const options = {
   temperature: "",
   light: "",
   gear: "",
+  trail: "",
   project: "",
   stage: "",
   parts: "",
@@ -177,6 +180,9 @@ for (let i = 0; i < args.length; i++) {
     i++;
   } else if (arg === "--gear") {
     options.gear = readFlagValue(i);
+    i++;
+  } else if (arg === "--trail") {
+    options.trail = readFlagValue(i);
     i++;
   } else if (arg === "--project") {
     options.project = readFlagValue(i);
@@ -661,6 +667,9 @@ async function main() {
   }
   if (normalizedMode) {
     frontMatter.push(`mode: ${normalizedMode}`);
+  }
+  if (normalizeValue(options.trail)) {
+    frontMatter.push(`trail: ${yamlString(normalizeValue(options.trail))}`);
   }
   if (normalizeValue(options.project)) {
     frontMatter.push(`project: ${yamlString(normalizeValue(options.project))}`);

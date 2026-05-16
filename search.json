@@ -10,9 +10,17 @@ permalink: /search.json
     "title": {{ post.title | jsonify }},
     "url": {{ post.url | relative_url | jsonify }},
     "date": {{ post.date | date: "%Y-%m-%d" | jsonify }},
+    "year": {{ post.date | date: "%Y" | jsonify }},
     "category": {{ post.category | default: "" | jsonify }},
+    "mode": {{ post.mode | default: "" | jsonify }},
+    "trail": {{ post.trail | default: "" | jsonify }},
+    "project": {{ post.project | default: "" | jsonify }},
+    "stage": {{ post.stage | default: "" | jsonify }},
     "tags": {{ post.tags | jsonify }},
     "location": {{ post.location | default: "" | jsonify }},
+    "coordinates": {% if post.coordinates and post.coordinates.lat and post.coordinates.lng %}{"lat": {{ post.coordinates.lat | jsonify }}, "lng": {{ post.coordinates.lng | jsonify }}}{% else %}null{% endif %},
+    "hasMedia": {% if post.image or post.video or post.images %}true{% else %}false{% endif %},
+    "hasMap": {% if post.coordinates and post.coordinates.lat and post.coordinates.lng %}true{% else %}false{% endif %},
     "excerpt": {{ post_excerpt | jsonify }},
     "content": {{ post_content | jsonify }}
   }{% unless forloop.last %},{% endunless %}

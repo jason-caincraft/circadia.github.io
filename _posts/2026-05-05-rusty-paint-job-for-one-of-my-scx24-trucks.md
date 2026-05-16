@@ -10,8 +10,10 @@ images:
 image: /images/20260504_210446.jpg
 image_layout: essay
 location: Home Workbench
+category: rc-crawling
 tags: []
 mode: build
+trail: "SCX24 Builds"
 coordinates:
   lat: 43.618621099722226
   lng: -116.42537219972223

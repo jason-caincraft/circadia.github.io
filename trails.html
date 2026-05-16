@@ -1,0 +1,89 @@
+---
+layout: default
+title: Trails
+permalink: /trails/
+---
+
+{% assign trail_posts = site.posts | where_exp: "post", "post.trail" %}
+{% assign trails = trail_posts | group_by: "trail" | sort: "name" %}
+
+<section class="section-panel fade-in">
+  <p class="section-kicker">Field Trails</p>
+  <h1 class="section-title">Project threads and recurring paths</h1>
+  <p class="section-copy">Follow posts that belong to the same build, route, experiment, or longer-running idea.</p>
+</section>
+
+{% if trails.size > 0 %}
+  <section class="trail-index fade-in" aria-label="Field trails">
+    {% for trail in trails %}
+      {% assign ordered_posts = trail.items | reverse %}
+      <article class="trail-group">
+        <header class="trail-header">
+          <div>
+            <p class="archive-year-label">Trail</p>
+            <h2 class="trail-title">{{ trail.name }}</h2>
+          </div>
+          {% assign trail_count = trail.items | size %}
+          <p class="trail-count">{{ trail_count }} note{% if trail_count != 1 %}s{% endif %}</p>
+        </header>
+
+        <ol class="trail-list">
+          {% for post in ordered_posts %}
+            {% assign category_key = post.category | downcase %}
+            {% capture category_label %}
+              {% case category_key %}
+                {% when "gardening" %}Garden
+                {% when "rc-crawling" %}RC Crawling
+                {% when "fpv" %}FPV / Aircraft
+                {% when "photography" %}Photography
+                {% when "amateur-radio" %}Amateur Radio
+                {% when "motorcycling" %}Motorcycling
+                {% when "camping" %}Camping
+                {% when "marksmanship" %}Marksmanship
+                {% else %}Field Note
+              {% endcase %}
+            {% endcapture %}
+
+            {% assign mode_key = post.mode | downcase %}
+            {% capture mode_label %}
+              {% case mode_key %}
+                {% when "build" %}Build
+                {% when "explore" %}Explore
+                {% when "test" %}Test
+                {% when "maintain" %}Maintain
+                {% when "observe" %}Observe
+              {% endcase %}
+            {% endcapture %}
+
+            <li class="trail-entry">
+              <a class="trail-entry-link" href="{{ post.url | relative_url }}">
+                <time class="trail-entry-date" datetime="{{ post.date | date_to_xmlschema }}">{{ post.date | date: "%b %-d, %Y" }}</time>
+                <span class="trail-entry-copy">
+                  <strong class="trail-entry-title">{{ post.title }}</strong>
+                  <span class="trail-entry-meta">
+                    <span>{{ category_label | strip }}</span>
+                    {% if mode_label != blank %}
+                      <span>{{ mode_label | strip }}</span>
+                    {% endif %}
+                    {% if post.stage %}
+                      <span>{{ post.stage }}</span>
+                    {% endif %}
+                    {% if post.location %}
+                      <span>{{ post.location }}</span>
+                    {% endif %}
+                  </span>
+                  <span class="trail-entry-excerpt">{{ post.excerpt | default: post.content | strip_html | strip_newlines | truncate: 170 }}</span>
+                </span>
+              </a>
+            </li>
+          {% endfor %}
+        </ol>
+      </article>
+    {% endfor %}
+  </section>
+{% else %}
+  <section class="section-panel fade-in">
+    <h2 class="map-ledger-title">No trails yet</h2>
+    <p class="section-copy">Add <code>trail: "SCX24 Builds"</code> to related posts and they will appear here automatically.</p>
+  </section>
+{% endif %}

@@ -1,0 +1,116 @@
+{% assign related_count = 0 %}
+{% assign related_tokens = "|" | append: page.url | append: "|" %}
+
+{% capture related_cards %}
+  {% if page.trail %}
+    {% for related_post in site.posts %}
+      {% if related_count < 3 and related_post.url != page.url and related_post.trail == page.trail %}
+        {% assign related_token = "|" | append: related_post.url | append: "|" %}
+        {% unless related_tokens contains related_token %}
+          {% include related-post-card.html post=related_post reason="Same trail" %}
+          {% assign related_tokens = related_tokens | append: related_post.url | append: "|" %}
+          {% assign related_count = related_count | plus: 1 %}
+        {% endunless %}
+      {% endif %}
+    {% endfor %}
+  {% endif %}
+
+  {% if page.project %}
+    {% for related_post in site.posts %}
+      {% if related_count < 3 and related_post.url != page.url and related_post.project == page.project %}
+        {% assign related_token = "|" | append: related_post.url | append: "|" %}
+        {% unless related_tokens contains related_token %}
+          {% include related-post-card.html post=related_post reason="Same project" %}
+          {% assign related_tokens = related_tokens | append: related_post.url | append: "|" %}
+          {% assign related_count = related_count | plus: 1 %}
+        {% endunless %}
+      {% endif %}
+    {% endfor %}
+  {% endif %}
+
+  {% if page.tags and page.tags != empty %}
+    {% for related_post in site.posts %}
+      {% assign has_shared_tag = false %}
+      {% if related_post.tags and related_post.tags != empty %}
+        {% for tag in page.tags %}
+          {% if related_post.tags contains tag %}
+            {% assign has_shared_tag = true %}
+            {% break %}
+          {% endif %}
+        {% endfor %}
+      {% endif %}
+      {% if related_count < 3 and related_post.url != page.url and has_shared_tag %}
+        {% assign related_token = "|" | append: related_post.url | append: "|" %}
+        {% unless related_tokens contains related_token %}
+          {% include related-post-card.html post=related_post reason="Shared tag" %}
+          {% assign related_tokens = related_tokens | append: related_post.url | append: "|" %}
+          {% assign related_count = related_count | plus: 1 %}
+        {% endunless %}
+      {% endif %}
+    {% endfor %}
+  {% endif %}
+
+  {% if page.location %}
+    {% for related_post in site.posts %}
+      {% if related_count < 3 and related_post.url != page.url and related_post.location == page.location %}
+        {% assign related_token = "|" | append: related_post.url | append: "|" %}
+        {% unless related_tokens contains related_token %}
+          {% include related-post-card.html post=related_post reason="Same location" %}
+          {% assign related_tokens = related_tokens | append: related_post.url | append: "|" %}
+          {% assign related_count = related_count | plus: 1 %}
+        {% endunless %}
+      {% endif %}
+    {% endfor %}
+  {% endif %}
+
+  {% if page.category %}
+    {% for related_post in site.posts %}
+      {% if related_count < 3 and related_post.url != page.url and related_post.category == page.category %}
+        {% assign related_token = "|" | append: related_post.url | append: "|" %}
+        {% unless related_tokens contains related_token %}
+          {% include related-post-card.html post=related_post reason="Same category" %}
+          {% assign related_tokens = related_tokens | append: related_post.url | append: "|" %}
+          {% assign related_count = related_count | plus: 1 %}
+        {% endunless %}
+      {% endif %}
+    {% endfor %}
+  {% endif %}
+
+  {% if page.coordinates and page.coordinates.lat and page.coordinates.lng %}
+    {% assign page_lat = page.coordinates.lat | plus: 0 %}
+    {% assign page_lng = page.coordinates.lng | plus: 0 %}
+    {% for related_post in site.posts %}
+      {% if related_count < 3 and related_post.url != page.url and related_post.coordinates and related_post.coordinates.lat and related_post.coordinates.lng %}
+        {% assign lat_delta = related_post.coordinates.lat | minus: page_lat %}
+        {% assign lng_delta = related_post.coordinates.lng | minus: page_lng %}
+        {% if lat_delta < 0 %}
+          {% assign lat_delta = lat_delta | times: -1 %}
+        {% endif %}
+        {% if lng_delta < 0 %}
+          {% assign lng_delta = lng_delta | times: -1 %}
+        {% endif %}
+        {% if lat_delta <= 0.08 and lng_delta <= 0.08 %}
+          {% assign related_token = "|" | append: related_post.url | append: "|" %}
+          {% unless related_tokens contains related_token %}
+            {% include related-post-card.html post=related_post reason="Nearby on the map" %}
+            {% assign related_tokens = related_tokens | append: related_post.url | append: "|" %}
+            {% assign related_count = related_count | plus: 1 %}
+          {% endunless %}
+        {% endif %}
+      {% endif %}
+    {% endfor %}
+  {% endif %}
+{% endcapture %}
+
+{% assign related_cards_content = related_cards | strip %}
+{% if related_cards_content != blank %}
+  <section class="related-posts" aria-labelledby="related-posts-heading">
+    <div class="related-header">
+      <p class="section-kicker">More Field Notes</p>
+      <h2 class="related-heading" id="related-posts-heading">Related posts</h2>
+    </div>
+    <div class="related-grid">
+      {{ related_cards }}
+    </div>
+  </section>
+{% endif %}
