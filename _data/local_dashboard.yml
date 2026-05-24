@@ -1,0 +1,19 @@
+quick_links:
+  - label: Weather alerts
+    href: "#dashboard-status"
+    note: Add a National Weather Service alerts link when ready.
+  - label: Air quality / smoke map
+    href: "#air-quality"
+    note: Placeholder for an AirNow, OpenAQ, or smoke map source.
+  - label: City services
+    href: "#local-links"
+    note: Add the preferred Meridian city services page.
+  - label: Trash / recycling
+    href: "#local-links"
+    note: Add the household pickup and recycling schedule source.
+  - label: Irrigation / watering info
+    href: "#local-links"
+    note: Add canal, irrigation, or watering guidance for the property.
+  - label: Local garden resources
+    href: "#local-links"
+    note: Add extension office, nursery, or planting calendar references.
