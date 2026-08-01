@@ -24,11 +24,11 @@
   {% endcase %}
 {% endcapture %}
 
-{% assign card_condition_weather = include.post.conditions.weather | default: "" %}
-{% assign card_condition_temperature = include.post.conditions.temperature | default: "" %}
-{% assign card_condition_light = include.post.conditions.light | default: "" %}
+{% assign card_condition_weather = include.post.conditions.weather | default: "" | strip %}
+{% assign card_condition_temperature = include.post.conditions.temperature | default: "" | strip %}
+{% assign card_condition_light = include.post.conditions.light | default: "" | strip %}
 {% assign has_conditions = false %}
-{% if card_condition_weather != blank or card_condition_temperature != blank or card_condition_light != blank %}
+{% if card_condition_weather != "" or card_condition_temperature != "" or card_condition_light != "" %}
   {% assign has_conditions = true %}
 {% endif %}
 
@@ -94,19 +94,19 @@
       <section class="meta-panel meta-panel--compact" aria-label="Conditions">
         <h3 class="meta-panel-title">Conditions</h3>
         <div class="conditions-list conditions-list--compact">
-          {% if card_condition_weather != blank %}
+          {% if card_condition_weather != "" %}
             <div class="conditions-item">
               <span class="meta-label">Weather</span>
               <span class="meta-value">{{ card_condition_weather }}</span>
             </div>
           {% endif %}
-          {% if card_condition_temperature != blank %}
+          {% if card_condition_temperature != "" %}
             <div class="conditions-item">
               <span class="meta-label">Temperature</span>
               <span class="meta-value">{{ card_condition_temperature }}</span>
             </div>
           {% endif %}
-          {% if card_condition_light != blank %}
+          {% if card_condition_light != "" %}
             <div class="conditions-item">
               <span class="meta-label">Light</span>
               <span class="meta-value">{{ card_condition_light }}</span>

@@ -28,9 +28,9 @@ layout: default
   {% endcase %}
 {% endcapture %}
 
-{% assign condition_weather = page.conditions.weather | default: "" %}
-{% assign condition_temperature = page.conditions.temperature | default: "" %}
-{% assign condition_light = page.conditions.light | default: "" %}
+{% assign condition_weather = page.conditions.weather | default: "" | strip %}
+{% assign condition_temperature = page.conditions.temperature | default: "" | strip %}
+{% assign condition_light = page.conditions.light | default: "" | strip %}
 {% assign has_conditions = false %}
 {% assign has_gear = false %}
 {% assign gallery_images = page.images | default: empty %}
@@ -39,7 +39,7 @@ layout: default
 {% assign essay_mode = false %}
 {% assign essay_images_serialized = "" %}
 {% assign essay_image_count = 0 %}
-{% if condition_weather != blank or condition_temperature != blank or condition_light != blank %}
+{% if condition_weather != "" or condition_temperature != "" or condition_light != "" %}
   {% assign has_conditions = true %}
 {% endif %}
 {% if page.gear and page.gear != empty %}
@@ -110,19 +110,19 @@ layout: default
         <section class="meta-panel" aria-labelledby="conditions-heading">
           <h2 class="meta-panel-title" id="conditions-heading">Conditions</h2>
           <div class="conditions-list">
-            {% if condition_weather != blank %}
+            {% if condition_weather != "" %}
               <div class="conditions-item">
                 <span class="meta-label">Weather</span>
                 <span class="meta-value">{{ condition_weather }}</span>
               </div>
             {% endif %}
-            {% if condition_temperature != blank %}
+            {% if condition_temperature != "" %}
               <div class="conditions-item">
                 <span class="meta-label">Temperature</span>
                 <span class="meta-value">{{ condition_temperature }}</span>
               </div>
             {% endif %}
-            {% if condition_light != blank %}
+            {% if condition_light != "" %}
               <div class="conditions-item">
                 <span class="meta-label">Light</span>
                 <span class="meta-value">{{ condition_light }}</span>
