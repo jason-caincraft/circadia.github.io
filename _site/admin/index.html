@@ -1,0 +1,526 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Circadia Admin</title>
+    <meta name="robots" content="noindex, nofollow">
+    <script>
+      window.CMS_MANUAL_INIT = true;
+    </script>
+    <style>
+      :root {
+        color-scheme: light;
+        --ink: #1d1a16;
+        --muted: #6b6258;
+        --paper: #f4efe6;
+        --panel: rgba(255, 252, 246, 0.96);
+        --edge: rgba(81, 66, 48, 0.16);
+        --accent: #9a5d2f;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        background:
+          radial-gradient(circle at top, rgba(154, 93, 47, 0.14), transparent 42%),
+          linear-gradient(180deg, #f7f1e7 0%, #efe6d7 100%);
+        color: var(--ink);
+        font-family: Georgia, "Times New Roman", serif;
+      }
+
+      .admin-shell {
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 2rem;
+      }
+
+      .admin-card {
+        width: min(100%, 42rem);
+        padding: 2rem;
+        border: 1px solid var(--edge);
+        border-radius: 1.5rem;
+        background: var(--panel);
+        box-shadow: 0 1.5rem 4rem rgba(41, 30, 15, 0.12);
+      }
+
+      .admin-kicker {
+        margin: 0 0 0.75rem;
+        color: var(--accent);
+        font: 600 0.8rem/1.2 "Trebuchet MS", "Segoe UI", sans-serif;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+      }
+
+      .admin-title {
+        margin: 0;
+        font-size: clamp(2rem, 5vw, 3rem);
+        line-height: 1;
+      }
+
+      .admin-copy {
+        margin: 1rem 0 0;
+        max-width: 34rem;
+        color: var(--muted);
+        font-size: 1rem;
+        line-height: 1.7;
+      }
+
+      .admin-note {
+        margin-top: 1.25rem;
+        color: var(--muted);
+        font: 0.92rem/1.6 "Trebuchet MS", "Segoe UI", sans-serif;
+      }
+
+      #nc-root {
+        min-height: 1px;
+      }
+
+      @media (max-width: 640px) {
+        .admin-shell {
+          padding: 1rem;
+        }
+
+        .admin-card {
+          padding: 1.5rem;
+          border-radius: 1rem;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div id="nc-root">
+      <main class="admin-shell">
+        <section class="admin-card" aria-labelledby="admin-title">
+          <p class="admin-kicker">Circadia Admin</p>
+          <h1 class="admin-title" id="admin-title">Sign in to write a field note.</h1>
+          <p class="admin-copy">
+            This editor saves posts directly into the GitHub repository that powers
+            <strong>caincraft.com</strong>. Use your GitHub login, then create or update entries in
+            <code>_posts/</code>, upload images into <code>images/</code>, and upload videos into
+            <code>videos/</code>.
+          </p>
+          <p class="admin-note">
+            If login does not open, verify the separate OAuth proxy has been deployed and that
+            <code>admin/config.yml</code> points to the right auth domain.
+          </p>
+        </section>
+      </main>
+    </div>
+    <script src="https://unpkg.com/exifr/dist/lite.umd.js"></script>
+    <script src="https://unpkg.com/decap-cms@^3.12.2/dist/decap-cms.js"></script>
+    <script>
+      (function() {
+        const CMS = window.CMS;
+        const exifr = window.exifr;
+        const MEDIA_PATH_KEYS = ["path", "public_path", "publicPath", "url", "value", "id"];
+        const MEDIA_BLOB_KEYS = ["file", "rawFile", "blob", "asset", "value"];
+
+        function getValue(source, key) {
+          if (!source) {
+            return undefined;
+          }
+
+          if (typeof source.get === "function") {
+            return source.get(key);
+          }
+
+          return source[key];
+        }
+
+        function toArray(value) {
+          if (!value) {
+            return [];
+          }
+
+          if (Array.isArray(value)) {
+            return value;
+          }
+
+          if (typeof value.toArray === "function") {
+            return value.toArray();
+          }
+
+          if (typeof value.toJS === "function") {
+            const plain = value.toJS();
+            return Array.isArray(plain) ? plain : [];
+          }
+
+          return [];
+        }
+
+        function toPlainObject(value) {
+          if (!value) {
+            return {};
+          }
+
+          if (typeof value.toJS === "function") {
+            return value.toJS();
+          }
+
+          return { ...value };
+        }
+
+        function toCoordinateNumber(value) {
+          const number = Number(value);
+          return Number.isFinite(number) ? number : null;
+        }
+
+        function normalizePath(value) {
+          return typeof value === "string" ? value.trim() : "";
+        }
+
+        function getListItemPath(item) {
+          if (!item) {
+            return "";
+          }
+
+          if (typeof item === "string") {
+            return normalizePath(item);
+          }
+
+          return normalizePath(
+            getValue(item, "photo") ||
+            getValue(item, "image") ||
+            getValue(item, "path") ||
+            getValue(item, "value") ||
+            getValue(item, "url")
+          );
+        }
+
+        function padNumber(value) {
+          return String(value).padStart(2, "0");
+        }
+
+        function formatDateForFrontMatter(date) {
+          const offsetMinutes = -date.getTimezoneOffset();
+          const sign = offsetMinutes >= 0 ? "+" : "-";
+          const absoluteOffset = Math.abs(offsetMinutes);
+          const offsetHours = padNumber(Math.floor(absoluteOffset / 60));
+          const offsetRemainderMinutes = padNumber(absoluteOffset % 60);
+
+          return [
+            `${date.getFullYear()}-${padNumber(date.getMonth() + 1)}-${padNumber(date.getDate())}`,
+            `${padNumber(date.getHours())}:${padNumber(date.getMinutes())}:${padNumber(date.getSeconds())}`,
+            `${sign}${offsetHours}${offsetRemainderMinutes}`
+          ].join(" ");
+        }
+
+        function pickExifDate(metadata) {
+          if (!metadata || typeof metadata !== "object") {
+            return null;
+          }
+
+          const candidates = [
+            metadata.DateTimeOriginal,
+            metadata.CreateDate,
+            metadata.ModifyDate,
+            metadata.DateTimeDigitized
+          ];
+
+          for (const candidate of candidates) {
+            if (candidate instanceof Date && !Number.isNaN(candidate.getTime())) {
+              return candidate;
+            }
+
+            if (typeof candidate === "string" || typeof candidate === "number") {
+              const parsed = new Date(candidate);
+              if (!Number.isNaN(parsed.getTime())) {
+                return parsed;
+              }
+            }
+          }
+
+          return null;
+        }
+
+        function pickExifCoordinates(metadata) {
+          if (!metadata || typeof metadata !== "object") {
+            return null;
+          }
+
+          const latitudeCandidates = [metadata.latitude, metadata.lat, metadata.GPSLatitude];
+          const longitudeCandidates = [metadata.longitude, metadata.lon, metadata.lng, metadata.GPSLongitude];
+
+          for (const latitude of latitudeCandidates) {
+            for (const longitude of longitudeCandidates) {
+              const lat = toCoordinateNumber(latitude);
+              const lng = toCoordinateNumber(longitude);
+              if (lat !== null && lng !== null) {
+                return { lat, lng };
+              }
+            }
+          }
+
+          return null;
+        }
+
+        function getCoordinatesIfComplete(data) {
+          const coordinates = toPlainObject(getValue(data, "coordinates"));
+          const lat = toCoordinateNumber(coordinates.lat);
+          const lng = toCoordinateNumber(coordinates.lng);
+          return lat === null || lng === null ? null : { lat, lng };
+        }
+
+        function getImageSelection(data) {
+          const rawImages = getValue(data, "images");
+          const imagePaths = toArray(rawImages).map((item) => getListItemPath(item)).filter(Boolean);
+
+          if (imagePaths.length > 0) {
+            return { imagePaths, source: "images" };
+          }
+
+          if (typeof rawImages !== "undefined") {
+            return { imagePaths: [], source: "images" };
+          }
+
+          const imagePath = normalizePath(getValue(data, "image"));
+          return imagePath ? { imagePaths: [imagePath], source: "image" } : { imagePaths: [], source: "none" };
+        }
+
+        function findDraftMediaBlob(entry, imagePath) {
+          const mediaFiles = toArray(getValue(entry, "mediaFiles"));
+          const targetName = imagePath.split("/").pop();
+          let firstBlob = null;
+
+          for (const candidate of mediaFiles) {
+            let candidateBlob = candidate instanceof Blob ? candidate : null;
+            if (!candidateBlob) {
+              for (const key of MEDIA_BLOB_KEYS) {
+                const value = getValue(candidate, key);
+                if (value instanceof Blob) {
+                  candidateBlob = value;
+                  break;
+                }
+              }
+            }
+
+            if (!candidateBlob) {
+              continue;
+            }
+
+            if (!firstBlob) {
+              firstBlob = candidateBlob;
+            }
+
+            for (const key of MEDIA_PATH_KEYS) {
+              const candidatePath = normalizePath(getValue(candidate, key));
+              const candidateName = candidatePath.split("/").pop();
+              if (candidatePath === imagePath || (candidateName && candidateName === targetName)) {
+                return candidateBlob;
+              }
+            }
+          }
+
+          return firstBlob;
+        }
+
+        async function resolveImageBlob(entry, imagePath) {
+          if (!imagePath) {
+            return null;
+          }
+
+          const draftBlob = findDraftMediaBlob(entry, imagePath);
+          if (draftBlob) {
+            return draftBlob;
+          }
+
+          const fetchTargets = [];
+          if (imagePath.startsWith("/")) {
+            fetchTargets.push(imagePath);
+          } else if (imagePath.startsWith("images/")) {
+            fetchTargets.push(`/${imagePath}`);
+          } else if (imagePath.includes("/")) {
+            fetchTargets.push(`/${imagePath}`, imagePath);
+          } else {
+            fetchTargets.push(`/images/${imagePath}`);
+          }
+
+          for (const target of fetchTargets) {
+            const url = new URL(target, window.location.origin);
+            if (url.origin !== window.location.origin) {
+              continue;
+            }
+
+            const response = await fetch(url.toString(), { credentials: "same-origin" });
+            if (response.ok) {
+              return response.blob();
+            }
+          }
+
+          throw new Error(`Image fetch failed for ${imagePath}`);
+        }
+
+        async function extractExifFromImage(entry, imagePath) {
+          if (!imagePath || !exifr || typeof exifr.parse !== "function") {
+            return {
+              imagePath,
+              captureDate: null,
+              coordinates: null
+            };
+          }
+
+          try {
+            const imageBlob = await resolveImageBlob(entry, imagePath);
+            if (!imageBlob) {
+              return {
+                imagePath,
+                captureDate: null,
+                coordinates: null
+              };
+            }
+
+            const metadata = await exifr.parse(imageBlob);
+
+            return {
+              imagePath,
+              captureDate: pickExifDate(metadata),
+              coordinates: pickExifCoordinates(metadata)
+            };
+          } catch (error) {
+            console.warn("Circadia admin EXIF lookup failed:", error);
+            return {
+              imagePath,
+              captureDate: null,
+              coordinates: null
+            };
+          }
+        }
+
+        async function resolveImageMetadata(entry, data) {
+          const selection = getImageSelection(data);
+          if (selection.imagePaths.length === 0) {
+            return {
+              source: selection.source,
+              imagePaths: [],
+              featuredImage: "",
+              featuredExif: null
+            };
+          }
+
+          const exifRecords = await Promise.all(
+            selection.imagePaths.map((imagePath) => extractExifFromImage(entry, imagePath))
+          );
+
+          let featuredIndex = 0;
+          let oldestTimestamp = Number.POSITIVE_INFINITY;
+
+          for (let i = 0; i < exifRecords.length; i++) {
+            const captureDate = exifRecords[i].captureDate;
+            if (!(captureDate instanceof Date) || Number.isNaN(captureDate.getTime())) {
+              continue;
+            }
+
+            const timestamp = captureDate.getTime();
+            if (timestamp < oldestTimestamp) {
+              oldestTimestamp = timestamp;
+              featuredIndex = i;
+            }
+          }
+
+          return {
+            source: selection.source,
+            imagePaths: selection.imagePaths,
+            featuredImage: selection.imagePaths[featuredIndex] || selection.imagePaths[0] || "",
+            featuredExif: exifRecords[featuredIndex] || null
+          };
+        }
+
+        if (CMS) {
+          CMS.registerEventListener({
+            name: "preSave",
+            handler: async ({ entry, collection }) => {
+              const collectionName = normalizePath(getValue(collection, "name"));
+              if (collectionName && collectionName !== "posts") {
+                return getValue(entry, "data");
+              }
+
+              const data = getValue(entry, "data");
+              if (!data) {
+                return data;
+              }
+
+              const resolvedImageMetadata = await resolveImageMetadata(entry, data);
+              const manualCoordinates = getCoordinatesIfComplete(data);
+
+              if (typeof data.set === "function") {
+                let nextData = data;
+
+                if (resolvedImageMetadata.source === "images") {
+                  if (resolvedImageMetadata.featuredImage) {
+                    nextData = nextData.set("image", resolvedImageMetadata.featuredImage);
+                  } else if (typeof nextData.delete === "function") {
+                    nextData = nextData.delete("image");
+                  }
+                } else if (resolvedImageMetadata.featuredImage) {
+                  nextData = nextData.set("image", resolvedImageMetadata.featuredImage);
+                }
+
+                if (
+                  resolvedImageMetadata.featuredExif &&
+                  resolvedImageMetadata.featuredExif.captureDate instanceof Date &&
+                  Number.isNaN(resolvedImageMetadata.featuredExif.captureDate.getTime()) === false
+                ) {
+                  nextData = nextData.set("date", formatDateForFrontMatter(resolvedImageMetadata.featuredExif.captureDate));
+                }
+
+                if (
+                  !manualCoordinates &&
+                  resolvedImageMetadata.featuredExif &&
+                  resolvedImageMetadata.featuredExif.coordinates
+                ) {
+                  nextData = nextData
+                    .setIn(["coordinates", "lat"], resolvedImageMetadata.featuredExif.coordinates.lat)
+                    .setIn(["coordinates", "lng"], resolvedImageMetadata.featuredExif.coordinates.lng);
+                }
+
+                return nextData;
+              }
+
+              const nextData = toPlainObject(data);
+
+              if (resolvedImageMetadata.source === "images") {
+                if (resolvedImageMetadata.featuredImage) {
+                  nextData.image = resolvedImageMetadata.featuredImage;
+                } else {
+                  delete nextData.image;
+                }
+              } else if (resolvedImageMetadata.featuredImage) {
+                nextData.image = resolvedImageMetadata.featuredImage;
+              }
+
+              if (
+                resolvedImageMetadata.featuredExif &&
+                resolvedImageMetadata.featuredExif.captureDate instanceof Date &&
+                Number.isNaN(resolvedImageMetadata.featuredExif.captureDate.getTime()) === false
+              ) {
+                nextData.date = formatDateForFrontMatter(resolvedImageMetadata.featuredExif.captureDate);
+              }
+
+              if (
+                !manualCoordinates &&
+                resolvedImageMetadata.featuredExif &&
+                resolvedImageMetadata.featuredExif.coordinates
+              ) {
+                nextData.coordinates = {
+                  lat: resolvedImageMetadata.featuredExif.coordinates.lat,
+                  lng: resolvedImageMetadata.featuredExif.coordinates.lng
+                };
+              }
+
+              return nextData;
+            }
+          });
+
+          CMS.init();
+        }
+      })();
+    </script>
+  </body>
+</html>
