@@ -1,7 +1,7 @@
 const { spawnSync } = require("child_process");
 
 const DEFAULT_MESSAGE = "Add new Circadia post";
-const ALLOWED_PREFIXES = ["_posts/", "images/"];
+const ALLOWED_PREFIXES = ["_posts/", "images/", "videos/"];
 
 function runGit(args) {
   const result = spawnSync("git", args, {
@@ -76,16 +76,17 @@ const publishableChanges = runGit([
   "--untracked-files=all",
   "--",
   "_posts",
-  "images"
+  "images",
+  "videos"
 ]);
 
 if (publishableChanges.status !== 0) {
-  exitWithGitError("check for post and image changes", publishableChanges);
+  exitWithGitError("check for post, image, and video changes", publishableChanges);
 }
 
 const publishablePaths = parseStatusPaths(publishableChanges.stdout);
 if (publishablePaths.length === 0) {
-  console.error("No changes found in _posts/ or images/. Nothing to publish.");
+  console.error("No changes found in _posts/, images/, or videos/. Nothing to publish.");
   process.exit(1);
 }
 
@@ -114,9 +115,9 @@ for (const filePath of publishablePaths) {
   console.log(`- ${filePath}`);
 }
 
-const addResult = runGit(["add", "_posts", "images"]);
+const addResult = runGit(["add", "_posts", "images", "videos"]);
 if (addResult.status !== 0) {
-  exitWithGitError("stage _posts/ and images/", addResult);
+  exitWithGitError("stage _posts/, images/, and videos/", addResult);
 }
 
 const commitResult = runGit(["commit", "-m", message]);

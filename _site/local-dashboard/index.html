@@ -1,0 +1,242 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    
+    
+    
+    <title>
+      
+        CainCraft Local Dashboard | CainCraft Circadia
+      
+    </title>
+    <meta name="description" content="A local home and yard dashboard for Meridian, Idaho weather, garden guidance, sunrise, sunset, and practical quick links.">
+    
+    <link rel="stylesheet" href="/assets/styles.css">
+    
+      
+        <link rel="stylesheet" href="/assets/css/local-dashboard.css">
+      
+    
+  </head>
+  <body class="page-inner">
+    <div class="page-shell">
+      <header class="site-banner ">
+        
+          <a class="site-banner-image-link" href="/" aria-label="Return to homepage">
+            <img
+              class="site-banner-image site-banner-image--compact"
+              src="/images/caincraft_banner.png"
+              alt="CainCraft Circadia banner"
+            >
+          </a>
+        
+
+        <div class="site-banner-top">
+          <a class="site-brand" href="/">CainCraft Circadia</a>
+
+          <nav class="site-nav" aria-label="Primary navigation">
+            <a class="site-nav-link" href="/">Home</a>
+            <a class="site-nav-link" href="/archive/">Archive</a>
+            <a class="site-nav-link" href="/trails/">Trails</a>
+            <a class="site-nav-link is-current" href="/local-dashboard/">Dashboard</a>
+            <a class="site-nav-link" href="/search/">Search</a>
+            <a class="site-nav-link" href="/category/">Categories</a>
+            <a class="site-nav-link" href="/map/">Map</a>
+          </nav>
+        </div>
+
+        
+          <p class="site-description">Field Notes and Anecdotes</p>
+        
+
+        <div class="category-links category-links--compact" aria-label="Browse categories">
+          <a class="category-link" href="/category/gardening/">Garden</a>
+          <a class="category-link" href="/category/rc-crawling/">RC Crawling</a>
+          <a class="category-link" href="/category/fpv/">FPV</a>
+          <a class="category-link" href="/category/photography/">Photography</a>
+          <a class="category-link" href="/category/amateur-radio/">Amateur Radio</a>
+          <a class="category-link" href="/category/motorcycling/">Motorcycling</a>
+          <a class="category-link" href="/category/camping/">Camping</a>
+          <a class="category-link" href="/category/marksmanship/">Marksmanship</a>
+        </div>
+      </header>
+
+      <main class="site-content">
+        <section class="section-panel local-dashboard-hero fade-in" aria-labelledby="local-dashboard-title">
+  <p class="section-kicker">Local Home Base</p>
+  <h1 class="section-title" id="local-dashboard-title">CainCraft Local Dashboard</h1>
+  <p class="section-copy">
+    Meridian, Idaho weather, yard notes, daylight, and local references gathered into one quiet bench-top view.
+  </p>
+  <div class="dashboard-status" id="dashboard-status" role="status" aria-live="polite" data-dashboard-status>
+    <span class="dashboard-status-dot" aria-hidden="true"></span>
+    <span data-dashboard-status-message>Loading local weather from Open-Meteo.</span>
+    <span class="dashboard-status-time" data-last-updated hidden></span>
+  </div>
+</section>
+
+<noscript>
+  <section class="section-panel dashboard-noscript" aria-labelledby="dashboard-noscript-title">
+    <h2 class="dashboard-card-title" id="dashboard-noscript-title">JavaScript Required</h2>
+    <p class="dashboard-card-copy">
+      This dashboard needs JavaScript to load Open-Meteo weather data. The quick links below are still available.
+    </p>
+  </section>
+</noscript>
+
+<section class="local-dashboard-grid fade-in" aria-label="Local dashboard">
+  <article class="dashboard-card dashboard-card--current" aria-labelledby="current-weather-title">
+    <header class="dashboard-card-header">
+      <div>
+        <p class="dashboard-card-kicker">Now</p>
+        <h2 class="dashboard-card-title" id="current-weather-title">Current Weather</h2>
+      </div>
+      <span class="dashboard-chip" data-current-condition>Loading</span>
+    </header>
+
+    <div class="current-weather-main">
+      <div>
+        <span class="dashboard-label">Temperature</span>
+        <strong class="current-temperature" data-current-temperature>--</strong>
+      </div>
+      <div class="current-weather-condition">
+        <span class="dashboard-label">Feels like</span>
+        <strong data-current-apparent>--</strong>
+      </div>
+    </div>
+
+    <dl class="dashboard-metric-grid">
+      <div>
+        <dt>Wind</dt>
+        <dd data-current-wind>--</dd>
+      </div>
+      <div>
+        <dt>Precipitation</dt>
+        <dd data-current-precipitation>--</dd>
+      </div>
+    </dl>
+  </article>
+
+  <article class="dashboard-card dashboard-card--sun" aria-labelledby="sun-times-title">
+    <header class="dashboard-card-header">
+      <div>
+        <p class="dashboard-card-kicker">Daylight</p>
+        <h2 class="dashboard-card-title" id="sun-times-title">Sunrise / Sunset</h2>
+      </div>
+    </header>
+    <dl class="sun-times">
+      <div>
+        <dt>Sunrise</dt>
+        <dd data-sunrise>--</dd>
+      </div>
+      <div>
+        <dt>Sunset</dt>
+        <dd data-sunset>--</dd>
+      </div>
+    </dl>
+  </article>
+
+  <article class="dashboard-card dashboard-card--wide" aria-labelledby="forecast-title">
+    <header class="dashboard-card-header">
+      <div>
+        <p class="dashboard-card-kicker">Next 7 Days</p>
+        <h2 class="dashboard-card-title" id="forecast-title">7-Day Forecast</h2>
+      </div>
+    </header>
+    <div class="forecast-list" data-forecast-list aria-live="polite">
+      <p class="dashboard-card-copy">Loading forecast.</p>
+    </div>
+  </article>
+
+  <article class="dashboard-card dashboard-card--wide" aria-labelledby="garden-guidance-title">
+    <header class="dashboard-card-header">
+      <div>
+        <p class="dashboard-card-kicker">Yard Notes</p>
+        <h2 class="dashboard-card-title" id="garden-guidance-title">Yard &amp; Garden Guidance</h2>
+      </div>
+    </header>
+    <ul class="guidance-list" data-garden-guidance aria-live="polite">
+      <li>Checking the forecast for garden notes.</li>
+    </ul>
+  </article>
+
+  <article class="dashboard-card" id="air-quality" aria-labelledby="air-quality-title">
+    <header class="dashboard-card-header">
+      <div>
+        <p class="dashboard-card-kicker">Smoke</p>
+        <h2 class="dashboard-card-title" id="air-quality-title">Air Quality / Smoke</h2>
+      </div>
+      <span class="dashboard-chip dashboard-chip--muted" data-aqi-status>Placeholder</span>
+    </header>
+    <p class="dashboard-card-copy" data-aqi-message>
+      AQI integration can be added later with AirNow, OpenAQ, or another public source. This card is ready for a
+      no-secret-key data feed when the source is chosen.
+    </p>
+  </article>
+
+  <article class="dashboard-card" id="local-links" aria-labelledby="local-links-title">
+    <header class="dashboard-card-header">
+      <div>
+        <p class="dashboard-card-kicker">References</p>
+        <h2 class="dashboard-card-title" id="local-links-title">Local Quick Links</h2>
+      </div>
+    </header>
+    <ul class="quick-link-list">
+      
+        <li>
+          <a class="quick-link" href="#dashboard-status">
+            <span class="quick-link-label">Weather alerts</span>
+            <span class="quick-link-note">Add a National Weather Service alerts link when ready.</span>
+          </a>
+        </li>
+      
+        <li>
+          <a class="quick-link" href="#air-quality">
+            <span class="quick-link-label">Air quality / smoke map</span>
+            <span class="quick-link-note">Placeholder for an AirNow, OpenAQ, or smoke map source.</span>
+          </a>
+        </li>
+      
+        <li>
+          <a class="quick-link" href="#local-links">
+            <span class="quick-link-label">City services</span>
+            <span class="quick-link-note">Add the preferred Meridian city services page.</span>
+          </a>
+        </li>
+      
+        <li>
+          <a class="quick-link" href="#local-links">
+            <span class="quick-link-label">Trash / recycling</span>
+            <span class="quick-link-note">Add the household pickup and recycling schedule source.</span>
+          </a>
+        </li>
+      
+        <li>
+          <a class="quick-link" href="#local-links">
+            <span class="quick-link-label">Irrigation / watering info</span>
+            <span class="quick-link-note">Add canal, irrigation, or watering guidance for the property.</span>
+          </a>
+        </li>
+      
+        <li>
+          <a class="quick-link" href="#local-links">
+            <span class="quick-link-label">Local garden resources</span>
+            <span class="quick-link-note">Add extension office, nursery, or planting calendar references.</span>
+          </a>
+        </li>
+      
+    </ul>
+  </article>
+</section>
+
+      </main>
+    </div>
+    
+      
+        <script src="/assets/js/local-dashboard.js" defer></script>
+      
+    
+  </body>
+</html>
