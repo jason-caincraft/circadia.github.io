@@ -3,51 +3,62 @@
   
   
   {
-    "title": "Graham Cabin Overnighter",
-    "url": "/2026/04/30/graham-cabin-overnighter/",
-    "date": "2026-04-30",
-    "category": "camping",
-    "tags": [],
-    "location": "Graham Cabin",
-    "excerpt": "The three hour trip bouncing along winding backcountry roads on underinflated tires was well worth the reward at the end of the road.",
-    "content": "The three hour trip bouncing along winding backcountry roads on underinflated tires was well worth the reward at the end of the road."
-  },
-
-  
-  
-  {
-    "title": "Calculate Our Range to Target",
-    "url": "/2026/04/30/calculate-our-range-to-target/",
-    "date": "2026-04-30",
-    "category": "marksmanship",
-    "tags": [],
-    "location": "Oregon",
-    "excerpt": "Testing out my range-finder. This is one of my steel targets set up yonder past the paper target.",
-    "content": "Testing out my range-finder. This is one of my steel targets set up yonder past the paper target."
-  },
-
-  
-  
-  {
-    "title": "Backyard RC Crawling",
-    "url": "/2026/04/29/backyard-rc-crawling/",
-    "date": "2026-04-29",
+    "title": "The C10 isn't a C10 anymore.",
+    "url": "/2026/05/08/the-c10-isnt-a-c10-anymore/",
+    "date": "2026-05-08",
+    "year": "2026",
     "category": "rc-crawling",
-    "tags": ["backyard","testing","suspension"],
-    "location": "Backyard rock pile",
-    "excerpt": "This is my Axial SCX6 Jeep working through the rougher line behind the shed. The current setup feels planted, but I still want more bite off-camber and a little less chassis slap on the drop-offs.",
-    "content": "This is my Axial SCX6 Jeep working through the rougher line behind the shed. The current setup feels planted, but I still want more bite off-camber and a little less chassis slap on the drop-offs.Notes for the next pass: soften the rear a touch, check the shock preload, and see whether the front tires are folding over too early on the sharper rock edges."
+    "mode": "build",
+    "trail": "SCX24 Builds",
+    "project": "",
+    "stage": "",
+    "tags": [],
+    "location": "",
+    "coordinates": {"lat": 43.61855489972222, "lng": -116.4252981},
+    "hasMedia": true,
+    "hasMap": true,
+    "excerpt": "This is another SCX24 I’ve been working on. I bought a C10 version, but I’ve ended up replacing everything except the radio. I should have just bought a kit, but here it is now.",
+    "content": "This is another SCX24 I’ve been working on. I bought a C10 version, but I’ve ended up replacing everything except the radio. I should have just bought a kit, but here it is now.I bought a landcruiser looking body for this and did a rust, mud, and dirt weathering job on it.The battery hides in a bag I made to look like canvas tarp.Hidden under the cab is an engine sound simulator."
+  },
+
+  
+  
+  {
+    "title": "Rusty Paint Job for one of my SCX24 trucks",
+    "url": "/2026/05/04/rusty-paint-job-for-one-of-my-scx24-trucks/",
+    "date": "2026-05-04",
+    "year": "2026",
+    "category": "rc-crawling",
+    "mode": "build",
+    "trail": "SCX24 Builds",
+    "project": "",
+    "stage": "",
+    "tags": [],
+    "location": "Home Workbench",
+    "coordinates": {"lat": 43.618621099722226, "lng": -116.42537219972223},
+    "hasMedia": true,
+    "hasMap": true,
+    "excerpt": "The bright yellow body is the “before” picture. I read about salt-chipping and decided to try a rusty paint job on this Isuzu Carry-all truck.",
+    "content": "The bright yellow body is the “before” picture. I read about salt-chipping and decided to try a rusty paint job on this Isuzu Carry-all truck.I started with a a few different rust color layers. Then sprayed on a layer of matte clear coat. Then I sprayed some mist on parts I wanted to look chipped then dropped salt on the wet areas and let it dry.I then airbrushed on the white top coat and let it dry. Once dry I washed the salt off and the rust was left behind. I gave it some more light blasts with some dirt and dust shades and topped it off with one more coat of matte clear.Now I want to do another one!"
   },
 
   
   
   {
     "title": "Backyard Fire Ring",
-    "url": "/2026/04/29/backyard-fire-ring/",
-    "date": "2026-04-29",
+    "url": "/2026/04/26/backyard-fire-ring/",
+    "date": "2026-04-26",
+    "year": "2026",
     "category": "camping",
+    "mode": "build",
+    "trail": "",
+    "project": "",
+    "stage": "",
     "tags": ["backyard","fire-ring","stonework"],
     "location": "Backyard",
+    "coordinates": {"lat": 43.618611, "lng": -116.425167},
+    "hasMedia": true,
+    "hasMap": true,
     "excerpt": "Last weekend I gathered some stones and built a fire pit. I dig it.",
     "content": "Last weekend I gathered some stones and built a fire pit. I dig it."
   },
@@ -55,14 +66,148 @@
   
   
   {
-    "title": "First Entry",
-    "url": "/2026/04/27/first-entry/",
-    "date": "2026-04-27",
+    "title": "Lowen Likes the Bubbles",
+    "url": "/2026/03/20/lowen-likes-the-bubbles/",
+    "date": "2026-03-20",
+    "year": "2026",
+    "category": "photography",
+    "mode": "observe",
+    "trail": "",
+    "project": "",
+    "stage": "",
+    "tags": [],
+    "location": "Home",
+    "coordinates": null,
+    "hasMedia": true,
+    "hasMap": false,
+    "excerpt": "Dude chases bubbles around.",
+    "content": "Dude chases bubbles around."
+  },
+
+  
+  
+  {
+    "title": "Verify our range to target",
+    "url": "/2026/02/28/verify-our-range-to-target/",
+    "date": "2026-02-28",
+    "year": "2026",
+    "category": "",
+    "mode": "",
+    "trail": "",
+    "project": "",
+    "stage": "",
+    "tags": [],
+    "location": "",
+    "coordinates": {"lat": 43.53308499972222, "lng": -117.1701515},
+    "hasMedia": true,
+    "hasMap": true,
+    "excerpt": "There’s a steel target in the center of the reticle. It’s set up yonder past the paper target.",
+    "content": "There’s a steel target in the center of the reticle. It’s set up yonder past the paper target."
+  },
+
+  
+  
+  {
+    "title": "Restored Pitts!",
+    "url": "/2025/11/08/restored-pitts/",
+    "date": "2025-11-08",
+    "year": "2025",
+    "category": "",
+    "mode": "",
+    "trail": "",
+    "project": "",
+    "stage": "",
+    "tags": [],
+    "location": "A school parking lot",
+    "coordinates": {"lat": 43.636642099999996, "lng": -116.4827693},
+    "hasMedia": true,
+    "hasMap": true,
+    "excerpt": "This is a Pitts RC biplane a friend gave me last year. I replaced the landing gear, repaired some linkages and bought a couple new batteries. After a few test flights at a school parking lot I can confirm it’s is airw...",
+    "content": "This is a Pitts RC biplane a friend gave me last year. I replaced the landing gear, repaired some linkages and bought a couple new batteries. After a few test flights at a school parking lot I can confirm it’s is airworthy again!"
+  },
+
+  
+  
+  {
+    "title": "May I have this dance?",
+    "url": "/2025/10/10/may-i-have-this-dance/",
+    "date": "2025-10-10",
+    "year": "2025",
+    "category": "photography",
+    "mode": "observe",
+    "trail": "",
+    "project": "",
+    "stage": "",
+    "tags": ["Utah"],
+    "location": "Utah",
+    "coordinates": {"lat": 41.1935833, "lng": -111.87363929972221},
+    "hasMedia": true,
+    "hasMap": true,
+    "excerpt": "Here’s Jake and Julia. The post date and gps info should get extracted from the photo.",
+    "content": "Here’s Jake and Julia. The post date and gps info should get extracted from the photo."
+  },
+
+  
+  
+  {
+    "title": "Graham Cabin Overnighter",
+    "url": "/2025/08/30/graham-cabin-overnighter/",
+    "date": "2025-08-30",
+    "year": "2025",
     "category": "camping",
-    "tags": ["trailhead","camp-setup","aspens"],
-    "location": "Somewhere off the main road",
-    "excerpt": "Camp went up fast once the wind dropped. Stove on the tailgate, damp boots by the fire ring, and just enough daylight left to mark the trailhead on the map before supper.",
-    "content": "Camp went up fast once the wind dropped. Stove on the tailgate, damp boots by the fire ring, and just enough daylight left to mark the trailhead on the map before supper.Nothing dramatic to report, which is usually a good sign. The notes for this stop are simple: tighten the ridge line next time, bring a second flashlight, and come back when the aspens turn."
+    "mode": "explore",
+    "trail": "",
+    "project": "",
+    "stage": "",
+    "tags": [],
+    "location": "Graham Cabin",
+    "coordinates": {"lat": 43.954084, "lng": -115.272847},
+    "hasMedia": true,
+    "hasMap": true,
+    "excerpt": "The three hour trip bouncing along winding backcountry roads on underinflated tires was well worth the reward at the end of the road.",
+    "content": "The three hour trip bouncing along winding backcountry roads on underinflated tires was well worth the reward at the end of the road."
+  },
+
+  
+  
+  {
+    "title": "Graham Cabin Visit",
+    "url": "/2025/08/29/multi-photo-test/",
+    "date": "2025-08-29",
+    "year": "2025",
+    "category": "",
+    "mode": "",
+    "trail": "",
+    "project": "",
+    "stage": "",
+    "tags": [],
+    "location": "",
+    "coordinates": {"lat": 43.984853999722226, "lng": -115.32068019972222},
+    "hasMedia": true,
+    "hasMap": true,
+    "excerpt": "The truck rolled along a dusty shelf road while the evening light kept getting softer.",
+    "content": "The truck rolled along a dusty shelf road while the evening light kept getting softer.One bend opened into a wider view and made the second stop feel worth taking.During lunch the next day a bushpilot made a full stop landing, turned around at the end of the runway and took off again."
+  },
+
+  
+  
+  {
+    "title": "Along The Trail",
+    "url": "/2025/08/29/along-the-trail/",
+    "date": "2025-08-29",
+    "year": "2025",
+    "category": "camping",
+    "mode": "explore",
+    "trail": "",
+    "project": "",
+    "stage": "",
+    "tags": [],
+    "location": "",
+    "coordinates": {"lat": 44.051907299999996, "lng": -115.4296846},
+    "hasMedia": true,
+    "hasMap": true,
+    "excerpt": "Putting along the mountain road. Jackson peak is off in the distance.,",
+    "content": "Putting along the mountain road. Jackson peak is off in the distance.,"
   }
 
 ]
