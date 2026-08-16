@@ -208,6 +208,19 @@ a:focus-visible {
   box-shadow: var(--shadow);
 }
 
+.homepage-intro {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(16rem, 1fr);
+  align-items: start;
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.homepage-intro .hero-panel,
+.homepage-intro .on-this-day {
+  margin-bottom: 0;
+}
+
 .site-banner-image--hero {
   margin-bottom: 1.25rem;
 }
@@ -1507,6 +1520,10 @@ a:focus-visible {
 }
 
 @media (max-width: 720px) {
+  .homepage-intro {
+    grid-template-columns: 1fr;
+  }
+
   .page-shell {
     padding: 1.25rem 0.9rem 3rem;
   }

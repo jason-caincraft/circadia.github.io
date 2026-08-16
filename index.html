@@ -3,6 +3,10 @@ layout: default
 title: Home
 ---
 
+{% if paginator.page == 1 %}
+  <div class="homepage-intro">
+{% endif %}
+
 <section class="hero-panel fade-in" aria-labelledby="site-title">
   <img
     class="site-banner-image site-banner-image--hero"
@@ -13,7 +17,6 @@ title: Home
   <h1 class="hero-title" id="site-title">{{ site.title }}</h1>
   <h2 class="hero-subtitle">{{ site.subtitle }}</h2>
   <h3 class="hero-intro">{{ site.intro }}</h3>
-
 </section>
 
 {% if paginator.page == 1 %}
@@ -24,6 +27,8 @@ title: Home
     <div class="on-this-day-results" data-on-this-day-results></div>
     <p class="empty-note" data-on-this-day-empty hidden>No earlier field notes share this date yet.</p>
   </section>
+
+  </div>
 
   <script>
   (() => {
