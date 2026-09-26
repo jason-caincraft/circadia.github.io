@@ -28,13 +28,6 @@ If you ever move the public site itself off GitHub Pages and onto Cloudflare, re
 - `search.json` includes each post's title, URL, date, category, tags, location, excerpt, and searchable text content.
 - Search runs entirely in the browser and checks title, category, tags, location, and note text.
 
-### On This Day
-
-- The homepage includes a small `On This Day` section.
-- It reads the same static `search.json` index in the browser.
-- The script compares the visitor's current month and day to post dates and shows matching posts from earlier years.
-- If there are no matches yet, the section shows a quiet empty state.
-
 ### Archive Timeline
 
 - `/archive/` keeps the site static and now groups entries into clearer year sections with compact month timelines.
@@ -285,7 +278,6 @@ See `_posts/2026-04-30-scx6-backyard-suspension-test.md` for a complete working 
 
 - The site uses standard Jekyll templates and `jekyll-paginate`.
 - Search works from a generated static JSON file and browser-side JavaScript.
-- On This Day also uses browser-side JavaScript against the generated static JSON file.
 - EXIF processing is local only in Node and does not run on GitHub Pages.
 - Browser authoring reads EXIF metadata client-side inside `/admin/` and uses the oldest selected photo to fill the featured image, publish date, and coordinates before save when available.
 - `/admin/` is a static route, while authentication is delegated to the separate OAuth proxy deployment.
@@ -294,7 +286,7 @@ See `_posts/2026-04-30-scx6-backyard-suspension-test.md` for a complete working 
 ## Project Structure
 
 - `_config.yml` holds the site identity and Jekyll pagination settings.
-- `index.html` renders the homepage hero, the `On This Day` section, and the paginated feed.
+- `index.html` renders the homepage hero and the paginated feed.
 - `search.html` provides the client-side search page at `/search/`.
 - `search.json` generates the static search index with Liquid.
 - `map.html` builds the optional field map page at `/map/`.
