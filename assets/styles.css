@@ -208,19 +208,6 @@ a:focus-visible {
   box-shadow: var(--shadow);
 }
 
-.homepage-intro {
-  display: grid;
-  grid-template-columns: minmax(0, 2fr) minmax(16rem, 1fr);
-  align-items: start;
-  gap: 1.5rem;
-  margin-bottom: 2rem;
-}
-
-.homepage-intro .hero-panel,
-.homepage-intro .on-this-day {
-  margin-bottom: 0;
-}
-
 .site-banner-image--hero {
   margin-bottom: 1.25rem;
 }
@@ -681,50 +668,6 @@ a:focus-visible {
   margin-bottom: 0;
 }
 
-.section-panel--compact {
-  padding-top: 1.15rem;
-  padding-bottom: 1.2rem;
-}
-
-.section-title--small {
-  font-size: clamp(1.6rem, 3vw, 2.1rem);
-}
-
-.on-this-day-results {
-  margin-top: 1rem;
-}
-
-.on-this-day-list {
-  display: grid;
-  gap: 0.8rem;
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-
-.on-this-day-entry + .on-this-day-entry {
-  padding-top: 0.8rem;
-  border-top: 1px dashed rgba(86, 68, 43, 0.18);
-}
-
-.on-this-day-link {
-  display: grid;
-  gap: 0.2rem;
-  text-decoration: none;
-}
-
-.on-this-day-title {
-  font-size: 1.05rem;
-  font-weight: 700;
-  line-height: 1.3;
-}
-
-.on-this-day-link:hover .on-this-day-title,
-.on-this-day-link:focus-visible .on-this-day-title {
-  color: var(--accent);
-}
-
-.on-this-day-meta,
 .search-summary,
 .search-label,
 .search-hint,
@@ -745,11 +688,6 @@ a:focus-visible {
 .related-reason,
 .related-meta {
   font-family: var(--sans);
-}
-
-.on-this-day-meta {
-  color: var(--muted);
-  font-size: 0.88rem;
 }
 
 .search-shell {
@@ -1520,10 +1458,6 @@ a:focus-visible {
 }
 
 @media (max-width: 720px) {
-  .homepage-intro {
-    grid-template-columns: 1fr;
-  }
-
   .page-shell {
     padding: 1.25rem 0.9rem 3rem;
   }
