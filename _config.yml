@@ -11,6 +11,7 @@ plugins:
 permalink: /:year/:month/:day/:title/
 exclude:
   - oauth-proxy
+  - projects/outdoor-explorer
 defaults:
   - scope:
       path: ""

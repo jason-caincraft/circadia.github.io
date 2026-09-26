@@ -2,7 +2,7 @@
 
 An independent destination explorer for **National Park Service properties in Idaho, Oregon, and Washington**. Start with a state and activity, browse matching destinations, open a park, and consult its official NPS page and provider-reported alerts before planning a visit.
 
-**Status:** blueprint for [#39](https://github.com/jason-caincraft/circadia.github.io/issues/39). This directory contains documentation only; the commands and source tree below are implementation targets, not an existing runnable application. Scaffolding begins in #40.
+**Status:** runnable scaffold for [#40](https://github.com/jason-caincraft/circadia.github.io/issues/40). The API exposes process health; the frontend shows connection status and a search preview. NPS integration and working destination search follow in #41 and #42.
 
 ## Scope
 
@@ -28,13 +28,13 @@ flowchart LR
 
 The frontend owns controls, URL filter state, rendering, navigation, and accessible loading/error messages. The backend owns validation, provider credentials, pagination, normalization, filtering, caching, and failures. Only the NPS adapter understands raw NPS DTOs. Production uses the real provider; deterministic tests inject fixtures at that same backend boundary. Browser tests exercise the actual app API.
 
-Choose **xUnit** for backend unit and API integration tests and **Playwright TypeScript** for browser tests. Use lightweight React without a full-stack framework; no database is needed initially. Pin supported .NET SDK, Node, and package versions in #40, including `global.json`, a Node version file, and an independent lockfile. Do not use the repository-root Node packages, Jekyll, Liquid, Circadia assets, OAuth worker, or Trailbreaker Recon.
+Use **xUnit** for backend unit and API integration tests, **Vitest** for frontend component tests, and **Playwright TypeScript** for planned browser tests. The frontend uses lightweight React without a full-stack framework; no database is needed initially. Runtime and dependency versions are pinned locally. Do not use the repository-root Node packages, Jekyll, Liquid, Circadia assets, OAuth worker, or Trailbreaker Recon.
 
 The frontend may later be statically hosted on caincraft.com or a subdomain; ASP.NET Core needs its own runtime host. Hosting, base paths, SPA fallback, exact CORS origins, and DNS integration are decisions for #49. No deployment or domain changes are part of this issue.
 
-### Proposed structure
+### Structure
 
-Only this README and `docs/` exist in the blueprint; other entries are targets for follow-on work.
+API and frontend source and initial tests are implemented. The `tests/e2e/` and provider fixtures below remain targets for #43 and #41.
 
 ```text
 projects/outdoor-explorer/
@@ -42,7 +42,7 @@ projects/outdoor-explorer/
   .gitignore                   # local secrets, build output, test artifacts
   .env.example                 # names/placeholders only
   global.json                  # pinned SDK
-  OutdoorExplorer.sln
+  OutdoorExplorer.slnx
   src/
     OutdoorExplorer.Api/       # endpoints, services, contracts, NPS adapter
     web/                      # React/TypeScript/Vite; own package.json + lockfile
@@ -61,40 +61,53 @@ projects/outdoor-explorer/
 
 See [normalized contracts and operational policy](docs/contracts.md) and the [architecture decisions](docs/adr/0001-independent-app.md).
 
-## Local development and tests: target workflow
+## Local development and checks
 
-**These commands become usable after #40; the full test suite arrives in #43.** Run from this directory, using the runtime versions pinned by #40. The scaffold must implement and verify these commands from a clean checkout, or update this section with its actual commands.
+Use **.NET SDK 10.0.401** (pinned in `global.json`, targeting .NET 10) and **Node 24.15.0** (pinned in `.nvmrc`; npm 8.19.1 or newer). Package versions and transitive dependencies are locked independently in NuGet `packages.lock.json` files and `src/web/package-lock.json`. The SDK is available from the [.NET 10 download page](https://dotnet.microsoft.com/en-us/download/dotnet/10.0); the Node version meets [Vite's runtime requirements](https://vite.dev/guide/).
+
+Run from `projects/outdoor-explorer/`:
 
 ```powershell
-dotnet restore OutdoorExplorer.sln
+dotnet restore OutdoorExplorer.slnx --locked-mode
 npm --prefix src/web ci
-npm --prefix tests/e2e ci
-npm --prefix tests/e2e exec -- playwright install chromium
 
-# Terminal 1: deterministic development with no NPS key or external API calls
-$env:ASPNETCORE_ENVIRONMENT = "Development"
-$env:OutdoorExplorer__Provider = "Fixture"
-dotnet run --project src/OutdoorExplorer.Api -- --urls http://localhost:5080
+# Terminal 1: API at http://localhost:5080 (Development launch profile)
+dotnet run --project src/OutdoorExplorer.Api
 
 # Terminal 2: frontend at http://localhost:5173
-npm --prefix src/web run dev -- --host localhost --port 5173 --strictPort
+npm --prefix src/web run dev
 ```
 
-Live development switches `OutdoorExplorer__Provider` to `Nps` and supplies `NPS_API_KEY` through a local secret store/environment. Do not paste keys into tracked files or commands saved in shell history. The app must explicitly map that variable to the provider options; environment variables do not automatically load from `.env` in ASP.NET Core.
+Open **http://localhost:5173**. No key, environment file, or provider connection is needed. `/health` returns `200` with `{"status":"ok"}`. Stop the API and reload the page to see the unavailable state; restart it and select **Retry connection** to recover. Health checks time out after five seconds. Search controls preview the layout; search is explicitly disabled until #42.
 
-Target quality commands:
+Configuration is checked in for local use: the API launch profile binds port 5080, Development configuration allows exactly `http://localhost:5173`, and Vite binds localhost on port 5173 with strict-port behavior. Production has no allowed CORS origins by default. CORS is a browser policy, not authentication. Changing ports requires updating these settings and the public API URL together.
+
+The frontend's optional `src/web/.env.local` may contain **only public configuration**, following `src/web/.env.example`. Vite disables automatic `VITE_*` exposure and explicitly injects only `VITE_API_BASE_URL`. Never place secrets in frontend files, public assets, or source code. Store future provider credentials outside the repository in a host secret manager or backend process environment. The root `.env.example` is a reference, not an automatically loaded configuration file. Provider configuration below is planned for #41 and is not consumed by this scaffold.
+
+Run all checks with PowerShell 7:
 
 ```powershell
-dotnet build OutdoorExplorer.sln --no-restore
-dotnet format OutdoorExplorer.sln --verify-no-changes
-dotnet test OutdoorExplorer.sln --no-build
-npm --prefix src/web run lint
-npm --prefix src/web run test -- --run
-npm --prefix src/web run build
-npm --prefix tests/e2e test
+pwsh -File scripts/check.ps1
 ```
 
-The E2E command must start/stop isolated backend and frontend servers via Playwright `webServer` configuration with the fixture provider and known ports. Stop manually started services first; CI must not reuse an unknown server. #43 must also supply a project-local aggregate command for API and E2E tests. Live provider smoke checks are opt-in and separate from normal tests.
+Or run the individual cross-platform commands:
+
+```powershell
+dotnet build OutdoorExplorer.slnx --no-restore
+dotnet format OutdoorExplorer.slnx --no-restore --verify-no-changes
+dotnet test OutdoorExplorer.slnx --no-build
+npm --prefix src/web run lint
+npm --prefix src/web test
+npm --prefix src/web run build
+```
+
+### Contributor notes
+
+Keep changes under this project except the explicit Jekyll publishing exclusion. Use `dotnet format OutdoorExplorer.slnx --no-restore` and `npm --prefix src/web run format` before review. Add API integration coverage for endpoints and component coverage for visible loading, failure, and recovery behavior. Tests use no external provider and require no credentials. Run the quality checks above before submitting changes; commit updated lockfiles with intentional dependency changes.
+
+Errors use Problem Details (`application/problem+json`) with `type`, `title`, `status`, safe `detail`, and `traceId`. Exceptions use the same sanitized response in Development and Production; route misses also follow this convention. Health reports process availability only, not NPS availability.
+
+The initial suite covers API health, exact-origin CORS, route errors, frontend success, failed requests, invalid responses, and retry. Playwright browser/server orchestration and broader fixture coverage are still scheduled for #43.
 
 ### Configuration contract
 
@@ -137,7 +150,7 @@ This is implementation order, which intentionally brings CI and alerts forward a
 | 12 | [#51 Conditions](https://github.com/jason-caincraft/circadia.github.io/issues/51) | After deployed MVP; independently sourced conditions |
 | 13 | [#52 Saved trips and hardening](https://github.com/jason-caincraft/circadia.github.io/issues/52) | Local-only persistence first; deeper accessibility/performance review |
 
-Before #40 ships to the publishing branch, resolve Jekyll artifact isolation: the current root `_config.yml` does not exclude `projects/`. A project-local `.gitignore` does not prevent Jekyll from copying tracked source. Arrange a separately scoped publishing exclusion or equivalent artifact boundary and verify generated-site contents before introducing runnable source/configuration. This blueprint changes no existing site configuration; its public documentation is safe to copy. Never store secrets in the site tree, even in ignored files.
+The root Jekyll configuration excludes only `projects/outdoor-explorer` from publication. This prevents app source, dependencies, local configuration, and build artifacts from being copied into Circadia. Existing site routes and root Node dependencies are unchanged. Verify this boundary with a Jekyll build to a temporary destination; it must contain the existing archive route and no `projects/outdoor-explorer` directory. Never store secrets in the site tree, even in ignored files.
 
 ## References
 
