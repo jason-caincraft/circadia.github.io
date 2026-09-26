@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="src/OutdoorExplorer.Api/OutdoorExplorer.Api.csproj" />
+  <Project Path="tests/OutdoorExplorer.Api.Tests/OutdoorExplorer.Api.Tests.csproj" />
+</Solution>
