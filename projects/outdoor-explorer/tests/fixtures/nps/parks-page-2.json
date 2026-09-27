@@ -1,0 +1,8 @@
+{
+  "total": "4", "limit": "2", "start": "2",
+  "data": [
+    {"id": "fixture-yell", "parkCode": "yell", "fullName": "Yellowstone National Park", "states": "ID,MT,WY", "url": "https://www.nps.gov/yell/index.htm", "latitude": "44.6", "longitude": "-110.5"},
+    {"id": "fixture-olym", "parkCode": "olym", "fullName": "Olympic National Park", "states": "WA", "url": "https://www.nps.gov/olym/index.htm", "latitude": "NaN", "longitude": "-123", "activities": null, "images": null,
+      "operatingHours": [{"standardHours": [{"monday": "All Day"}], "exceptions": null}]}
+  ]
+}
