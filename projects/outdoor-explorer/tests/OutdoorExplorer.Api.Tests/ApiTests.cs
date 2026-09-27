@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Xunit;
 
 public class ApiTests
@@ -36,7 +37,8 @@ public class ApiTests
     }
 
     private static WebApplicationFactory<Program> CreateApp(string environment = "Development") =>
-        new WebApplicationFactory<Program>().WithWebHostBuilder(builder => builder.UseEnvironment(environment));
+        new WebApplicationFactory<Program>().WithWebHostBuilder(builder =>
+            builder.UseEnvironment(environment).ConfigureLogging(logging => logging.ClearProviders()));
 
     [Fact]
     public async Task HealthIsAvailableWithoutProviderCredentials()

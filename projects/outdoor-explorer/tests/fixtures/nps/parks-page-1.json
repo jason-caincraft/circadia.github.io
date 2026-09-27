@@ -1,0 +1,26 @@
+{
+  "total": "4", "limit": "2", "start": "0",
+  "data": [
+    {
+      "id": "fixture-crla", "parkCode": "crla", "fullName": "Crater Lake National Park",
+      "designation": "National Park", "states": "OR", "latitude": "42.94", "longitude": "-122.1",
+      "url": "https://www.nps.gov/crla/index.htm", "description": "A deep lake with hiking trails.",
+      "activities": [
+        {"id": "B33DC9B6-0B7D-4322-BAD7-A13A34C584A3", "name": "Guided Tours"},
+        {"id": "B33DC9B6-0B7D-4322-BAD7-A13A34C584A3", "name": "Guided Tours"}
+      ],
+      "images": [
+        {"url": "https://www.nps.gov/example-reviewed.jpg", "credit": "NPS / Fixture", "caption": "Fixture lake", "altText": "Blue lake"},
+        {"url": "https://example.com/uncleared.jpg", "credit": "Third party"}
+      ],
+      "operatingHours": [{"name": "Park", "description": "Seasonal access", "standardHours": {"monday": "All Day"},
+        "exceptions": [{"name": "Winter", "startDate": "2026-12-01", "endDate": "2026-12-31", "exceptionHours": {"monday": "Closed"}}]}]
+    },
+    {
+      "id": "fixture-yell", "parkCode": "yell", "fullName": "Yellowstone National Park",
+      "designation": "National Park", "states": "WY, ID,MT", "latitude": "44.6", "longitude": "-110.5",
+      "url": "https://www.nps.gov/yell/index.htm", "description": "Geysers and mountains.",
+      "activities": [], "images": [], "operatingHours": []
+    }
+  ]
+}

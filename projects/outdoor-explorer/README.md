@@ -2,7 +2,7 @@
 
 An independent destination explorer for **National Park Service properties in Idaho, Oregon, and Washington**. Start with a state and activity, browse matching destinations, open a park, and consult its official NPS page and provider-reported alerts before planning a visit.
 
-**Status:** runnable scaffold for [#40](https://github.com/jason-caincraft/circadia.github.io/issues/40). The API exposes process health; the frontend shows connection status and a search preview. NPS integration and working destination search follow in #41 and #42.
+**Status:** NPS parks backend implemented for [#41](https://github.com/jason-caincraft/circadia.github.io/issues/41), including normalized list/detail endpoints, pagination, caching, and deterministic fixture tests. The frontend still shows connection status and a search preview; destination UI follows in #42.
 
 ## Scope
 
@@ -34,7 +34,7 @@ The frontend may later be statically hosted on caincraft.com or a subdomain; ASP
 
 ### Structure
 
-API and frontend source and initial tests are implemented. The `tests/e2e/` and provider fixtures below remain targets for #43 and #41.
+API, frontend scaffold, and provider fixtures are implemented. The `tests/e2e/` directory remains a target for #43.
 
 ```text
 projects/outdoor-explorer/
@@ -82,7 +82,37 @@ Open **http://localhost:5173**. No key, environment file, or provider connection
 
 Configuration is checked in for local use: the API launch profile binds port 5080, Development configuration allows exactly `http://localhost:5173`, and Vite binds localhost on port 5173 with strict-port behavior. Production has no allowed CORS origins by default. CORS is a browser policy, not authentication. Changing ports requires updating these settings and the public API URL together.
 
-The frontend's optional `src/web/.env.local` may contain **only public configuration**, following `src/web/.env.example`. Vite disables automatic `VITE_*` exposure and explicitly injects only `VITE_API_BASE_URL`. Never place secrets in frontend files, public assets, or source code. Store future provider credentials outside the repository in a host secret manager or backend process environment. The root `.env.example` is a reference, not an automatically loaded configuration file. Provider configuration below is planned for #41 and is not consumed by this scaffold.
+The frontend's optional `src/web/.env.local` may contain **only public configuration**, following `src/web/.env.example`. Vite disables automatic `VITE_*` exposure and explicitly injects only `VITE_API_BASE_URL`. Never place secrets in frontend files, public assets, or source code. Store provider credentials outside the repository in a host secret manager or backend process environment. The root `.env.example` is a reference, not an automatically loaded configuration file.
+
+### NPS parks API
+
+Obtain a personal key through the [NPS signup](https://www.nps.gov/subjects/developer/get-started.htm) out of band. Configure `NPS_API_KEY` in the backend process environment or have the host secret manager inject it. Do not paste keys into source, frontend configuration, terminal commands saved in history, or issue comments. The API always uses NPS; automated tests replace its provider or HTTP transport through dependency injection. There is no runtime fixture mode or `Nps:ApiKey` fallback.
+
+After starting the API, request:
+
+```text
+http://localhost:5080/api/parks?states=ID,OR,WA
+http://localhost:5080/api/parks/crla
+http://localhost:5080/api/parks?states=OR&q=lake&activityId=B33DC9B6-0B7D-4322-BAD7-A13A34C584A3
+```
+
+Responses include `data`, `status`, `retrievedAt`, and stable warning codes. A missing key returns safe 503 Problem Details on park routes; `/health` continues to work. Empty successful searches return 200 with `data: []`. Invalid filters/codes return 400. A well-formed code absent from the complete regional catalog returns 404; absence from a partial catalog returns 503.
+
+All filters and detail requests share one ID/OR/WA catalog cached in memory for 60 minutes. Concurrent misses share one fetch. A failed or incomplete refresh never overwrites a complete catalog: it can be served as `stale` until 24 hours after retrieval. Without that fallback, usable incomplete data is `partial`; no usable data returns 503. Failed/partial refreshes have a 30-second cooldown. Restarting the process clears the cache. Each process allows 120 park requests per minute; excess requests get 429 Problem Details. This MVP limiter is global, not per user, and distributed hosting needs shared quota coordination.
+
+The adapter sends the key only in `X-Api-Key`, disables redirects and default HTTP logging, and uses a fixed official NPS API origin. It fetches all `limit=50` pages with state filters and validates page offsets/totals; duplicates are removed by park code. Attempts time out after 10 seconds with a 30-second overall fetch budget. Network/5xx/timeouts receive at most two retries with jitter; 401/403 are not retried. Upstream 429 honors `Retry-After` (five-second increasing fallback). Waits beyond the budget become unavailable/stale responses. Only numeric status/quota metadata is logged, never credentials or upstream bodies.
+
+Invalid coordinate pairs become `null`; multi-state parks keep every reported state. Official links must use HTTP(S) on `nps.gov` or its subdomains. Photos retain credit, caption, alt text, and source, but only exact URLs in `Nps__ApprovedPhotoUrls__0` (and subsequent indices) are returned after a human has reviewed reuse rights. The default allowlist is empty. No image rights are inferred from an NPS credit or host.
+
+Default tests need no key or network. An optional live smoke test is skipped unless `NPS_LIVE_SMOKE=1`; with a key already securely configured in the environment, run:
+
+```powershell
+$env:NPS_LIVE_SMOKE = '1'
+dotnet test OutdoorExplorer.slnx --filter 'Category=Live'
+Remove-Item Env:NPS_LIVE_SMOKE
+```
+
+It checks the real normalized regional catalog, including Crater Lake, and never records payloads or credentials. Endpoint/detail behavior is covered by offline integration tests. See [fixture provenance](tests/fixtures/nps/README.md) and [API contracts](docs/contracts.md).
 
 Run all checks with PowerShell 7:
 
@@ -111,17 +141,17 @@ The initial suite covers API health, exact-origin CORS, route errors, frontend s
 
 ### Configuration contract
 
-| Variable | Owner | Planned value/behavior |
+| Variable | Owner | Value/behavior |
 | --- | --- | --- |
-| `NPS_API_KEY` | Backend secret | Required only in `Nps` mode; never returned or logged |
-| `OutdoorExplorer__Provider` | Backend | `Nps` by default; `Fixture` only in Development/Test |
-| `Nps__BaseUrl` | Backend | `https://developer.nps.gov/api/v1/`; not client-controlled |
-| `Nps__ParksCacheMinutes` | Backend | `60`, proposed policy |
-| `Nps__AlertsCacheMinutes` | Backend | `5`, proposed policy |
+| `NPS_API_KEY` | Backend secret | Required for park fetches; never returned or logged |
+| `Nps__ParksCacheMinutes` | Backend | `60`; integer 1–1440, with a 24-hour total stale age limit |
+| `Nps__AttemptTimeout` | Backend | `00:00:10`; positive, at most 10 seconds |
+| `Nps__RequestBudget` | Backend | `00:00:30`; positive, at most 30 seconds |
+| `Nps__ApprovedPhotoUrls__0` | Backend | Exact reviewed photo URL; empty allowlist by default |
 | `AllowedOrigins__0` | Backend | `http://localhost:5173` in development; exact staging origin later |
 | `VITE_API_BASE_URL` | Public frontend build config | `http://localhost:5080`; never a secret |
 
-Keep production keys in the host's secret manager. Use .NET user secrets for local storage if the scaffold adds an explicit `Nps:ApiKey` fallback, with `NPS_API_KEY` taking precedence. Commit only placeholders. Ignore local `.env*` (except examples), local secret files, `.NET bin/obj`, `node_modules`, `dist`, Playwright artifacts, and logs within the project. Redact credentials from diagnostics and fixture recordings; rotate any accidentally exposed key. Never use a `VITE_` variable for a provider key because frontend configuration is public.
+Keep production keys in the host's secret manager and inject them as `NPS_API_KEY`. Commit only placeholders. Ignore local `.env*` (except examples), local secret files, `.NET bin/obj`, `node_modules`, `dist`, Playwright artifacts, and logs within the project. Redact credentials from diagnostics and fixture recordings; rotate any accidentally exposed key. Never use a `VITE_` variable for a provider key because frontend configuration is public.
 
 ## Attribution, content, and accessibility
 
