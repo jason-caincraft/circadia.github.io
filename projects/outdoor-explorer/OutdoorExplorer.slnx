@@ -1,4 +1,5 @@
 <Solution>
   <Project Path="src/OutdoorExplorer.Api/OutdoorExplorer.Api.csproj" />
   <Project Path="tests/OutdoorExplorer.Api.Tests/OutdoorExplorer.Api.Tests.csproj" />
+  <Project Path="tests/OutdoorExplorer.E2eHost/OutdoorExplorer.E2eHost.csproj" />
 </Solution>
