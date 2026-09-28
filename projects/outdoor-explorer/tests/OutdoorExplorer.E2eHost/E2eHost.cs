@@ -51,6 +51,16 @@ internal static class E2eHost
         protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
         {
             var uri = request.RequestUri ?? throw new InvalidOperationException("Missing fixture request URI.");
+            var filters = Microsoft.AspNetCore.WebUtilities.QueryHelpers.ParseQuery(uri.Query);
+            if (uri.Host == "developer.nps.gov" && uri.AbsolutePath is "/api/v1/alerts" or "/api/v1/roadevents" &&
+                filters["parkCode"].ToString() is "crla" or "olym" or "yell")
+            {
+                var roads = uri.AbsolutePath.EndsWith("roadevents", StringComparison.Ordinal);
+                var content = filters["parkCode"] == "crla"
+                    ? File.ReadAllText(Path.Combine(AppContext.BaseDirectory, "Fixtures", roads ? "road-events.json" : "alerts.json"))
+                    : roads ? "{\"type\":\"FeatureCollection\",\"features\":[]}" : "{\"total\":\"0\",\"start\":\"0\",\"data\":[]}";
+                return Task.FromResult(new HttpResponseMessage(HttpStatusCode.OK) { Content = new StringContent(content, System.Text.Encoding.UTF8, "application/json") });
+            }
             if (uri.Host != "developer.nps.gov" || uri.AbsolutePath != "/api/v1/parks" ||
                 !uri.Query.Contains("stateCode=ID,OR,WA", StringComparison.Ordinal))
                 throw new InvalidOperationException("Unexpected fixture request.");

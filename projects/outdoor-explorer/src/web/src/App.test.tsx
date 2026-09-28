@@ -7,6 +7,8 @@ import { parseSearch } from './parks';
 function mockApi() {
   const fetch = vi.fn(async (input: string) => {
     const url = new URL(input, 'http://localhost');
+    if (/\/(alerts|road-events)$/.test(url.pathname))
+      return Response.json(envelope([]));
     if (url.pathname.endsWith('/crla')) return Response.json(envelope(park));
     if (url.pathname.endsWith('/nepe'))
       return Response.json(envelope(secondPark));

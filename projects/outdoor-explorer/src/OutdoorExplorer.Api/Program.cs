@@ -22,6 +22,8 @@ builder.Services.AddHttpClient<INpsProvider, NpsProvider>(client =>
     PooledConnectionLifetime = TimeSpan.FromMinutes(5)
 }).RemoveAllLoggers();
 builder.Services.AddSingleton<ParksService>();
+builder.Services.AddTransient<INpsConditionsProvider>(services => (NpsProvider)services.GetRequiredService<INpsProvider>());
+builder.Services.AddSingleton<ConditionsService>();
 builder.Services.AddRateLimiter(options =>
 {
     options.AddFixedWindowLimiter("parks", limiter =>

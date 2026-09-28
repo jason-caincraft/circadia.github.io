@@ -1,0 +1,32 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "id": "fixture-road",
+      "geometry": { "type": "LineString", "coordinates": [] },
+      "properties": {
+        "core_details": {
+          "data_source_id": "fixture-crla-source",
+          "name": "Fixture road work",
+          "event_type": "work-zone",
+          "description": "Synthetic road incident. Expect delays.",
+          "road_names": ["Fixture road"]
+        },
+        "start_date": "2026-09-27T10:00:00Z",
+        "end_date": "2026-09-30T10:00:00Z",
+        "is_end_date_verified": false
+      }
+    }
+  ],
+  "road_event_feed_info": {
+    "update_date": "2026-09-28T09:30:00Z",
+    "data_sources": [
+      {
+        "data_source_id": "fixture-crla-source",
+        "organization_name": "Crater Lake National Park",
+        "update_date": "2026-09-28T09:00:00Z"
+      }
+    ]
+  }
+}
