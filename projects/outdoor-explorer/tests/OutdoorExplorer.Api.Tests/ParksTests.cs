@@ -161,6 +161,24 @@ public sealed class ParksTests
         Assert.Equal(1, handler.Calls);
     }
 
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public async Task Upstream429HonorsRetryAfterAndCanRecover(bool useDate)
+    {
+        using var handler = new Handler((_, call, _) =>
+        {
+            if (call > 1) return Task.FromResult(Json("{\"total\":\"0\",\"start\":\"0\",\"data\":[]}"));
+            var response = new HttpResponseMessage(HttpStatusCode.TooManyRequests);
+            response.Headers.RetryAfter = useDate
+                ? new(DateTimeOffset.UtcNow.AddMinutes(-1))
+                : new(TimeSpan.Zero);
+            return Task.FromResult(response);
+        });
+        Assert.Equal("fresh", (await Provider(handler).GetParksAsync(ParksService.SupportedStates, default)).Status);
+        Assert.Equal(2, handler.Calls);
+    }
+
     [Fact]
     public async Task TimeoutsAreBoundedAndCallerCancellationPropagates()
     {
@@ -260,6 +278,50 @@ public sealed class ParksTests
         using var client = app.CreateClient();
         Assert.Equal(HttpStatusCode.BadRequest, (await client.GetAsync("/api/parks" + suffix)).StatusCode);
         Assert.Equal(0, handler.Calls);
+    }
+
+    [Fact]
+    public async Task OversizedKeywordReturns400BeforeFetching()
+    {
+        using var handler = Pages();
+        await using var app = App(handler);
+        using var client = app.CreateClient();
+        using var response = await client.GetAsync("/api/parks?q=" + new string('x', 201));
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+        Assert.Equal(0, handler.Calls);
+    }
+
+    [Fact]
+    public async Task WireContractUsesCamelCaseAndNormalizesOptionalValues()
+    {
+        using var handler = Pages();
+        await using var app = App(handler);
+        using var client = app.CreateClient();
+        using var response = await client.GetAsync("/api/parks");
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        Assert.Equal("application/json", response.Content.Headers.ContentType?.MediaType);
+        var body = JsonNode.Parse(await response.Content.ReadAsStringAsync())!;
+        Assert.Equal(["data", "retrievedAt", "status", "warnings"], body.AsObject().Select(p => p.Key).Order());
+        Assert.Equal("fresh", body["status"]!.GetValue<string>());
+        Assert.True(DateTimeOffset.TryParse(body["retrievedAt"]!.GetValue<string>(), out _));
+        var parks = body["data"]!.AsArray();
+        Assert.Equal(3, parks.Count);
+        var lake = parks[0]!;
+        Assert.Equal(["activities", "coordinates", "description", "designation", "id", "name", "officialUrl", "operatingInformation", "parkCode", "photos", "provider", "providerId", "retrievedAt", "states"],
+            lake.AsObject().Select(p => p.Key).Order());
+        Assert.Equal(42.94, lake["coordinates"]!["latitude"]!.GetValue<double>());
+        Assert.Equal(-122.1, lake["coordinates"]!["longitude"]!.GetValue<double>());
+        Assert.Single(lake["activities"]!.AsArray());
+        var olympic = parks[1]!;
+        Assert.Null(olympic["coordinates"]);
+        Assert.Null(olympic["description"]);
+        Assert.Empty(olympic["activities"]!.AsArray());
+        Assert.Empty(olympic["photos"]!.AsArray());
+        Assert.Empty(olympic["operatingInformation"]![0]!["exceptions"]!.AsArray());
+        using var detailResponse = await client.GetAsync("/api/parks/crla");
+        var detail = JsonNode.Parse(await detailResponse.Content.ReadAsStringAsync())!;
+        Assert.True(JsonNode.DeepEquals(lake, detail["data"]));
+        Assert.Equal(body["retrievedAt"]!.GetValue<string>(), detail["retrievedAt"]!.GetValue<string>());
     }
 
     [Fact]

@@ -2,7 +2,7 @@
 
 An independent destination explorer for **National Park Service properties in Idaho, Oregon, and Washington**. Start with a state and activity, browse matching destinations, open a park, and consult its official NPS page and provider-reported alerts before planning a visit.
 
-**Status:** NPS parks backend (#41) and searchable destination list/detail UI (#42) are implemented. Search supports multiple states, keywords, catalog-derived activities, shareable URLs, credited approved photos, and operating information. Component tests use synthetic normalized fixtures; browser integration coverage follows in #43.
+**Status:** NPS parks backend (#41) and searchable destination list/detail UI (#42) are implemented. Search supports multiple states, keywords, catalog-derived activities, shareable URLs, credited approved photos, and operating information. Deterministic API and Chromium browser coverage (#43) uses synthetic NPS fixtures without credentials.
 
 ## Scope
 
@@ -28,13 +28,13 @@ flowchart LR
 
 The frontend owns controls, URL filter state, rendering, navigation, and accessible loading/error messages. The backend owns validation, provider credentials, pagination, normalization, filtering, caching, and failures. Only the NPS adapter understands raw NPS DTOs. Production uses the real provider; deterministic tests inject fixtures at that same backend boundary. Browser tests exercise the actual app API.
 
-Use **xUnit** for backend unit and API integration tests, **Vitest** for frontend component tests, and **Playwright TypeScript** for planned browser tests. The frontend uses lightweight React without a full-stack framework; no database is needed initially. Runtime and dependency versions are pinned locally. Do not use the repository-root Node packages, Jekyll, Liquid, Circadia assets, OAuth worker, or Trailbreaker Recon.
+Use **xUnit** for backend unit and API integration tests, **Vitest** for frontend component tests, and **Playwright TypeScript** for browser tests. The frontend uses lightweight React without a full-stack framework; no database is needed initially. Runtime and dependency versions are pinned locally. Do not use the repository-root Node packages, Jekyll, Liquid, Circadia assets, OAuth worker, or Trailbreaker Recon.
 
 The frontend may later be statically hosted on caincraft.com or a subdomain; ASP.NET Core needs its own runtime host. Hosting, base paths, SPA fallback, exact CORS origins, and DNS integration are decisions for #49. No deployment or domain changes are part of this issue.
 
 ### Structure
 
-API, frontend scaffold, and provider fixtures are implemented. The `tests/e2e/` directory remains a target for #43.
+API, frontend, provider fixtures, and the Playwright suite are implemented. A separate `tests/OutdoorExplorer.E2eHost/` executable boots the actual API with fixture HTTP transport.
 
 ```text
 projects/outdoor-explorer/
@@ -47,6 +47,7 @@ projects/outdoor-explorer/
     OutdoorExplorer.Api/       # endpoints, services, contracts, NPS adapter
     web/                      # React/TypeScript/Vite; own package.json + lockfile
   tests/
+    OutdoorExplorer.E2eHost/   # test-only Kestrel host with fixture HTTP transport
     OutdoorExplorer.Api.Tests/ # xUnit unit + WebApplicationFactory tests
     e2e/                      # Playwright TS; own package.json + lockfile
     fixtures/nps/             # sanitized representative provider payloads
@@ -63,7 +64,7 @@ See [normalized contracts and operational policy](docs/contracts.md) and the [ar
 
 ## Local development and checks
 
-Use **.NET SDK 10.0.401** (pinned in `global.json`, targeting .NET 10) and **Node 24.15.0** (pinned in `.nvmrc`; npm 8.19.1 or newer). Package versions and transitive dependencies are locked independently in NuGet `packages.lock.json` files and `src/web/package-lock.json`. The SDK is available from the [.NET 10 download page](https://dotnet.microsoft.com/en-us/download/dotnet/10.0); the Node version meets [Vite's runtime requirements](https://vite.dev/guide/).
+Use **.NET SDK 10.0.401** (pinned in `global.json`, targeting .NET 10) and **Node 24.15.0** (pinned in `.nvmrc`; npm 8.19.1 or newer). Package versions and transitive dependencies are locked independently in NuGet `packages.lock.json` files and independent frontend/E2E `package-lock.json` files. The SDK is available from the [.NET 10 download page](https://dotnet.microsoft.com/en-us/download/dotnet/10.0); the Node version meets [Vite's runtime requirements](https://vite.dev/guide/).
 
 Run from `projects/outdoor-explorer/`:
 
@@ -135,11 +136,31 @@ Or run the individual cross-platform commands:
 ```powershell
 dotnet build OutdoorExplorer.slnx --no-restore
 dotnet format OutdoorExplorer.slnx --no-restore --verify-no-changes
-dotnet test OutdoorExplorer.slnx --no-build
+dotnet test OutdoorExplorer.slnx --no-build --filter 'Category!=Live'
 npm --prefix src/web run lint
 npm --prefix src/web test
 npm --prefix src/web run build
 ```
+
+### Deterministic API and browser tests
+
+After installing the pinned SDK and Node, run this one-time dependency/browser setup from this project directory (downloads require network):
+
+```powershell
+npm --prefix src/web ci
+npm --prefix tests/e2e ci
+npm --prefix tests/e2e run install:browsers
+```
+
+One command restores/builds the backend and runs offline API tests plus Chromium E2E:
+
+```powershell
+npm --prefix tests/e2e run test:all
+```
+
+The test command explicitly excludes live-NPS tests, needs no real NPS key, and starts/stops both services on dedicated loopback ports 5088/5178. Tests never reuse an existing server. Dependency restoration may need network on a fresh machine; test data and app requests need none. `scripts/check.ps1` also runs E2E type/format checks and browser tests alongside the existing build/lint/component checks.
+
+Failure traces, screenshots, and video are retained under `tests/e2e/test-results/`; the HTML report lives under `tests/e2e/playwright-report/`. These directories are ignored by Git. See [test conventions](tests/e2e/README.md) for diagnostics, optional browsers, and the separate live-smoke path. CI upload/retention and scheduling remain scoped to #48.
 
 ### Contributor notes
 
@@ -147,7 +168,7 @@ Keep changes under this project except the explicit Jekyll publishing exclusion.
 
 Errors use Problem Details (`application/problem+json`) with `type`, `title`, `status`, safe `detail`, and `traceId`. Exceptions use the same sanitized response in Development and Production; route misses also follow this convention. Health reports process availability only, not NPS availability.
 
-The initial suite covers API health, exact-origin CORS, route errors, frontend success, failed requests, invalid responses, and retry. Playwright browser/server orchestration and broader fixture coverage are still scheduled for #43.
+The suite covers API health, CORS, safe failures, pagination, normalization, wire contracts, input validation, cache behavior, quotas and retries, frontend states, and browser search/detail journeys. See [test conventions and diagnostics](tests/e2e/README.md).
 
 ### Configuration contract
 
