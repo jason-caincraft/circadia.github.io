@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import ParkMap from './ParkMap';
+import Conditions from './Conditions';
 import ProximityFilter from './ProximityFilter';
 import {
   distanceKm,
@@ -89,6 +90,7 @@ function Details({ park }: { park: Park }) {
       </p>
       <ParkPhoto key={park.photos[0]?.url ?? park.id} photo={park.photos[0]} />
       <p>{park.description ?? 'Description not supplied by NPS.'}</p>
+      <Conditions park={park} />
       <h2>Activities</h2>
       {park.activities.length ? (
         <ul>
