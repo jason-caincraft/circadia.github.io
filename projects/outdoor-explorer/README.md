@@ -2,7 +2,7 @@
 
 An independent destination explorer for **National Park Service properties in Idaho, Oregon, and Washington**. Start with a state and activity, browse matching destinations, open a park, and consult its official NPS page and provider-reported alerts before planning a visit.
 
-**Status:** NPS parks backend implemented for [#41](https://github.com/jason-caincraft/circadia.github.io/issues/41), including normalized list/detail endpoints, pagination, caching, and deterministic fixture tests. The frontend still shows connection status and a search preview; destination UI follows in #42.
+**Status:** NPS parks backend (#41) and searchable destination list/detail UI (#42) are implemented. Search supports multiple states, keywords, catalog-derived activities, shareable URLs, credited approved photos, and operating information. Component tests use synthetic normalized fixtures; browser integration coverage follows in #43.
 
 ## Scope
 
@@ -78,13 +78,23 @@ dotnet run --project src/OutdoorExplorer.Api
 npm --prefix src/web run dev
 ```
 
-Open **http://localhost:5173**. No key, environment file, or provider connection is needed. `/health` returns `200` with `{"status":"ok"}`. Stop the API and reload the page to see the unavailable state; restart it and select **Retry connection** to recover. Health checks time out after five seconds. Search controls preview the layout; search is explicitly disabled until #42.
+Open **http://localhost:5173**. Destination search requires the API with `NPS_API_KEY` configured as described below; automated tests need no key or network. `/health` remains a key-free process check. Stop the API and reload to see the unavailable state; restart it and select **Retry destinations** to recover. Browser park requests time out after 40 seconds, allowing the backend its 30-second provider budget.
 
 Configuration is checked in for local use: the API launch profile binds port 5080, Development configuration allows exactly `http://localhost:5173`, and Vite binds localhost on port 5173 with strict-port behavior. Production has no allowed CORS origins by default. CORS is a browser policy, not authentication. Changing ports requires updating these settings and the public API URL together.
 
 The frontend's optional `src/web/.env.local` may contain **only public configuration**, following `src/web/.env.example`. Vite disables automatic `VITE_*` exposure and explicitly injects only `VITE_API_BASE_URL`. Never place secrets in frontend files, public assets, or source code. Store provider credentials outside the repository in a host secret manager or backend process environment. The root `.env.example` is a reference, not an automatically loaded configuration file.
 
 ### NPS parks API
+
+For repeated local use, the API supports .NET User Secrets in Development. From the repository root, run this in PowerShell 7 and enter the key at the masked prompt:
+
+```powershell
+$npsKey = Read-Host 'NPS API key' -MaskInput
+@{ NPS_API_KEY = $npsKey } | ConvertTo-Json -Compress | dotnet user-secrets set --project projects/outdoor-explorer/src/OutdoorExplorer.Api
+Remove-Variable npsKey
+```
+
+Restart the API after saving. User Secrets are stored outside the repository under your Windows user profile and automatically loaded by the Development launch profile. They are not encrypted and are intended for local development only. An existing `NPS_API_KEY` environment variable takes precedence. Production should use the host's secret manager or backend environment.
 
 Obtain a personal key through the [NPS signup](https://www.nps.gov/subjects/developer/get-started.htm) out of band. Configure `NPS_API_KEY` in the backend process environment or have the host secret manager inject it. Do not paste keys into source, frontend configuration, terminal commands saved in history, or issue comments. The API always uses NPS; automated tests replace its provider or HTTP transport through dependency injection. There is no runtime fixture mode or `Nps:ApiKey` fallback.
 
@@ -189,3 +199,11 @@ Provider guidance checked for this blueprint on 2026-09-26; recheck contracts an
 - [NPS API documentation](https://www.nps.gov/subjects/developer/api-documentation.htm)
 - [NPS authentication and rate limits](https://home.nps.gov/subjects/developer/guides.htm)
 - [NPS content and image disclaimer](https://www.nps.gov/aboutus/disclaimer.htm)
+
+### Destination browser
+
+Choose one or more states, an optional keyword (up to 200 characters), and an activity, then select **Search destinations**. Filters are applied by the API. Activity options come from a separate unfiltered regional catalog request, so narrowing a search does not remove choices. Stale or partial catalog data is labeled. Empty results, unavailable data, and missing destinations have distinct messages.
+
+The query parameters `states`, `q`, and `activityId` preserve the submitted search; `park` opens a destination detail view. For example, `?states=OR,WA&q=lake` and `?states=OR&park=crla` are shareable links. Back to destinations preserves filters, and browser Back/Forward restores URL state. Invalid recognized parameters (including duplicates) show a recoverable message; unknown parameters are ignored. Clearing every state disables submission.
+
+Photos use only the API's reviewed allowlist, with supplied credits and source links. Missing or failed photos have a fixed-aspect placeholder. Missing descriptions, activities, and operating information are labeled. Provider strings are rendered as text. NPS attribution follows the [NPS disclaimer](https://www.nps.gov/aboutus/disclaimer.htm), reviewed 2026-09-27; no NPS marks are used.
