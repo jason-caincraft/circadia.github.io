@@ -1,6 +1,6 @@
 # API and normalized data
 
-Park models and endpoints are implemented in #41; alerts remain a design contract for #45. The NPS parks schema was checked on 2026-09-26 against its [official Swagger definition](https://www.nps.gov/subjects/developer/customcf/swagger.json?03142019). Saved synthetic fixtures represent this schema, not a live recording. C# records in `Parks/Contracts.cs` are the backend source of truth; frontend type generation/contract checking remains for #42. Dates use ISO 8601 UTC strings; absent optional values are `null`, lists are arrays, and provider text must be rendered as text rather than trusted HTML.
+Park models and endpoints are implemented in #41; alerts remain a design contract for #45. The NPS parks schema was checked on 2026-09-26 against its [official Swagger definition](https://www.nps.gov/subjects/developer/customcf/swagger.json?03142019). Saved synthetic fixtures represent this schema, not a live recording. C# records in `Parks/Contracts.cs` are the backend source of truth; matching frontend types are maintained in `src/web/src/parks.ts`, with synthetic normalized fixtures in `parks.fixtures.ts`. Keep these types synchronized when changing the C# records; automatic type generation is not configured. Dates use ISO 8601 UTC strings; absent optional values are `null`, lists are arrays, and provider text must be rendered as text rather than trusted HTML.
 
 ## Models
 
