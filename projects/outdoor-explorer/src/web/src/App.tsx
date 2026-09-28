@@ -1,4 +1,12 @@
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import ParkMap from './ParkMap';
+import ProximityFilter from './ProximityFilter';
+import {
+  distanceKm,
+  nearbyParks,
+  validCoordinates,
+  type Proximity,
+} from './geography';
 import {
   type DataResult,
   type Park,
@@ -122,19 +130,28 @@ function Details({ park }: { park: Park }) {
 function Search({
   search,
   navigate,
+  proximity,
+  setProximity,
 }: {
   search: string;
   navigate: (query: string) => void;
+  proximity: Proximity | null;
+  setProximity: (value: Proximity | null) => void;
 }) {
   const parsed = parseSearch(search);
   const [selected, setSelected] = useState(parsed.selected);
   const [query, setQuery] = useState(parsed.q);
   const [activity, setActivity] = useState(parsed.activityId);
   const [attempt, setAttempt] = useState(0);
+  const [showMap, setShowMap] = useState(false);
   const catalog = useData<Park[]>('/api/parks', attempt);
   const result = useData<Park[]>(
     parsed.invalid ? null : `/api/parks?${parsed.filters}`,
     attempt,
+  );
+  const destinations = useMemo(
+    () => nearbyParks(result?.data?.data ?? [], proximity),
+    [result?.data?.data, proximity],
   );
   const activities = [
     ...new Map(
@@ -222,6 +239,7 @@ function Search({
           <button disabled={!selected.length}>Search destinations</button>
         </form>
         {!selected.length && <p role="status">Choose at least one state.</p>}
+        <ProximityFilter value={proximity} onChange={setProximity} />
         {catalog?.error && (
           <p>
             Activity choices are unavailable.{' '}
@@ -237,6 +255,7 @@ function Search({
           href="?"
           onClick={(event) => {
             event.preventDefault();
+            setProximity(null);
             navigate('?');
           }}
         >
@@ -260,15 +279,52 @@ function Search({
         result.data && (
           <section aria-label="Destinations">
             <Freshness result={result.data} />
-            <p role="status">{result.data.data.length} destinations found</p>
-            {!result.data.data.length && (
+            <p role="status">{destinations.length} destinations found</p>
+            {proximity && (
+              <p>
+                Within approximately {proximity.radiusKm} km of your location.{' '}
+                {
+                  result.data.data.filter(
+                    (park) => !validCoordinates(park.coordinates),
+                  ).length
+                }{' '}
+                matching destinations without valid coordinates excluded.
+              </p>
+            )}
+            <button
+              type="button"
+              aria-expanded={showMap}
+              aria-controls="map-results"
+              onClick={() => setShowMap((value) => !value)}
+            >
+              {showMap ? 'Hide map' : 'Show map'}
+            </button>
+            {!showMap && (
+              <p>
+                Showing the map loads tiles from OpenStreetMap, which receives
+                your IP address and the map area viewed.
+              </p>
+            )}
+            <div id="map-results">
+              {showMap && (
+                <ParkMap
+                  parks={destinations}
+                  filters={parsed.filters.toString()}
+                  navigate={navigate}
+                />
+              )}
+            </div>
+            {!destinations.length && (
               <p>
                 No destinations match these filters. Try another state, keyword,
                 or activity.
               </p>
             )}
+            <h2 id="destination-list" tabIndex={-1}>
+              Destination list
+            </h2>
             <div className="park-grid">
-              {result.data.data.map((park) => {
+              {destinations.map((park) => {
                 const href = `?${parsed.filters}&park=${encodeURIComponent(park.parkCode)}`;
                 return (
                   <article className="park-card" key={park.id}>
@@ -296,6 +352,27 @@ function Search({
                         {park.designation ?? 'Designation not supplied'}
                       </p>
                       <p>{park.states.join(', ') || 'Location not supplied'}</p>
+                      {!validCoordinates(park.coordinates) && (
+                        <p>
+                          Map location unavailable: NPS coordinates are missing
+                          or invalid.
+                        </p>
+                      )}
+                      {park.states.length > 1 && (
+                        <p>
+                          Multi-state property; one approximate NPS map
+                          location.
+                        </p>
+                      )}
+                      {proximity && validCoordinates(park.coordinates) && (
+                        <p>
+                          About{' '}
+                          {Math.round(
+                            distanceKm(proximity.origin, park.coordinates),
+                          )}{' '}
+                          km away in a straight line.
+                        </p>
+                      )}
                       <p className="summary">
                         {park.description ?? 'Description not supplied by NPS.'}
                       </p>
@@ -371,12 +448,13 @@ function Destination({
 }
 export default function App() {
   const [search, setSearch] = useState(window.location.search);
+  const [proximity, setProximity] = useState<Proximity | null>(null);
   const main = useRef<HTMLElement>(null);
-  function navigate(query: string) {
+  const navigate = useCallback((query: string) => {
     window.history.pushState(null, '', query);
     setSearch(window.location.search);
     main.current?.focus();
-  }
+  }, []);
   useEffect(() => {
     function pop() {
       setSearch(window.location.search);
@@ -407,7 +485,13 @@ export default function App() {
         {parseSearch(search).park ? (
           <Destination key={search} search={search} navigate={navigate} />
         ) : (
-          <Search key={search} search={search} navigate={navigate} />
+          <Search
+            key={search}
+            search={search}
+            navigate={navigate}
+            proximity={proximity}
+            setProximity={setProximity}
+          />
         )}
         <aside className="field-note">
           <h2>Before you head out</h2>

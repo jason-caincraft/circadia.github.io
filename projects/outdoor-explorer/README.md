@@ -2,7 +2,7 @@
 
 An independent destination explorer for **National Park Service properties in Idaho, Oregon, and Washington**. Start with a state and activity, browse matching destinations, open a park, and consult its official NPS page and provider-reported alerts before planning a visit.
 
-**Status:** NPS parks backend (#41) and searchable destination list/detail UI (#42) are implemented. Search supports multiple states, keywords, catalog-derived activities, shareable URLs, credited approved photos, and operating information. Deterministic API and Chromium browser coverage (#43) uses synthetic NPS fixtures without credentials.
+**Status:** NPS parks backend (#41), searchable destination list/detail UI (#42), deterministic tests (#43), and optional map/proximity filters (#44) are implemented. Search supports multiple states, keywords, catalog-derived activities, shareable URLs, credited approved photos, and operating information. API and Chromium browser coverage uses synthetic NPS fixtures and map tiles without credentials or live provider traffic.
 
 ## Scope
 
@@ -10,7 +10,7 @@ The MVP supports one or more states (`ID`, `OR`, `WA`), text search, NPS activit
 
 NPS is the source for its own properties, not a complete outdoor inventory. The MVP excludes state parks, Forest Service/BLM inventory, reservations, live campsite availability, crowd/solitude predictions, routing, weather, accounts, and saved trips. An activity listing does not establish current access. Missing alerts do not mean safe travel or open roads. Coordinates describe a property, not a verified entrance or navigable destination.
 
-Maps, campgrounds, drive times, additional providers, and saved trips are separately scoped follow-ons. Basic accessibility is part of the MVP, not deferred to later hardening.
+Campgrounds, drive times, additional providers, and saved trips are separately scoped follow-ons. Basic accessibility is part of the MVP, not deferred to later hardening.
 
 ## Architecture and boundaries
 
@@ -228,3 +228,11 @@ Choose one or more states, an optional keyword (up to 200 characters), and an ac
 The query parameters `states`, `q`, and `activityId` preserve the submitted search; `park` opens a destination detail view. For example, `?states=OR,WA&q=lake` and `?states=OR&park=crla` are shareable links. Back to destinations preserves filters, and browser Back/Forward restores URL state. Invalid recognized parameters (including duplicates) show a recoverable message; unknown parameters are ignored. Clearing every state disables submission.
 
 Photos use only the API's reviewed allowlist, with supplied credits and source links. Missing or failed photos have a fixed-aspect placeholder. Missing descriptions, activities, and operating information are labeled. Provider strings are rendered as text. NPS attribution follows the [NPS disclaimer](https://www.nps.gov/aboutus/disclaimer.htm), reviewed 2026-09-27; no NPS marks are used.
+
+### Optional park map and proximity
+
+Select **Show map** to load Leaflet 1.9.4 and OpenStreetMap standard raster tiles. The destination list always remains available. Markers use the same submitted state, keyword, activity, and optional proximity filters as the list. Bounds fit valid points; a single point is capped at zoom 10. Missing or invalid coordinate pairs are labeled in the list and omitted from the map. Multi-state properties retain every reported state and have one marker at their NPS property coordinate, even when that point lies outside a selected state. Coordinates are approximate property locations, not verified entrances or navigation targets. Keyboard-operable markers open popups linking to destination detail while retaining search filters.
+
+The map needs no provider token. Attribution remains visible on and below the map. Opening it sends the viewed map area, browser IP address, and origin Referer to OpenStreetMap. Tiles use the exact HTTPS endpoint, a browser User-Agent, an origin Referer, and normal browser caching; there is no prefetch, bulk download, offline tile cache, or proxy. Only tiles for the displayed viewport are requested. The [OSMF tile usage policy](https://operations.osmfoundation.org/policies/tiles/), [terms of use](https://wiki.osmfoundation.org/wiki/Terms_of_Use), and [privacy policy](https://wiki.osmfoundation.org/wiki/Privacy_Policy) apply. Tile policy reviewed 2026-09-28. Service is best-effort and may be blocked or withdrawn; reassess provider capacity and policies before release or increased traffic. Failed tiles leave markers and the list usable; a map-library load failure shows a list fallback. Hide and reopen the map to retry.
+
+Select **Use my location** to request browser permission; location is never requested automatically. A successful request enables an approximate radius (50–1000 km) applied locally to the API-filtered destinations. Distance is straight-line great-circle distance to the supplied property point, not driving distance or distance to an entrance. Destinations without valid coordinates are excluded only while proximity is active, with an explicit count. Denied, unavailable, or timed-out location leaves other filters usable. Location remains in memory through search/detail navigation, is not sent to the API, saved to storage, or included in shared URLs, and is cleared by reload, **Clear location filter**, or **Reset filters**. Browser location requires a secure context (HTTPS or localhost). City geocoding is not used.
