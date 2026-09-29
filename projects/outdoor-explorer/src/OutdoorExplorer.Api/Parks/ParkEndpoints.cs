@@ -5,6 +5,22 @@ public static class ParkEndpoints
     public static void MapParkEndpoints(this WebApplication app)
     {
         var group = app.MapGroup("/api/parks").RequireRateLimiting("parks");
+        group.MapGet("/{parkCode}/campgrounds", async (string parkCode, ParksService parks, CampgroundsService campgrounds, CancellationToken token) =>
+        {
+            parkCode = parkCode.Trim().ToLowerInvariant();
+            if (!ParkMapper.ParkCodePattern().IsMatch(parkCode)) return Results.Problem(statusCode: 400, title: "Invalid park code");
+            try
+            {
+                var catalog = await parks.GetAsync(token);
+                var park = catalog.Data.FirstOrDefault(p => p.ParkCode == parkCode);
+                if (park is null) return Results.Problem(statusCode: catalog.Status == "partial" ? 503 : 404, title: "Park unavailable");
+                return Results.Ok(await campgrounds.GetAsync(park, token));
+            }
+            catch (NpsUnavailableException)
+            {
+                return Results.Problem(statusCode: 503, title: "Campgrounds unavailable", detail: "NPS campground information is temporarily unavailable. Check the official park source.");
+            }
+        });
         group.MapGet("/{parkCode}/{feed}", async (string parkCode, string feed, ParksService parks, ConditionsService conditions, CancellationToken token) =>
         {
             parkCode = parkCode.Trim().ToLowerInvariant();

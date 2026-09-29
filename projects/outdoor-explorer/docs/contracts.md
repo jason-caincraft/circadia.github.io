@@ -70,6 +70,7 @@ Validate coordinates as a pair of finite numbers with latitude in [-90, 90] and 
 | `GET /api/parks/{parkCode}` | `DataResult<Park>` within supported geography |
 | `GET /api/parks/{parkCode}/alerts` | `DataResult<VisitorNotice[]>`; independent from park details |
 | `GET /api/parks/{parkCode}/road-events` | `DataResult<VisitorNotice[]>`; independent road feed |
+| `GET /api/parks/{parkCode}/campgrounds` | `DataResult<Campground[]>`; independent park campground inventory |
 
 Trim and uppercase state inputs; reject unsupported/empty state sets with 400. OR within states, AND across state, text, and activity filters. Text matches name and description case-insensitively; activity matches an exact NPS ID. Empty text/activity means no filter. Bound text to 200 characters and validate park codes and activity IDs against the ingested catalog/contract. Unknown well-formed activity IDs yield empty results; malformed input yields 400. Park codes outside the supported catalog yield 404. Apply filters after all upstream pages are collected; stable name/parkCode ordering avoids pagination artifacts. Activity options come from the normalized catalog, not invented labels. Initial bounded regional results require no public paging; upstream pagination remains mandatory.
 
@@ -84,6 +85,12 @@ Checked 2026-09-28 against the [official NPS Swagger definition](https://www.nps
 The feeds have separate requests, loading messages, retries, empty states, and unavailable states. A malformed record, mismatched park, or incomplete alerts pagination makes that feed unavailable rather than presenting incomplete information as complete. Empty success explicitly says no alerts/road events were returned by NPS. Every feed shows retrieval time; records separately label provider index/source update dates or their absence. Park details and the other feed remain usable after a failure. The page explains that NPS feeds may be delayed or incomplete and missing records do not establish safe travel or open roads.
 
 ## Provider abstraction and resilience
+
+### Verified campground contract (#46)
+
+Checked 2026-09-29 against the [official NPS Swagger definition](https://www.nps.gov/subjects/developer/customcf/swagger.json?03142019). `/campgrounds` accepts `parkCode`, `limit`, and `start`; response pagination metadata is string-shaped and `data` is an array. The adapter fetches every page, validates offsets and total, rejects wrong-park and unusable records, and deduplicates by provider ID. A malformed or incomplete result is unavailable rather than a false empty result.
+
+`Campground` preserves provider ID, park code/name, description, physical address or coordinates, supplied fee text, reservation description and HTTPS URL, positive site type counts, total inventory count, affirmative amenity labels/details, and provider index date. `siteTypesProvided` and `amenitiesProvided` distinguish a missing object from one with no positive values. The official NPS park page is the source fallback. Empty fees and missing counts remain missing; neither zero fees nor live availability is inferred. Amenity and site-type filters use positive documented values only. Complete responses, including empty arrays, are cached per park for five minutes, with a 30-second failure cooldown.
 
 Live verification on 2026-09-26 confirmed that `stateCode=ID,OR,WA` requires literal comma separators. Encoding the whole list as `ID%2COR%2CWA` silently returned only Idaho matches. Encode each state value individually and preserve separators; the transport regression test and opt-in live smoke test cover all three states.
 

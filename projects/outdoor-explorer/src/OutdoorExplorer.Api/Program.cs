@@ -24,6 +24,8 @@ builder.Services.AddHttpClient<INpsProvider, NpsProvider>(client =>
 builder.Services.AddSingleton<ParksService>();
 builder.Services.AddTransient<INpsConditionsProvider>(services => (NpsProvider)services.GetRequiredService<INpsProvider>());
 builder.Services.AddSingleton<ConditionsService>();
+builder.Services.AddTransient<INpsCampgroundsProvider>(services => (NpsProvider)services.GetRequiredService<INpsProvider>());
+builder.Services.AddSingleton<CampgroundsService>();
 builder.Services.AddRateLimiter(options =>
 {
     options.AddFixedWindowLimiter("parks", limiter =>

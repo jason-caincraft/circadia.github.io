@@ -1,0 +1,8 @@
+{
+  "total": "3", "limit": "2", "start": "2",
+  "data": [
+    {"id": "fixture-primitive", "parkCode": "crla", "name": "Primitive Camp",
+     "accessibility": {"classifications": ["Primitive Camping Areas"]},
+     "campsites": null, "amenities": null, "fees": null, "reservationsurl": "javascript:alert(1)"}
+  ]
+}

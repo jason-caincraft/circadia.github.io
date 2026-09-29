@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import ParkMap from './ParkMap';
 import Conditions from './Conditions';
+import Campgrounds from './Campgrounds';
 import ProximityFilter from './ProximityFilter';
 import {
   distanceKm,
@@ -91,6 +92,7 @@ function Details({ park }: { park: Park }) {
       <ParkPhoto key={park.photos[0]?.url ?? park.id} photo={park.photos[0]} />
       <p>{park.description ?? 'Description not supplied by NPS.'}</p>
       <Conditions park={park} />
+      <Campgrounds key={park.parkCode} park={park} />
       <h2>Activities</h2>
       {park.activities.length ? (
         <ul>
