@@ -4,7 +4,7 @@ using Microsoft.Extensions.Options;
 
 namespace OutdoorExplorer.Api.Parks;
 
-public sealed partial class NpsProvider(HttpClient client, IOptions<NpsOptions> options, TimeProvider clock, ILogger<NpsProvider> logger) : INpsProvider, INpsConditionsProvider
+public sealed partial class NpsProvider(HttpClient client, IOptions<NpsOptions> options, TimeProvider clock, ILogger<NpsProvider> logger) : INpsProvider, INpsConditionsProvider, INpsCampgroundsProvider
 {
     public async Task<DataResult<Park[]>> GetParksAsync(string[] states, CancellationToken cancellationToken)
     {

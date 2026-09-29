@@ -52,6 +52,16 @@ internal static class E2eHost
         {
             var uri = request.RequestUri ?? throw new InvalidOperationException("Missing fixture request URI.");
             var filters = Microsoft.AspNetCore.WebUtilities.QueryHelpers.ParseQuery(uri.Query);
+            if (uri.Host == "developer.nps.gov" && uri.AbsolutePath == "/api/v1/campgrounds" &&
+                filters["parkCode"].ToString() is "crla" or "olym" or "yell")
+            {
+                var content = filters["parkCode"] == "crla"
+                    ? File.ReadAllText(Path.Combine(AppContext.BaseDirectory, "Fixtures",
+                        filters["start"] == "0" ? "campgrounds-page-1.json" :
+                        filters["start"] == "2" ? "campgrounds-page-2.json" : throw new InvalidOperationException("Unexpected campground page.")))
+                    : "{\"total\":\"0\",\"start\":\"0\",\"data\":[]}";
+                return Task.FromResult(new HttpResponseMessage(HttpStatusCode.OK) { Content = new StringContent(content, System.Text.Encoding.UTF8, "application/json") });
+            }
             if (uri.Host == "developer.nps.gov" && uri.AbsolutePath is "/api/v1/alerts" or "/api/v1/roadevents" &&
                 filters["parkCode"].ToString() is "crla" or "olym" or "yell")
             {

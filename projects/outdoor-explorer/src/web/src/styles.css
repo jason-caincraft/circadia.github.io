@@ -299,6 +299,27 @@ dd {
 article {
   overflow-wrap: anywhere;
 }
+.campground-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin: 1rem 0;
+}
+.campground-filters label {
+  display: grid;
+  gap: 0.35rem;
+  min-width: min(100%, 14rem);
+}
+.campground-list {
+  display: grid;
+  gap: 1rem;
+}
+.campground-card {
+  border: 1px solid #bfc7b7;
+  border-radius: 12px;
+  background: #fffef8;
+  padding: 1.25rem;
+}
 @media (max-width: 760px) {
   form,
   .park-grid {

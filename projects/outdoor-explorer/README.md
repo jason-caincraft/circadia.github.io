@@ -2,7 +2,7 @@
 
 An independent destination explorer for **National Park Service properties in Idaho, Oregon, and Washington**. Start with a state and activity, browse matching destinations, open a park, and consult its official NPS page and provider-reported alerts before planning a visit.
 
-**Status:** NPS parks backend (#41), searchable destination list/detail UI (#42), deterministic tests (#43), optional map/proximity filters (#44), and independent NPS alerts/road events (#45) are implemented. Search supports multiple states, keywords, catalog-derived activities, shareable URLs, credited approved photos, and operating information. API and Chromium browser coverage uses synthetic NPS fixtures and map tiles without credentials or live provider traffic.
+**Status:** NPS parks backend (#41), searchable destination list/detail UI (#42), deterministic tests (#43), optional map/proximity filters (#44), independent NPS alerts/road events (#45), and park-level campgrounds (#46) are implemented. Search supports multiple states, keywords, catalog-derived activities, shareable URLs, credited approved photos, and operating information. API and Chromium browser coverage uses synthetic NPS fixtures and map tiles without credentials or live provider traffic.
 
 ## Scope
 
@@ -10,7 +10,7 @@ The MVP supports one or more states (`ID`, `OR`, `WA`), text search, NPS activit
 
 NPS is the source for its own properties, not a complete outdoor inventory. The MVP excludes state parks, Forest Service/BLM inventory, reservations, live campsite availability, crowd/solitude predictions, routing, weather, accounts, and saved trips. An activity listing does not establish current access. Missing alerts do not mean safe travel or open roads. Coordinates describe a property, not a verified entrance or navigable destination.
 
-Campgrounds, drive times, additional providers, and saved trips are separately scoped follow-ons. Basic accessibility is part of the MVP, not deferred to later hardening.
+Drive times, additional providers, and saved trips are separately scoped follow-ons. Basic accessibility is part of the MVP, not deferred to later hardening.
 
 ## Architecture and boundaries
 
@@ -240,5 +240,9 @@ Select **Use my location** to request browser permission; location is never requ
 ### Visitor alerts and road events
 
 Park details load separate visitor-alert and road-event feeds through the backend. Each feed shows NPS attribution, retrieval time, provider index/source update dates where supplied, and official source links. Successful empty responses say that NPS returned no records. Unavailable feeds retain the destination details and offer independent retry buttons. NPS data may be delayed or incomplete; missing records do not mean safe travel or open roads. Consult the linked official park source before visiting.
+
+### Campgrounds
+
+Park details load NPS `/campgrounds` independently through `/api/parks/{parkCode}/campgrounds`. The API validates all upstream pages and park membership, normalizes physical location, site inventory, supplied fees, reservation information, and documented amenities, then caches a complete result for five minutes. Missing fields are labeled; invalid or incomplete feeds are unavailable with a retry option. Filters select only campgrounds with positive NPS site counts or affirmative amenity values. Campground counts are inventory, not real-time availability, and primitive classification says nothing about crowd levels. Booking links appear only for valid HTTPS URLs supplied by NPS. The park page remains available if this feed fails.
 
 Backend routes are `/api/parks/{parkCode}/alerts` and `/api/parks/{parkCode}/road-events`. Complete feeds, including empty results, are cached for five minutes, compared with 60 minutes for park metadata. Failures use a 30-second cooldown and never reuse expired feed data. Road-event source organization must match the catalog park name because the published GeoJSON contract has no feature park-code field; unverifiable membership is shown as unavailable. See [verified contracts](docs/contracts.md) for endpoint fields and limitations.

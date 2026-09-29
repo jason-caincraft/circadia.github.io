@@ -1,0 +1,23 @@
+{
+  "total": "3", "limit": "2", "start": "0",
+  "data": [
+    {
+      "id": "fixture-mazama", "parkCode": "crla", "name": "Mazama Campground",
+      "description": "Synthetic developed campground.",
+      "addresses": [{"type": "Physical", "line1": "Fixture Road", "city": "Crater Lake", "stateCode": "OR"}],
+      "latitude": "42.9", "longitude": "-122.1",
+      "fees": ["Standard campsite: $30 per night"],
+      "reservationsdescription": "Advance reservations may be made through the linked source.",
+      "reservationsurl": "https://www.recreation.gov/camping/campgrounds/fixture-mazama",
+      "campsites": {"totalsites": "100", "tentonly": "40", "rvonly": "20", "group": "0"},
+      "amenities": {"toilets": ["Flush toilets"], "potablewater": ["Yes - seasonal"], "showers": ["None"], "dumpstation": "Yes"},
+      "lastIndexedDate": "2026-09-28"
+    },
+    {
+      "id": 42, "parkCode": "crla", "name": "Lost Creek Campground",
+      "description": "Synthetic tent campground.",
+      "fees": null, "reservationsurl": "", "campsites": [{"tentonly": 14, "horse": 2, "totalsites": 16}],
+      "amenities": [{"toilets": ["Vault toilets"], "potablewater": ["No"], "showers": ["None"]}]
+    }
+  ]
+}
